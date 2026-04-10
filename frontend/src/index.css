@@ -381,6 +381,11 @@ body {
   color: var(--accent);
   line-height: 1;
 }
+.sidebar-logo-img {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
 .sidebar-logo-text {
   font-size: 14px;
   font-weight: 600;

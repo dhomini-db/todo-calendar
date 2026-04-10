@@ -101,7 +101,7 @@ export default function Sidebar() {
     <aside className="sidebar">
       {/* Logo */}
       <div className="sidebar-logo">
-        <span className="sidebar-logo-icon">◈</span>
+        <img src="/logo-icon.svg" alt="TodoCalendar" className="sidebar-logo-img" />
         <span className="sidebar-logo-text">TodoCalendar</span>
       </div>
 

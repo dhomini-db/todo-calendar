@@ -1,0 +1,60 @@
+<svg width="320" height="64" viewBox="0 0 320 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="hdrClip">
+      <rect x="0" y="4" width="56" height="56" rx="12"/>
+    </clipPath>
+  </defs>
+
+  <!-- ── Icon mark ── -->
+  <!-- Body -->
+  <rect x="0" y="4" width="56" height="56" rx="12" fill="#111111"/>
+  <!-- Blue header -->
+  <rect x="0" y="4" width="56" height="20" fill="#3b82f6" clip-path="url(#hdrClip)"/>
+  <!-- Highlight edge -->
+  <rect x="0" y="4" width="56" height="1" fill="rgba(255,255,255,0.18)" clip-path="url(#hdrClip)"/>
+
+  <!-- Binding tabs -->
+  <rect x="14" y="0" width="8" height="16" rx="4" fill="#1d4ed8"/>
+  <rect x="15" y="1" width="6" height="11" rx="3" fill="#3b82f6"/>
+  <rect x="34" y="0" width="8" height="16" rx="4" fill="#1d4ed8"/>
+  <rect x="35" y="1" width="6" height="11" rx="3" fill="#3b82f6"/>
+
+  <!-- Dot grid row 1 -->
+  <circle cx="10"  cy="35" r="2" fill="white" opacity="0.12"/>
+  <circle cx="20"  cy="35" r="2" fill="white" opacity="0.12"/>
+  <circle cx="30"  cy="35" r="2" fill="white" opacity="0.12"/>
+  <circle cx="40"  cy="35" r="2" fill="white" opacity="0.12"/>
+  <circle cx="50"  cy="35" r="2" fill="white" opacity="0.12"/>
+
+  <!-- Dot grid row 2 — today highlight -->
+  <circle cx="10"  cy="46" r="2"   fill="white" opacity="0.12"/>
+  <circle cx="20"  cy="46" r="2"   fill="white" opacity="0.12"/>
+  <circle cx="30"  cy="46" r="3"   fill="#3b82f6"/>
+  <circle cx="40"  cy="46" r="2"   fill="white" opacity="0.12"/>
+  <circle cx="50"  cy="46" r="2"   fill="white" opacity="0.12"/>
+
+  <!-- Score dots -->
+  <circle cx="20" cy="56" r="3" fill="#4ade80"/>
+  <circle cx="30" cy="56" r="3" fill="#fbbf24"/>
+  <circle cx="40" cy="56" r="3" fill="#f87171"/>
+
+  <!-- ── Wordmark ── -->
+  <text
+    x="72"
+    y="33"
+    font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif"
+    font-size="20"
+    font-weight="700"
+    letter-spacing="-0.6"
+    fill="#f0f0f0"
+  >Todo</text>
+  <text
+    x="72"
+    y="54"
+    font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif"
+    font-size="20"
+    font-weight="300"
+    letter-spacing="-0.4"
+    fill="#888888"
+  >Calendar</text>
+</svg>
