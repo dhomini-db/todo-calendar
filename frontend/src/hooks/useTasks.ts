@@ -9,77 +9,69 @@ import {
 } from '../api/tasks'
 import type { TaskRequest } from '../types'
 
-/**
- * Chaves de cache do React Query.
- * Centralizar aqui evita strings duplicadas em vários componentes.
- */
 export const queryKeys = {
-  tasks: (date: string) => ['tasks', date] as const,
+  tasks:   (date: string)                => ['tasks', date]          as const,
   summary: (year: number, month: number) => ['summary', year, month] as const,
 }
 
-/** Tarefas de um dia específico */
+/** Extrai year/month de uma string "YYYY-MM-DD" */
+function ymFromDate(date: string) {
+  const [y, m] = date.split('-').map(Number)
+  return { year: y, month: m }
+}
+
 export function useTasksByDate(date: string) {
   return useQuery({
     queryKey: queryKeys.tasks(date),
-    queryFn: () => getTasksByDate(date),
-    enabled: !!date,
+    queryFn:  () => getTasksByDate(date),
+    enabled:  !!date,
   })
 }
 
-/** Resumo mensal (cores dos dias no calendário) */
 export function useMonthSummary(year: number, month: number) {
   return useQuery({
     queryKey: queryKeys.summary(year, month),
-    queryFn: () => getMonthlySummary(year, month),
+    queryFn:  () => getMonthlySummary(year, month),
   })
 }
 
-/** Criar tarefa — invalida o cache do dia e do mês ao salvar */
-export function useCreateTask(date: string, year: number, month: number) {
+function useInvalidateBoth(date: string) {
   const qc = useQueryClient()
+  const { year, month } = ymFromDate(date)
+  return () => {
+    qc.invalidateQueries({ queryKey: queryKeys.tasks(date) })
+    qc.invalidateQueries({ queryKey: queryKeys.summary(year, month) })
+  }
+}
+
+export function useCreateTask(date: string) {
+  const invalidate = useInvalidateBoth(date)
   return useMutation({
     mutationFn: (data: TaskRequest) => createTask(data),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: queryKeys.tasks(date) })
-      qc.invalidateQueries({ queryKey: queryKeys.summary(year, month) })
-    },
+    onSuccess:  invalidate,
   })
 }
 
-/** Alternar conclusão — invalida o cache do dia e do mês */
-export function useToggleTask(date: string, year: number, month: number) {
-  const qc = useQueryClient()
+export function useToggleTask(date: string) {
+  const invalidate = useInvalidateBoth(date)
   return useMutation({
     mutationFn: (id: number) => toggleTask(id),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: queryKeys.tasks(date) })
-      qc.invalidateQueries({ queryKey: queryKeys.summary(year, month) })
-    },
+    onSuccess:  invalidate,
   })
 }
 
-/** Excluir tarefa */
-export function useDeleteTask(date: string, year: number, month: number) {
-  const qc = useQueryClient()
+export function useDeleteTask(date: string) {
+  const invalidate = useInvalidateBoth(date)
   return useMutation({
     mutationFn: (id: number) => deleteTask(id),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: queryKeys.tasks(date) })
-      qc.invalidateQueries({ queryKey: queryKeys.summary(year, month) })
-    },
+    onSuccess:  invalidate,
   })
 }
 
-/** Atualizar tarefa */
-export function useUpdateTask(date: string, year: number, month: number) {
-  const qc = useQueryClient()
+export function useUpdateTask(date: string) {
+  const invalidate = useInvalidateBoth(date)
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: TaskRequest }) =>
-      updateTask(id, data),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: queryKeys.tasks(date) })
-      qc.invalidateQueries({ queryKey: queryKeys.summary(year, month) })
-    },
+    mutationFn: ({ id, data }: { id: number; data: TaskRequest }) => updateTask(id, data),
+    onSuccess:  invalidate,
   })
 }
