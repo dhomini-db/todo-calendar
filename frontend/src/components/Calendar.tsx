@@ -20,14 +20,15 @@ interface CalendarProps {
   onChangeMonth: (date: Date) => void
 }
 
-function colorClass(summary: DaySummary | undefined): string {
-  if (!summary || summary.total === 0) return ''
+/** Retorna a classe CSS e a cor do bar para o dia */
+function dayStyle(summary: DaySummary | undefined): { cls: string; bar: string } {
+  if (!summary || summary.total === 0) return { cls: '', bar: '' }
   switch (summary.color) {
-    case 'GREEN':       return 'day-green'
-    case 'LIGHT_GREEN': return 'day-lightgreen'
-    case 'YELLOW':      return 'day-yellow'
-    case 'RED':         return 'day-red'
-    default:            return ''
+    case 'GREEN':       return { cls: 'day-green',      bar: '#4ade80' }
+    case 'LIGHT_GREEN': return { cls: 'day-lightgreen', bar: '#34d399' }
+    case 'YELLOW':      return { cls: 'day-yellow',     bar: '#fbbf24' }
+    case 'RED':         return { cls: 'day-red',        bar: '#f87171' }
+    default:            return { cls: '',               bar: '' }
   }
 }
 
@@ -47,18 +48,21 @@ export default function Calendar({ selectedDate, onSelectDate, currentMonth, onC
 
   return (
     <div className="calendar-wrap">
+      {/* Header */}
       <div className="calendar-header">
         <button className="cal-nav" onClick={() => onChangeMonth(subMonths(currentMonth, 1))} aria-label="Mês anterior">‹</button>
         <h2 className="calendar-month">{monthLabel}</h2>
         <button className="cal-nav" onClick={() => onChangeMonth(addMonths(currentMonth, 1))} aria-label="Próximo mês">›</button>
       </div>
 
+      {/* Weekday labels */}
       <div className="cal-weekdays">
         {WEEK_DAYS.map(d => (
           <div key={d} className="cal-weekday">{d}</div>
         ))}
       </div>
 
+      {/* Day grid */}
       <div className="cal-grid">
         {Array.from({ length: startOffset }).map((_, i) => <div key={`e-${i}`} />)}
 
@@ -67,7 +71,9 @@ export default function Calendar({ selectedDate, onSelectDate, currentMonth, onC
           const daySumm    = summary[key]
           const isSelected = isSameDay(day, selectedDate)
           const isTodayDay = isToday(day)
-          const color      = colorClass(daySumm)
+          const { cls, bar } = dayStyle(daySumm)
+          const hasTasks   = daySumm && daySumm.total > 0
+          const pct        = hasTasks ? Math.round(daySumm!.percentage) : 0
 
           return (
             <button
@@ -75,26 +81,49 @@ export default function Calendar({ selectedDate, onSelectDate, currentMonth, onC
               onClick={() => onSelectDate(day)}
               className={[
                 'cal-day',
-                color,
+                cls,
                 isSelected ? 'selected' : '',
-                isTodayDay && !color ? 'today' : '',
+                isTodayDay && !cls ? 'today' : '',
               ].filter(Boolean).join(' ')}
-              title={daySumm ? `${daySumm.completed}/${daySumm.total} (${daySumm.percentage}%)` : undefined}
+              title={hasTasks ? `${daySumm!.completed}/${daySumm!.total} tarefas · ${pct}%` : undefined}
             >
-              {format(day, 'd')}
-              {daySumm && daySumm.total > 0 && (
-                <span className="cal-day-pct">{Math.round(daySumm.percentage)}%</span>
+              <span className="cal-day-num">{format(day, 'd')}</span>
+
+              {hasTasks && (
+                <>
+                  <span className="cal-day-pct">{pct}%</span>
+                  {/* barra de progresso na base do célula */}
+                  <div className="cal-day-bar-track">
+                    <div
+                      className="cal-day-bar-fill"
+                      style={{ width: `${pct}%`, background: bar }}
+                    />
+                  </div>
+                </>
               )}
             </button>
           )
         })}
       </div>
 
+      {/* Legend */}
       <div className="cal-legend">
-        <div className="legend-item"><div className="legend-dot" style={{ background: 'rgba(74,222,128,0.5)' }} />100%</div>
-        <div className="legend-item"><div className="legend-dot" style={{ background: 'rgba(52,211,153,0.5)' }} />70–99%</div>
-        <div className="legend-item"><div className="legend-dot" style={{ background: 'rgba(251,191,36,0.5)' }} />50–69%</div>
-        <div className="legend-item"><div className="legend-dot" style={{ background: 'rgba(248,113,113,0.5)' }} />{'< 50%'}</div>
+        <div className="legend-item">
+          <div className="legend-dot" style={{ background: '#4ade80' }} />
+          100%
+        </div>
+        <div className="legend-item">
+          <div className="legend-dot" style={{ background: '#34d399' }} />
+          70–99%
+        </div>
+        <div className="legend-item">
+          <div className="legend-dot" style={{ background: '#fbbf24' }} />
+          50–69%
+        </div>
+        <div className="legend-item">
+          <div className="legend-dot" style={{ background: '#f87171' }} />
+          {'< 50%'}
+        </div>
       </div>
     </div>
   )
