@@ -1,0 +1,58 @@
+version: '3.9'
+
+# ════════════════════════════════════════════════════════════════════════════
+# Portas escolhidas para não conflitar com outros containers:
+#   PostgreSQL  → host:5433  (container:5432)
+#   Backend     → host:8081  (container:8081)
+#   Frontend    → host:3001  (container:80)
+# ════════════════════════════════════════════════════════════════════════════
+
+services:
+
+  # ── Banco de dados ─────────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: todocalendar-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: todocalendar
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"     # acesso externo via DBeaver/psql: localhost:5433
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d todocalendar"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── API Spring Boot ────────────────────────────────────────────────────────
+  backend:
+    build: ./backend
+    container_name: todocalendar-api
+    restart: unless-stopped
+    environment:
+      # Dentro do Docker, "db" resolve para o container de banco
+      DB_URL: jdbc:postgresql://db:5432/todocalendar
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    ports:
+      - "8081:8081"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ── Frontend React/Nginx ───────────────────────────────────────────────────
+  frontend:
+    build: ./frontend
+    container_name: todocalendar-web
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
