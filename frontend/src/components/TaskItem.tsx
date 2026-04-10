@@ -16,35 +16,44 @@ export default function TaskItem({ task, date }: TaskItemProps) {
   const remove = useDeleteTask(date)
   const update = useUpdateTask(date)
 
-  function handleToggle() {
-    toggle.mutate(task.id)
-  }
+  const isPositive = task.type === 'POSITIVE'
 
-  function handleDelete() {
-    remove.mutate(task.id)
-  }
+  // Para tarefa negativa: "boa escolha" é quando NÃO está concluída
+  const isGoodOutcome = isPositive ? task.completed : !task.completed
 
   function handleEditSave() {
     const trimmed = editTitle.trim()
     if (!trimmed || trimmed === task.title) { setEditing(false); return }
     update.mutate(
-      { id: task.id, data: { title: trimmed, description: task.description, date: task.date } },
+      { id: task.id, data: { title: trimmed, description: task.description, date: task.date, type: task.type } },
       { onSuccess: () => setEditing(false) },
     )
   }
 
   function handleEditKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter') handleEditSave()
+    if (e.key === 'Enter')  handleEditSave()
     if (e.key === 'Escape') { setEditTitle(task.title); setEditing(false) }
   }
 
+  const typeClass = isPositive ? 'task-positive' : 'task-negative'
+  const doneClass = task.completed ? 'done' : ''
+
   return (
-    <div className={`task-item ${task.completed ? 'done' : ''}`}>
+    <div className={`task-item ${typeClass} ${doneClass}`}>
+      {/* Indicador de tipo */}
+      <span
+        className="task-type-icon"
+        title={isPositive ? 'Tarefa positiva' : 'Hábito a evitar'}
+        aria-hidden
+      >
+        {isPositive ? '↑' : '↓'}
+      </span>
+
       {/* Checkbox */}
       <button
-        className={`task-checkbox ${task.completed ? 'checked' : ''}`}
-        onClick={handleToggle}
-        aria-label={task.completed ? 'Desmarcar' : 'Marcar como concluída'}
+        className={`task-checkbox ${isPositive ? 'positive' : 'negative'} ${task.completed ? 'checked' : ''}`}
+        onClick={() => toggle.mutate(task.id)}
+        aria-label={task.completed ? 'Desmarcar' : 'Marcar'}
       />
 
       {/* Content */}
@@ -59,10 +68,18 @@ export default function TaskItem({ task, date }: TaskItemProps) {
             autoFocus
           />
         ) : (
-          <p className={`task-title ${task.completed ? 'done' : ''}`}>{task.title}</p>
-        )}
-        {task.description && !editing && (
-          <p className="task-desc">{task.description}</p>
+          <>
+            <p className={`task-title ${task.completed ? 'done' : ''}`}>{task.title}</p>
+            {task.description && <p className="task-desc">{task.description}</p>}
+            {/* Badge de resultado */}
+            {task.completed && (
+              <span className={`task-outcome ${isGoodOutcome ? 'good' : 'bad'}`}>
+                {isPositive
+                  ? '✓ boa escolha'
+                  : '✗ hábito realizado'}
+              </span>
+            )}
+          </>
         )}
       </div>
 
@@ -71,21 +88,13 @@ export default function TaskItem({ task, date }: TaskItemProps) {
         <div className="task-actions">
           {confirmDelete ? (
             <div className="delete-confirm">
-              <button className="confirm-yes" onClick={handleDelete}>Excluir</button>
+              <button className="confirm-yes" onClick={() => remove.mutate(task.id)}>Excluir</button>
               <button className="confirm-no"  onClick={() => setConfirmDelete(false)}>Cancelar</button>
             </div>
           ) : (
             <>
-              <button
-                className="task-action-btn"
-                onClick={() => setEditing(true)}
-                title="Editar"
-              >✎</button>
-              <button
-                className="task-action-btn danger"
-                onClick={() => setConfirmDelete(true)}
-                title="Excluir"
-              >✕</button>
+              <button className="task-action-btn" onClick={() => setEditing(true)} title="Editar">✎</button>
+              <button className="task-action-btn danger" onClick={() => setConfirmDelete(true)} title="Excluir">✕</button>
             </>
           )}
         </div>

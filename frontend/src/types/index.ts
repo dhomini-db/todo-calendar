@@ -1,11 +1,15 @@
 // ── Tarefas ────────────────────────────────────────────────────
 
+export type TaskType  = 'POSITIVE' | 'NEGATIVE'
+export type TaskColor = 'GREEN' | 'LIGHT_GREEN' | 'YELLOW' | 'RED' | 'NONE'
+
 export interface Task {
   id: number
   title: string
   description?: string
   date: string        // "YYYY-MM-DD"
   completed: boolean
+  type: TaskType
   createdAt: string
   updatedAt: string
 }
@@ -14,14 +18,13 @@ export interface TaskRequest {
   title: string
   description?: string
   date: string
+  type?: TaskType
 }
-
-export type TaskColor = 'GREEN' | 'LIGHT_GREEN' | 'YELLOW' | 'RED' | 'NONE'
 
 export interface DaySummary {
   date: string
   total: number
-  completed: number
+  completed: number   // representa "boas escolhas" no novo modelo
   percentage: number
   color: TaskColor
 }
