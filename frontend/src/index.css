@@ -843,6 +843,9 @@ a.sidebar-item.active .sidebar-item-icon {
   transition: background 0.12s, border-color 0.12s;
   flex-shrink: 0;
   margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .task-checkbox.positive.checked  { background: var(--accent);  border-color: var(--accent); }
 .task-checkbox.negative.checked  { background: var(--red);     border-color: var(--red);    }

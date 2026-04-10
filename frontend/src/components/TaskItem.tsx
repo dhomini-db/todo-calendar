@@ -43,7 +43,13 @@ export default function TaskItem({ task, date }: TaskItemProps) {
         className={`task-checkbox ${isPositive ? 'positive' : 'negative'} ${task.completed ? 'checked' : ''}`}
         onClick={() => toggle.mutate(task.id)}
         aria-label={task.completed ? 'Desmarcar' : 'Marcar'}
-      />
+      >
+        {task.completed && (
+          <svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="2 6 5 9 10 3"/>
+          </svg>
+        )}
+      </button>
 
       {/* Content */}
       <div className="task-content">
