@@ -23,30 +23,11 @@ Sistema estilo To-Do List com Calendário, inspirado no Notion.
 
 ## Como rodar
 
-### Com Docker (recomendado)
-
 ```bash
 docker compose up --build
 ```
 
 Acesse: http://localhost:3001
-
-### Desenvolvimento local
-
-**Backend:**
-```bash
-cd backend
-./mvnw spring-boot:run
-```
-> Requer PostgreSQL rodando em localhost:5433
-
-**Frontend:**
-```bash
-cd frontend
-npm install
-npm run dev
-```
-Acesse: http://localhost:5173
 
 ## API Endpoints
 
