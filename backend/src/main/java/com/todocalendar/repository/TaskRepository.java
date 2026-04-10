@@ -12,9 +12,23 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     List<Task> findByDateAndUserIdOrderByCreatedAtAsc(LocalDate date, Long userId);
 
+    /**
+     * Retorna por dia: total de tarefas e total de "boas escolhas".
+     *
+     * Boa escolha =
+     *   - Tarefa POSITIVE concluída   (você fez o que devia)
+     *   - Tarefa NEGATIVE não concluída (você evitou o hábito ruim)
+     *
+     * Porcentagem = goodOutcomes / total × 100
+     */
     @Query("""
-            SELECT t.date, COUNT(t),
-                   SUM(CASE WHEN t.completed = true THEN 1 ELSE 0 END)
+            SELECT t.date,
+                   COUNT(t),
+                   SUM(CASE
+                         WHEN t.type = 'POSITIVE' AND t.completed = true  THEN 1
+                         WHEN t.type = 'NEGATIVE' AND t.completed = false THEN 1
+                         ELSE 0
+                       END)
             FROM Task t
             WHERE t.date BETWEEN :start AND :end
               AND t.user.id = :userId

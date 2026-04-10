@@ -1,15 +1,12 @@
 package com.todocalendar.dto;
 
+import com.todocalendar.entity.TaskType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDate;
 
-/**
- * DTO de entrada para criação e atualização de tarefas.
- * Evita expor a entidade diretamente na API.
- */
 @Data
 public class TaskRequest {
 
@@ -20,4 +17,7 @@ public class TaskRequest {
 
     @NotNull(message = "A data é obrigatória")
     private LocalDate date;
+
+    /** Padrão POSITIVE se não informado pelo frontend */
+    private TaskType type;
 }

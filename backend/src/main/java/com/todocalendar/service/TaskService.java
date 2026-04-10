@@ -4,6 +4,7 @@ import com.todocalendar.dto.DaySummaryResponse;
 import com.todocalendar.dto.TaskRequest;
 import com.todocalendar.dto.TaskResponse;
 import com.todocalendar.entity.Task;
+import com.todocalendar.entity.TaskType;
 import com.todocalendar.entity.User;
 import com.todocalendar.repository.TaskRepository;
 import com.todocalendar.repository.UserRepository;
@@ -42,6 +43,7 @@ public class TaskService {
                 .description(request.getDescription())
                 .date(request.getDate())
                 .completed(false)
+                .type(request.getType() != null ? request.getType() : TaskType.POSITIVE)
                 .user(user)
                 .build();
         return toResponse(taskRepository.save(task));
@@ -53,6 +55,7 @@ public class TaskService {
         task.setTitle(request.getTitle());
         task.setDescription(request.getDescription());
         task.setDate(request.getDate());
+        if (request.getType() != null) task.setType(request.getType());
         return toResponse(taskRepository.save(task));
     }
 
@@ -71,6 +74,14 @@ public class TaskService {
 
     // ── Resumo mensal ──────────────────────────────────────────
 
+    /**
+     * Calcula o score diário considerando tipos:
+     *   - POSITIVE concluída       → boa escolha
+     *   - NEGATIVE não concluída   → boa escolha (resistiu ao hábito ruim)
+     *   - Demais combinações       → má escolha
+     *
+     * score = boas_escolhas / total × 100
+     */
     public Map<String, DaySummaryResponse> getMonthlySummary(int year, int month, Long userId) {
         YearMonth yearMonth = YearMonth.of(year, month);
         LocalDate start = yearMonth.atDay(1);
@@ -80,16 +91,16 @@ public class TaskService {
 
         Map<String, DaySummaryResponse> summary = new LinkedHashMap<>();
         for (Object[] row : rows) {
-            LocalDate date     = (LocalDate) row[0];
-            long total         = (Long) row[1];
-            long completed     = (Long) row[2];
-            double percentage  = total == 0 ? 0 : (completed * 100.0) / total;
-            String color       = resolveColor(percentage, total);
+            LocalDate date        = (LocalDate) row[0];
+            long total            = (Long) row[1];
+            long goodOutcomes     = (Long) row[2];
+            double percentage     = total == 0 ? 0 : (goodOutcomes * 100.0) / total;
+            String color          = resolveColor(percentage, total);
 
             summary.put(date.toString(), DaySummaryResponse.builder()
                     .date(date)
                     .total((int) total)
-                    .completed((int) completed)
+                    .completed((int) goodOutcomes) // campo reutilizado para boas escolhas
                     .percentage(Math.round(percentage * 10.0) / 10.0)
                     .color(color)
                     .build());
@@ -107,10 +118,6 @@ public class TaskService {
         return "RED";
     }
 
-    /**
-     * Busca a tarefa e verifica se pertence ao usuário.
-     * Lança 404 se não existir ou se pertencer a outro usuário.
-     */
     private Task findOrThrow(Long id, Long userId) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tarefa não encontrada: " + id));
@@ -127,6 +134,7 @@ public class TaskService {
                 .description(task.getDescription())
                 .date(task.getDate())
                 .completed(task.isCompleted())
+                .type(task.getType())
                 .createdAt(task.getCreatedAt())
                 .updatedAt(task.getUpdatedAt())
                 .build();

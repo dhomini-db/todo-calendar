@@ -1,14 +1,12 @@
 package com.todocalendar.dto;
 
+import com.todocalendar.entity.TaskType;
 import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/**
- * DTO de saída que representa uma tarefa no response da API.
- */
 @Data
 @Builder
 public class TaskResponse {
@@ -17,6 +15,7 @@ public class TaskResponse {
     private String description;
     private LocalDate date;
     private boolean completed;
+    private TaskType type;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

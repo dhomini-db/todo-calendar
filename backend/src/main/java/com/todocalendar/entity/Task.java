@@ -34,10 +34,14 @@ public class Task {
     private boolean completed = false;
 
     /**
-     * Usuário dono da tarefa.
-     * nullable = true para compatibilidade com dados existentes no banco.
-     * Em produção nova, seria NOT NULL.
+     * Tipo da tarefa: POSITIVE (fazer) ou NEGATIVE (evitar).
+     * Padrão POSITIVE para manter compatibilidade com tarefas existentes.
      */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private TaskType type = TaskType.POSITIVE;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = true)
     private User user;
