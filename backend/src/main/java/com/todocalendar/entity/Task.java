@@ -8,10 +8,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/**
- * Entidade que representa uma tarefa no banco de dados.
- * Cada tarefa pertence a um dia específico (date) e pode ser marcada como concluída.
- */
 @Entity
 @Table(name = "tasks")
 @Getter
@@ -31,19 +27,20 @@ public class Task {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    /**
-     * Data à qual a tarefa pertence (sem hora — um dia inteiro).
-     * Ex: 2024-04-10
-     */
     @Column(nullable = false)
     private LocalDate date;
 
-    /**
-     * Indica se a tarefa foi concluída.
-     * Usado no cálculo de porcentagem de conclusão do dia.
-     */
     @Column(nullable = false)
     private boolean completed = false;
+
+    /**
+     * Usuário dono da tarefa.
+     * nullable = true para compatibilidade com dados existentes no banco.
+     * Em produção nova, seria NOT NULL.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = true)
+    private User user;
 
     @CreationTimestamp
     @Column(updatable = false)

@@ -4,7 +4,9 @@ import com.todocalendar.dto.DaySummaryResponse;
 import com.todocalendar.dto.TaskRequest;
 import com.todocalendar.dto.TaskResponse;
 import com.todocalendar.entity.Task;
+import com.todocalendar.entity.User;
 import com.todocalendar.repository.TaskRepository;
+import com.todocalendar.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,88 +23,68 @@ import java.util.Map;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
 
-    // ──────────────────────────────────────────────
-    // CRUD
-    // ──────────────────────────────────────────────
+    // ── CRUD ───────────────────────────────────────────────────
 
-    public List<TaskResponse> getTasksByDate(LocalDate date) {
-        return taskRepository.findByDateOrderByCreatedAtAsc(date)
+    public List<TaskResponse> getTasksByDate(LocalDate date, Long userId) {
+        return taskRepository.findByDateAndUserIdOrderByCreatedAtAsc(date, userId)
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
     @Transactional
-    public TaskResponse createTask(TaskRequest request) {
+    public TaskResponse createTask(TaskRequest request, Long userId) {
+        User user = userRepository.getReferenceById(userId);
         Task task = Task.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .date(request.getDate())
                 .completed(false)
+                .user(user)
                 .build();
         return toResponse(taskRepository.save(task));
     }
 
     @Transactional
-    public TaskResponse updateTask(Long id, TaskRequest request) {
-        Task task = findOrThrow(id);
+    public TaskResponse updateTask(Long id, TaskRequest request, Long userId) {
+        Task task = findOrThrow(id, userId);
         task.setTitle(request.getTitle());
         task.setDescription(request.getDescription());
         task.setDate(request.getDate());
         return toResponse(taskRepository.save(task));
     }
 
-    /**
-     * Alterna o estado de conclusão da tarefa (toggle).
-     * Se estava false → vira true; se estava true → vira false.
-     */
     @Transactional
-    public TaskResponse toggleCompletion(Long id) {
-        Task task = findOrThrow(id);
+    public TaskResponse toggleCompletion(Long id, Long userId) {
+        Task task = findOrThrow(id, userId);
         task.setCompleted(!task.isCompleted());
         return toResponse(taskRepository.save(task));
     }
 
     @Transactional
-    public void deleteTask(Long id) {
-        findOrThrow(id);
+    public void deleteTask(Long id, Long userId) {
+        findOrThrow(id, userId);
         taskRepository.deleteById(id);
     }
 
-    // ──────────────────────────────────────────────
-    // Resumo mensal com cálculo de porcentagem e cor
-    // ──────────────────────────────────────────────
+    // ── Resumo mensal ──────────────────────────────────────────
 
-    /**
-     * Para cada dia do mês que possui tarefas, retorna:
-     *   - total de tarefas
-     *   - total de concluídas
-     *   - porcentagem de conclusão (0–100)
-     *   - cor do dia baseada na porcentagem
-     *
-     * Lógica de cor:
-     *   100%      → GREEN
-     *   70–99%    → LIGHT_GREEN  (intermediário útil — adicionado além do solicitado)
-     *   50–69%    → YELLOW
-     *   1–49%     → RED
-     *   sem tasks → NONE
-     */
-    public Map<String, DaySummaryResponse> getMonthlySummary(int year, int month) {
+    public Map<String, DaySummaryResponse> getMonthlySummary(int year, int month, Long userId) {
         YearMonth yearMonth = YearMonth.of(year, month);
         LocalDate start = yearMonth.atDay(1);
-        LocalDate end = yearMonth.atEndOfMonth();
+        LocalDate end   = yearMonth.atEndOfMonth();
 
-        List<Object[]> rows = taskRepository.findDailySummary(start, end);
+        List<Object[]> rows = taskRepository.findDailySummary(start, end, userId);
 
         Map<String, DaySummaryResponse> summary = new LinkedHashMap<>();
         for (Object[] row : rows) {
-            LocalDate date  = (LocalDate) row[0];
-            long total      = (Long) row[1];
-            long completed  = (Long) row[2];
-
-            double percentage = total == 0 ? 0 : (completed * 100.0) / total;
-            String color = resolveColor(percentage, total);
+            LocalDate date     = (LocalDate) row[0];
+            long total         = (Long) row[1];
+            long completed     = (Long) row[2];
+            double percentage  = total == 0 ? 0 : (completed * 100.0) / total;
+            String color       = resolveColor(percentage, total);
 
             summary.put(date.toString(), DaySummaryResponse.builder()
                     .date(date)
@@ -115,21 +97,27 @@ public class TaskService {
         return summary;
     }
 
-    // ──────────────────────────────────────────────
-    // Utilitários privados
-    // ──────────────────────────────────────────────
+    // ── Utilitários privados ───────────────────────────────────
 
     private String resolveColor(double percentage, long total) {
-        if (total == 0) return "NONE";
+        if (total == 0)        return "NONE";
         if (percentage == 100) return "GREEN";
         if (percentage >= 70)  return "LIGHT_GREEN";
         if (percentage >= 50)  return "YELLOW";
         return "RED";
     }
 
-    private Task findOrThrow(Long id) {
-        return taskRepository.findById(id)
+    /**
+     * Busca a tarefa e verifica se pertence ao usuário.
+     * Lança 404 se não existir ou se pertencer a outro usuário.
+     */
+    private Task findOrThrow(Long id, Long userId) {
+        Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tarefa não encontrada: " + id));
+        if (task.getUser() != null && !task.getUser().getId().equals(userId)) {
+            throw new EntityNotFoundException("Tarefa não encontrada: " + id);
+        }
+        return task;
     }
 
     private TaskResponse toResponse(Task task) {
