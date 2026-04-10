@@ -16,9 +16,7 @@ export default function TaskItem({ task, date }: TaskItemProps) {
   const remove = useDeleteTask(date)
   const update = useUpdateTask(date)
 
-  const isPositive = task.type === 'POSITIVE'
-
-  // Para tarefa negativa: "boa escolha" é quando NÃO está concluída
+  const isPositive  = task.type === 'POSITIVE'
   const isGoodOutcome = isPositive ? task.completed : !task.completed
 
   function handleEditSave() {
@@ -40,15 +38,6 @@ export default function TaskItem({ task, date }: TaskItemProps) {
 
   return (
     <div className={`task-item ${typeClass} ${doneClass}`}>
-      {/* Indicador de tipo */}
-      <span
-        className="task-type-icon"
-        title={isPositive ? 'Tarefa positiva' : 'Hábito a evitar'}
-        aria-hidden
-      >
-        {isPositive ? '↑' : '↓'}
-      </span>
-
       {/* Checkbox */}
       <button
         className={`task-checkbox ${isPositive ? 'positive' : 'negative'} ${task.completed ? 'checked' : ''}`}
@@ -71,12 +60,9 @@ export default function TaskItem({ task, date }: TaskItemProps) {
           <>
             <p className={`task-title ${task.completed ? 'done' : ''}`}>{task.title}</p>
             {task.description && <p className="task-desc">{task.description}</p>}
-            {/* Badge de resultado */}
             {task.completed && (
               <span className={`task-outcome ${isGoodOutcome ? 'good' : 'bad'}`}>
-                {isPositive
-                  ? '✓ boa escolha'
-                  : '✗ hábito realizado'}
+                {isPositive ? 'Concluída' : 'Hábito realizado'}
               </span>
             )}
           </>
@@ -93,8 +79,20 @@ export default function TaskItem({ task, date }: TaskItemProps) {
             </div>
           ) : (
             <>
-              <button className="task-action-btn" onClick={() => setEditing(true)} title="Editar">✎</button>
-              <button className="task-action-btn danger" onClick={() => setConfirmDelete(true)} title="Excluir">✕</button>
+              <button className="task-action-btn"        onClick={() => setEditing(true)}      title="Editar">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </button>
+              <button className="task-action-btn danger" onClick={() => setConfirmDelete(true)} title="Excluir">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                  <path d="M10 11v6M14 11v6"/>
+                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                </svg>
+              </button>
             </>
           )}
         </div>

@@ -14,10 +14,9 @@ function progressColor(pct: number): string {
   if (pct >= 70)   return '#34d399'
   if (pct >= 50)   return '#fbbf24'
   if (pct > 0)     return '#f87171'
-  return 'var(--border-subtle)'
+  return 'var(--line)'
 }
 
-/** Boas escolhas = POSITIVE concluída ou NEGATIVE não concluída */
 function calcScore(tasks: { completed: boolean; type: TaskType }[]) {
   if (tasks.length === 0) return 0
   const good = tasks.filter(t =>
@@ -25,6 +24,15 @@ function calcScore(tasks: { completed: boolean; type: TaskType }[]) {
     (t.type === 'NEGATIVE' && !t.completed),
   ).length
   return Math.round((good / tasks.length) * 100)
+}
+
+function PlusIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+      <line x1="12" y1="5" x2="12" y2="19"/>
+      <line x1="5"  y1="12" x2="19" y2="12"/>
+    </svg>
+  )
 }
 
 export default function TaskPanel({ selectedDate }: TaskPanelProps) {
@@ -37,22 +45,20 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
   const [description, setDescription] = useState('')
   const [taskType,    setTaskType]    = useState<TaskType>('POSITIVE')
 
-  const pct         = calcScore(tasks)
-  const goodCount   = tasks.filter(t =>
+  const pct       = calcScore(tasks)
+  const goodCount = tasks.filter(t =>
     (t.type === 'POSITIVE' && t.completed) ||
     (t.type === 'NEGATIVE' && !t.completed),
   ).length
-  const dateLabel   = format(selectedDate, "EEEE',' d 'de' MMMM 'de' yyyy", { locale: ptBR })
+
+  // Date labels
+  const dayName   = format(selectedDate, "EEEE", { locale: ptBR })
+  const dateLabel = format(selectedDate, "d 'de' MMMM", { locale: ptBR })
 
   function handleCreate() {
     if (!title.trim()) return
     create.mutate(
-      {
-        title: title.trim(),
-        description: description.trim() || undefined,
-        date: dateStr,
-        type: taskType,
-      },
+      { title: title.trim(), description: description.trim() || undefined, date: dateStr, type: taskType },
       {
         onSuccess: () => {
           setTitle('')
@@ -71,11 +77,16 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
     setTaskType('POSITIVE')
   }
 
+  const positiveTasks = tasks.filter(t => t.type === 'POSITIVE')
+  const negativeTasks = tasks.filter(t => t.type === 'NEGATIVE')
+
   return (
     <div className="task-panel">
       {/* Header */}
       <div className="panel-header">
-        <p className="panel-date">{dateLabel}</p>
+        <p className="panel-date" style={{ textTransform: 'capitalize' }}>
+          {dayName} · {dateLabel}
+        </p>
         <p className="panel-count">
           {goodCount} <span>/ {tasks.length} {tasks.length === 1 ? 'tarefa' : 'tarefas'}</span>
         </p>
@@ -86,11 +97,11 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
           />
         </div>
         {tasks.length > 0 && (
-          <p className="panel-score-label">{pct}% de boas escolhas</p>
+          <p className="panel-score-label">{pct}% de boas escolhas hoje</p>
         )}
       </div>
 
-      {/* Task list — separado por tipo */}
+      {/* Task list */}
       <div className="panel-body">
         {isLoading && <p className="panel-empty">Carregando...</p>}
 
@@ -98,20 +109,17 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
           <p className="panel-empty">Nenhuma tarefa para este dia.</p>
         )}
 
-        {/* Positivas primeiro */}
-        {tasks.filter(t => t.type === 'POSITIVE').map(task => (
+        {positiveTasks.map(task => (
           <TaskItem key={task.id} task={task} date={dateStr} />
         ))}
 
-        {/* Separador se há ambos os tipos */}
-        {tasks.some(t => t.type === 'POSITIVE') && tasks.some(t => t.type === 'NEGATIVE') && (
+        {positiveTasks.length > 0 && negativeTasks.length > 0 && (
           <div className="task-type-divider">
             <span>Hábitos a evitar</span>
           </div>
         )}
 
-        {/* Negativas depois */}
-        {tasks.filter(t => t.type === 'NEGATIVE').map(task => (
+        {negativeTasks.map(task => (
           <TaskItem key={task.id} task={task} date={dateStr} />
         ))}
       </div>
@@ -120,7 +128,6 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
       <div className="panel-footer">
         {showForm ? (
           <div className="add-form">
-            {/* Toggle de tipo */}
             <div className="type-toggle">
               <button
                 className={`type-btn positive ${taskType === 'POSITIVE' ? 'active' : ''}`}
@@ -144,7 +151,7 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
 
             <input
               className="add-input"
-              placeholder="Título da tarefa"
+              placeholder="Nome da tarefa"
               value={title}
               onChange={e => setTitle(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleCreate()}
@@ -170,7 +177,7 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
           </div>
         ) : (
           <button className="add-btn" onClick={() => setShowForm(true)}>
-            <span style={{ fontSize: 18, lineHeight: 1 }}>+</span>
+            <PlusIcon />
             Nova tarefa
           </button>
         )}
