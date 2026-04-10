@@ -9,23 +9,23 @@
    Adicione novos [data-theme="X"] para criar novos temas.
 ═══════════════════════════════════════════════════════════ */
 
-/* Tema padrão: Midnight Blue */
+/* Tema padrão: Black + Blue */
 :root,
 [data-theme="amber-night"] {
-  --bg:            #080c14;
-  --surface:       #0e1420;
-  --card:          #131d2e;
-  --card-hover:    #1a2540;
+  --bg:            #0a0a08;
+  --surface:       #111110;
+  --card:          #1a1a17;
+  --card-hover:    #222220;
   --border:        rgba(59, 130, 246, 0.12);
   --border-subtle: rgba(255, 255, 255, 0.05);
 
   --accent:        #3b82f6;
-  --accent-dim:    rgba(59, 130, 246, 0.18);
-  --accent-glow:   rgba(59, 130, 246, 0.08);
+  --accent-dim:    rgba(59, 130, 246, 0.15);
+  --accent-glow:   rgba(59, 130, 246, 0.07);
 
-  --text:          #e8edf5;
-  --text-muted:    #6b7a96;
-  --text-dim:      #3a4560;
+  --text:          #f5f0e8;
+  --text-muted:    #7a7468;
+  --text-dim:      #4a4640;
 
   --positive:      #4ade80;
   --positive-dim:  rgba(74, 222, 128, 0.14);
