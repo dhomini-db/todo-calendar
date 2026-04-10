@@ -1,0 +1,30 @@
+# ── Java / Maven ──────────────────────────────────────────────────────────────
+backend/target/
+backend/.mvn/
+*.class
+*.jar
+!**/src/main/**/target/
+
+# ── Node / Frontend ───────────────────────────────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# ── IDEs ──────────────────────────────────────────────────────────────────────
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# ── Sistema operacional ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Variáveis de ambiente ─────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+# volumes são efêmeros, não versionar
