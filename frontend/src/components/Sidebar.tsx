@@ -1,54 +1,41 @@
-interface SidebarProps {
-  currentView: 'calendar'
-}
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 
-export default function Sidebar({ currentView }: SidebarProps) {
+export default function Sidebar() {
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
+  function handleLogout() {
+    logout()
+    navigate('/login', { replace: true })
+  }
+
   return (
-    <aside className="w-56 min-h-screen bg-[#111111] border-r border-[#2a2a2a] flex flex-col px-3 py-6 shrink-0">
-      {/* Logo / título */}
-      <div className="flex items-center gap-2 px-2 mb-8">
-        <span className="text-2xl">📅</span>
-        <span className="font-semibold text-white text-lg tracking-tight">
-          TodoCalendar
-        </span>
+    <aside className="sidebar">
+      <div className="sidebar-logo">
+        <span className="sidebar-logo-icon">◈</span>
+        <span className="sidebar-logo-text">TodoCalendar</span>
       </div>
 
-      {/* Navegação */}
-      <nav className="flex flex-col gap-1">
-        <NavItem
-          icon="🗓️"
-          label="Calendário"
-          active={currentView === 'calendar'}
-        />
+      <nav className="sidebar-nav">
+        <button className="sidebar-item active">
+          <span className="sidebar-item-icon">▦</span>
+          Calendário
+        </button>
       </nav>
 
-      {/* Rodapé */}
-      <div className="mt-auto px-2 text-xs text-gray-600">
-        v0.1.0
+      <div className="sidebar-footer">
+        {user && (
+          <>
+            <p className="sidebar-user-name">{user.name}</p>
+            <p className="sidebar-user-email">{user.email}</p>
+          </>
+        )}
+        <button className="sidebar-logout" onClick={handleLogout}>
+          <span style={{ fontSize: 14 }}>⎋</span>
+          Sair
+        </button>
       </div>
     </aside>
-  )
-}
-
-function NavItem({
-  icon,
-  label,
-  active,
-}: {
-  icon: string
-  label: string
-  active: boolean
-}) {
-  return (
-    <button
-      className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm w-full text-left transition-colors ${
-        active
-          ? 'bg-[#2c2c2c] text-white font-medium'
-          : 'text-gray-400 hover:bg-[#222] hover:text-gray-200'
-      }`}
-    >
-      <span>{icon}</span>
-      {label}
-    </button>
   )
 }

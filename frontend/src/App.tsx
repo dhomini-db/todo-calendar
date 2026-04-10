@@ -1,37 +1,37 @@
 import { useState } from 'react'
-import Calendar from './components/Calendar'
-import Sidebar from './components/Sidebar'
+import { Navigate } from 'react-router-dom'
+import Calendar  from './components/Calendar'
+import Sidebar   from './components/Sidebar'
 import TaskPanel from './components/TaskPanel'
+import { useAuth } from './contexts/AuthContext'
 
 export default function App() {
-  const [selectedDate, setSelectedDate]   = useState(new Date())
-  const [currentMonth, setCurrentMonth]   = useState(new Date())
+  const { isAuthenticated } = useAuth()
+
+  if (!isAuthenticated) return <Navigate to="/login" replace />
+
+  const today = new Date()
+  const [selectedDate,  setSelectedDate]  = useState(today)
+  const [currentMonth,  setCurrentMonth]  = useState(today)
 
   return (
-    <div className="flex min-h-screen bg-[#191919]">
-      {/* Sidebar */}
-      <Sidebar currentView="calendar" />
-
-      {/* Conteúdo principal */}
-      <main className="flex-1 p-6 flex flex-col gap-6 overflow-auto">
-        <h1 className="text-2xl font-bold text-white tracking-tight">Calendário</h1>
-
-        <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-6 items-start">
-          {/* Calendário — ocupa mais espaço */}
+    <div className="app-shell">
+      <Sidebar />
+      <div className="main-content">
+        <div className="calendar-area">
+          <h1 className="page-title">Calendário</h1>
+          <p className="page-sub">Clique em um dia para gerenciar suas tarefas</p>
           <Calendar
             selectedDate={selectedDate}
-            onSelectDate={date => {
-              setSelectedDate(date)
-              setCurrentMonth(date)
-            }}
+            onSelectDate={setSelectedDate}
             currentMonth={currentMonth}
             onChangeMonth={setCurrentMonth}
           />
-
-          {/* Painel de tarefas do dia selecionado */}
+        </div>
+        <div className="panel-area">
           <TaskPanel selectedDate={selectedDate} />
         </div>
-      </main>
+      </div>
     </div>
   )
 }
