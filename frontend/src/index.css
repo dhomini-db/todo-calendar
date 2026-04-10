@@ -286,7 +286,7 @@ body {
 .sidebar-logout:hover { background: var(--red-dim); color: var(--red); }
 
 /* ── Main content ─────────────────────────────────────────── */
-.main-content  { flex: 1; display: flex; overflow: hidden; min-width: 0; }
+.main-content  { flex: 1; display: flex; overflow: hidden; min-width: 0; background: var(--bg); }
 
 .calendar-area {
   flex: 1;
@@ -653,3 +653,224 @@ body {
 /* Page titles */
 .page-title { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; margin-bottom: 4px; }
 .page-sub   { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+
+/* ═══════════════════════════════════════════════════════════
+   SIDEBAR — section labels & user avatar
+═══════════════════════════════════════════════════════════ */
+.sidebar-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 0 14px;
+  margin-bottom: 4px;
+}
+
+/* Override sidebar-item to also work as <a> (NavLink) */
+a.sidebar-item {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: background 0.12s, color 0.12s;
+}
+a.sidebar-item:hover  { background: var(--card); color: var(--text); }
+a.sidebar-item.active { background: var(--accent-dim); color: var(--accent); }
+
+.sidebar-user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 0 8px;
+}
+.sidebar-user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sidebar-user-text { min-width: 0; }
+
+/* ═══════════════════════════════════════════════════════════
+   INNER PAGES (Personalizar, Conta, placeholders)
+═══════════════════════════════════════════════════════════ */
+.inner-page {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 36px;
+  min-width: 0;
+}
+.inner-page-header { margin-bottom: 28px; }
+
+/* Settings section */
+.settings-section { margin-bottom: 28px; }
+.settings-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+}
+
+/* ── Theme cards ─────────────────────────────────────────── */
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+.theme-card {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  overflow: hidden;
+  font-family: inherit;
+}
+.theme-card:hover        { border-color: var(--border); }
+.theme-card.active       { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+
+.theme-preview {
+  height: 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+}
+.theme-preview-bar   { height: 6px; border-radius: 99px; width: 50%; }
+.theme-preview-lines { display: flex; flex-direction: column; gap: 5px; margin-top: 4px; }
+.theme-preview-line  { height: 4px; border-radius: 99px; }
+.theme-preview-line.long  { width: 80%; }
+.theme-preview-line.short { width: 50%; }
+
+.theme-card-body {
+  padding: 10px 14px 12px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.theme-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+.theme-card-label { font-size: 13px; font-weight: 600; color: var(--text); }
+.theme-card-desc  { font-size: 11px; color: var(--text-muted); }
+.theme-card-badge {
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--accent-dim);
+  color: var(--accent);
+  padding: 2px 7px;
+  border-radius: 99px;
+}
+
+.theme-color-dot {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: 0 0 6px currentColor;
+}
+
+/* ── Conta page ──────────────────────────────────────────── */
+.conta-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+.conta-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+.conta-name  { font-size: 16px; font-weight: 600; color: var(--text); }
+.conta-email { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+/* ── Placeholder action list ─────────────────────────────── */
+.placeholder-actions {
+  background: var(--card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.placeholder-action-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.placeholder-action-item:last-child { border-bottom: none; }
+.placeholder-action-title { font-size: 13px; font-weight: 500; color: var(--text); }
+.placeholder-action-desc  { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+
+.soon-badge {
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--card-hover);
+  color: var(--text-dim);
+  padding: 3px 9px;
+  border-radius: 99px;
+  border: 1px solid var(--border-subtle);
+  white-space: nowrap;
+}
+
+/* ── Dashboard placeholder stats ────────────────────────── */
+.placeholder-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.placeholder-stat-card {
+  background: var(--card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+}
+.placeholder-stat-label { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; }
+.placeholder-stat-value { font-size: 28px; font-weight: 700; color: var(--text-dim); letter-spacing: -1px; }
+
+/* ── Placeholder banner ──────────────────────────────────── */
+.placeholder-banner {
+  background: var(--card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 36px 28px;
+  text-align: center;
+}
+.placeholder-banner-icon  { font-size: 36px; margin-bottom: 14px; }
+.placeholder-banner-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+.placeholder-banner-desc  { font-size: 13px; color: var(--text-muted); max-width: 440px; margin: 0 auto; line-height: 1.6; }
