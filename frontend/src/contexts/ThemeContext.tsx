@@ -10,7 +10,7 @@ export interface ThemeOption {
 }
 
 export const THEMES: ThemeOption[] = [
-  { id: 'amber-night', label: 'Amber Night',  description: 'Escuro com acento dourado',    preview: '#fbbf24' },
+  { id: 'amber-night', label: 'Midnight Blue', description: 'Escuro com acento azul',       preview: '#3b82f6' },
   { id: 'arctic',      label: 'Arctic Blue',   description: 'Escuro com acento azul',       preview: '#38bdf8' },
   { id: 'rose-dawn',   label: 'Rose Dawn',     description: 'Claro com acento rosado',      preview: '#f43f5e' },
 ]

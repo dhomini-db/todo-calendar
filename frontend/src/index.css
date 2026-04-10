@@ -9,23 +9,23 @@
    Adicione novos [data-theme="X"] para criar novos temas.
 ═══════════════════════════════════════════════════════════ */
 
-/* Tema padrão: Amber Night */
+/* Tema padrão: Midnight Blue */
 :root,
 [data-theme="amber-night"] {
-  --bg:            #0a0a08;
-  --surface:       #111110;
-  --card:          #1a1a17;
-  --card-hover:    #222220;
-  --border:        rgba(251, 191, 36, 0.10);
+  --bg:            #080c14;
+  --surface:       #0e1420;
+  --card:          #131d2e;
+  --card-hover:    #1a2540;
+  --border:        rgba(59, 130, 246, 0.12);
   --border-subtle: rgba(255, 255, 255, 0.05);
 
-  --accent:        #fbbf24;
-  --accent-dim:    rgba(251, 191, 36, 0.15);
-  --accent-glow:   rgba(251, 191, 36, 0.08);
+  --accent:        #3b82f6;
+  --accent-dim:    rgba(59, 130, 246, 0.18);
+  --accent-glow:   rgba(59, 130, 246, 0.08);
 
-  --text:          #f5f0e8;
-  --text-muted:    #7a7468;
-  --text-dim:      #4a4640;
+  --text:          #e8edf5;
+  --text-muted:    #6b7a96;
+  --text-dim:      #3a4560;
 
   --positive:      #4ade80;
   --positive-dim:  rgba(74, 222, 128, 0.14);
@@ -92,7 +92,7 @@ body {
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
-  background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(251,191,36,0.03) 0%, transparent 60%);
+  background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59,130,246,0.04) 0%, transparent 60%);
   transition: background-color 0.3s, color 0.3s;
 }
 
@@ -532,7 +532,7 @@ body {
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
-  border: 1px dashed rgba(251,191,36,0.2);
+  border: 1px dashed rgba(59,130,246,0.2);
   border-radius: var(--radius);
   background: none;
   color: var(--text-muted);
