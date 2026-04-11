@@ -103,7 +103,11 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
 
       {/* Task list */}
       <div className="panel-body">
-        {isLoading && <p className="panel-empty">Carregando...</p>}
+        {isLoading && (
+          <div className="panel-loading" aria-label="Carregando tarefas" role="status">
+            <div className="panel-spinner" />
+          </div>
+        )}
 
         {!isLoading && tasks.length === 0 && (
           <p className="panel-empty">Nenhuma tarefa para este dia.</p>
@@ -150,19 +154,23 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
             )}
 
             <input
+              id="task-title"
               className="add-input"
               placeholder="Nome da tarefa"
               value={title}
               onChange={e => setTitle(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleCreate()}
               autoFocus
+              aria-label="Nome da tarefa"
             />
             <textarea
+              id="task-desc"
               className="add-input"
               placeholder="Descrição (opcional)"
               rows={2}
               value={description}
               onChange={e => setDescription(e.target.value)}
+              aria-label="Descrição da tarefa"
             />
             <div className="add-form-actions">
               <button

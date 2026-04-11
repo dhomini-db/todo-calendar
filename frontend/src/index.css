@@ -1379,8 +1379,8 @@ a.sidebar-item.active .sidebar-item-icon {
 
 /* Toggle switch */
 .template-toggle-btn {
-  width: 34px;
-  height: 19px;
+  width: 36px;
+  height: 20px;
   border-radius: 99px;
   border: none;
   cursor: pointer;
@@ -1394,12 +1394,250 @@ a.sidebar-item.active .sidebar-item-icon {
 .template-toggle-knob {
   position: absolute;
   top: 2px;
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: #fff;
   transition: left 0.18s;
   box-shadow: 0 1px 3px rgba(0,0,0,0.25);
 }
-.template-toggle-btn.on  .template-toggle-knob { left: 17px; }
+.template-toggle-btn.on  .template-toggle-knob { left: 18px; }
 .template-toggle-btn.off .template-toggle-knob { left: 2px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   UI/UX PRO MAX — Accessibility & Interaction Quality Layer
+   Rules: focus rings · touch targets · keyboard nav ·
+          reduced-motion · animation polish · visual refinements
+   Ref: https://github.com/nextlevelbuilder/ui-ux-pro-max-skill
+═══════════════════════════════════════════════════════════════ */
+
+/* ── 1. Focus ring system ──────────────────────────────────────
+   Rule: All interactive elements must have a visible focus
+   indicator for keyboard/switch navigation (WCAG 2.4.7).
+   Use :focus-visible to skip on mouse clicks.
+─────────────────────────────────────────────────────────────── */
+
+/* Remove browser default outline globally, restore via focus-visible */
+* { outline: none; }
+
+/* Universal focus ring — offset from element edge */
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r-xs);
+}
+
+/* Elements that already render a box-shadow focus ring — skip outline */
+.field-input:focus-visible,
+.add-input:focus-visible,
+.task-edit-input:focus-visible {
+  outline: none;
+}
+
+/* Sidebar nav items — inset ring (flush with pill shape) */
+.sidebar-item:focus-visible,
+a.sidebar-item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* Cal nav buttons — rounded ring */
+.cal-nav:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r);
+}
+
+/* Auth button */
+.auth-btn:focus-visible { box-shadow: 0 0 0 3px var(--accent-glow), 0 0 0 5px var(--accent); }
+
+/* ── 2. Keyboard navigation: task action buttons ───────────────
+   Anti-pattern: opacity:0 on hover-only hides actions from
+   keyboard users. Show on :focus-within too.
+─────────────────────────────────────────────────────────────── */
+.task-item:focus-within .task-actions { opacity: 1; }
+
+/* ── 3. Touch targets — minimum 44×44pt (Apple HIG / WCAG 2.5.5)
+   Desktop compromise: 28–32px with adequate spacing
+─────────────────────────────────────────────────────────────── */
+
+/* Checkbox — larger visual + touch area */
+.task-checkbox {
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+}
+
+/* Task action buttons — taller */
+.task-action-btn {
+  width: 28px;
+  height: 28px;
+}
+
+/* Calendar nav — bigger hit area */
+.cal-nav {
+  width: 30px;
+  height: 30px;
+}
+
+/* Weekday buttons — min height for touch */
+.weekday-btn {
+  min-height: 32px;
+  padding: 6px 12px;
+}
+
+/* ── 4. Checkbox animation — tactile feedback on completion ────
+   150-300ms range per skill guidelines.
+─────────────────────────────────────────────────────────────── */
+.task-checkbox.checked svg {
+  animation: checkPop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes checkPop {
+  from { transform: scale(0.4) rotate(-10deg); opacity: 0; }
+  to   { transform: scale(1)   rotate(0deg);   opacity: 1; }
+}
+
+/* ── 5. Button active states — physical press feedback ─────────
+   Scale down 2% on click for kinetic feel.
+─────────────────────────────────────────────────────────────── */
+.btn-primary:active:not(:disabled) { transform: scale(0.98); }
+.btn-ghost:active                  { transform: scale(0.98); }
+.auth-btn:active:not(:disabled)    { transform: scale(0.98) !important; }
+.cal-nav:active                    { transform: scale(0.9); }
+.add-btn:active                    { transform: scale(0.99); }
+
+/* ── 6. Today indicator dot — clear "now" anchor in calendar ───
+   Dot below the date number, disappears when selected.
+─────────────────────────────────────────────────────────────── */
+.cal-day.today:not(.selected)::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ── 7. Sidebar active item — accent left border marker ────────
+   Gives spatial anchoring: "you are here" signal.
+─────────────────────────────────────────────────────────────── */
+.sidebar-item,
+a.sidebar-item {
+  position: relative;
+}
+.sidebar-item.active::before,
+a.sidebar-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 20%;
+  height: 60%;
+  width: 2.5px;
+  border-radius: 0 2px 2px 0;
+  background: var(--accent);
+}
+
+/* ── 8. Sidebar section labels — increase contrast ─────────────
+   --text-3 on dark bg is borderline. Bump up slightly.
+─────────────────────────────────────────────────────────────── */
+.sidebar-section-label {
+  color: var(--text-2);
+  font-size: 9.5px;
+}
+
+/* ── 9. Template card inactive — better visual cue ─────────────
+   Lower opacity + grayscale = clearly paused.
+   Recovers on hover to hint it's interactive.
+─────────────────────────────────────────────────────────────── */
+.template-card.inactive {
+  opacity: 0.42;
+  filter: grayscale(0.25);
+  transition: opacity 0.18s, filter 0.18s, background 0.12s, border-color 0.12s;
+}
+.template-card.inactive:hover {
+  opacity: 0.7;
+  filter: grayscale(0);
+}
+
+/* ── 10. Smooth theme switching ─────────────────────────────────
+   Transition bg/border on main structural elements
+   so theme changes feel intentional, not jarring.
+─────────────────────────────────────────────────────────────── */
+.sidebar,
+.main-content,
+.calendar-wrap,
+.panel-area,
+.task-panel { transition: background-color 0.25s, border-color 0.25s; }
+
+/* ── 11. Task done state — more elegant than opacity alone ──────
+   Keep text readable but clearly deprioritized.
+─────────────────────────────────────────────────────────────── */
+.task-item.done {
+  opacity: 0.48;
+}
+.task-item.done:hover {
+  opacity: 0.72;
+}
+
+/* ── 12. Progress fill spring animation — make it feel alive ────
+   Already has cubic-bezier in the main sheet;
+   increase spring strength slightly.
+─────────────────────────────────────────────────────────────── */
+.progress-fill {
+  transition: width 0.45s cubic-bezier(0.34, 1.3, 0.64, 1), background-color 0.25s;
+}
+
+/* ── 13. Panel loading spinner ──────────────────────────────────
+   Show when tasks are being fetched.
+─────────────────────────────────────────────────────────────── */
+.panel-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 0;
+}
+.panel-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--line-md);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+/* ── 14. Delete confirm — clearer destructive UX ────────────────
+   Add slight red tint to container so user recognizes danger.
+─────────────────────────────────────────────────────────────── */
+.delete-confirm {
+  background: var(--red-soft);
+  border-radius: var(--r-sm);
+  padding: 2px 4px;
+}
+
+/* ── 15. Add button — richer hover state ────────────────────────
+   Upgrade from dashed to a subtle filled highlight.
+─────────────────────────────────────────────────────────────── */
+.add-btn:hover {
+  border-style: solid;
+  border-color: var(--accent-border);
+  color: var(--text);
+  background: var(--accent-glow);
+}
+
+/* ── 16. prefers-reduced-motion ─────────────────────────────────
+   Respect user OS-level motion preference.
+   Collapse all transitions/animations to instant.
+─────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
