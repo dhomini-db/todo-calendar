@@ -2,7 +2,7 @@
 
 > Sistema de gestão de tarefas diárias com calendário inteligente, recorrência automática e múltiplos temas visuais.
 
-🌐 **Acesse o projeto:** [todo-calendar.vercel.app](https://todo-calendar.vercel.app)
+🌐 **Acesse o projeto:** [todo-calendar-dhomini.vercel.app](https://todo-calendar-dhomini.vercel.app)
 
 ---
 
