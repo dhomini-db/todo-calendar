@@ -1,13 +1,15 @@
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { useState } from 'react'
-import { useTasksByDate, useCreateTask } from '../hooks/useTasks'
-import type { TaskType } from '../types'
+import { useTasksByDate, useCreateTask, useCreateRecurringTask } from '../hooks/useTasks'
+import type { TaskType, RecurrenceType } from '../types'
 import TaskItem from './TaskItem'
 
 interface TaskPanelProps {
   selectedDate: Date
 }
+
+// ── Helpers ────────────────────────────────────────────────────
 
 function progressColor(pct: number): string {
   if (pct === 100) return '#4ade80'
@@ -26,6 +28,18 @@ function calcScore(tasks: { completed: boolean; type: TaskType }[]) {
   return Math.round((good / tasks.length) * 100)
 }
 
+const WEEK_DAYS = [
+  { value: '1', label: 'Seg' },
+  { value: '2', label: 'Ter' },
+  { value: '3', label: 'Qua' },
+  { value: '4', label: 'Qui' },
+  { value: '5', label: 'Sex' },
+  { value: '6', label: 'Sáb' },
+  { value: '7', label: 'Dom' },
+]
+
+// ── Icons ──────────────────────────────────────────────────────
+
 function PlusIcon() {
   return (
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -35,47 +49,87 @@ function PlusIcon() {
   )
 }
 
+function RepeatIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="17 1 21 5 17 9"/>
+      <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+      <polyline points="7 23 3 19 7 15"/>
+      <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+    </svg>
+  )
+}
+
+// ── Component ──────────────────────────────────────────────────
+
 export default function TaskPanel({ selectedDate }: TaskPanelProps) {
   const dateStr = format(selectedDate, 'yyyy-MM-dd')
   const { data: tasks = [], isLoading } = useTasksByDate(dateStr)
-  const create = useCreateTask(dateStr)
+  const createTask      = useCreateTask(dateStr)
+  const createRecurring = useCreateRecurringTask(dateStr)
 
-  const [showForm,    setShowForm]    = useState(false)
-  const [title,       setTitle]       = useState('')
-  const [description, setDescription] = useState('')
-  const [taskType,    setTaskType]    = useState<TaskType>('POSITIVE')
+  // Form state
+  const [showForm,       setShowForm]       = useState(false)
+  const [title,          setTitle]          = useState('')
+  const [description,    setDescription]    = useState('')
+  const [taskType,       setTaskType]       = useState<TaskType>('POSITIVE')
+  const [isRecurring,    setIsRecurring]    = useState(false)
+  const [recurrenceType, setRecurrenceType] = useState<RecurrenceType>('DAILY')
+  const [daysOfWeek,     setDaysOfWeek]     = useState<string[]>([])
 
+  // Score
   const pct       = calcScore(tasks)
   const goodCount = tasks.filter(t =>
     (t.type === 'POSITIVE' && t.completed) ||
     (t.type === 'NEGATIVE' && !t.completed),
   ).length
 
-  // Date labels
   const dayName   = format(selectedDate, "EEEE", { locale: ptBR })
   const dateLabel = format(selectedDate, "d 'de' MMMM", { locale: ptBR })
 
-  function handleCreate() {
-    if (!title.trim()) return
-    create.mutate(
-      { title: title.trim(), description: description.trim() || undefined, date: dateStr, type: taskType },
-      {
-        onSuccess: () => {
-          setTitle('')
-          setDescription('')
-          setTaskType('POSITIVE')
-          setShowForm(false)
-        },
-      },
+  function toggleDay(val: string) {
+    setDaysOfWeek(prev =>
+      prev.includes(val) ? prev.filter(d => d !== val) : [...prev, val].sort(),
     )
   }
 
-  function cancelForm() {
+  function handleSubmit() {
+    if (!title.trim()) return
+
+    if (isRecurring) {
+      // Cria template → backend auto-gera a instância do dia
+      createRecurring.mutate(
+        {
+          title:         title.trim(),
+          description:   description.trim() || undefined,
+          type:          taskType,
+          recurrenceType,
+          daysOfWeek:    recurrenceType === 'WEEKLY' ? daysOfWeek.join(',') : undefined,
+        },
+        { onSuccess: resetForm },
+      )
+    } else {
+      // Tarefa avulsa
+      createTask.mutate(
+        { title: title.trim(), description: description.trim() || undefined, date: dateStr, type: taskType },
+        { onSuccess: resetForm },
+      )
+    }
+  }
+
+  function resetForm() {
     setShowForm(false)
     setTitle('')
     setDescription('')
     setTaskType('POSITIVE')
+    setIsRecurring(false)
+    setRecurrenceType('DAILY')
+    setDaysOfWeek([])
   }
+
+  const isPending = createTask.isPending || createRecurring.isPending
+  const canSubmit = title.trim() &&
+    (!isRecurring || recurrenceType === 'DAILY' || daysOfWeek.length > 0)
 
   const positiveTasks = tasks.filter(t => t.type === 'POSITIVE')
   const negativeTasks = tasks.filter(t => t.type === 'NEGATIVE')
@@ -128,10 +182,11 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
         ))}
       </div>
 
-      {/* Footer */}
+      {/* Footer — form or add button */}
       <div className="panel-footer">
         {showForm ? (
           <div className="add-form">
+            {/* Tipo positiva/negativa */}
             <div className="type-toggle">
               <button
                 className={`type-btn positive ${taskType === 'POSITIVE' ? 'active' : ''}`}
@@ -153,18 +208,19 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
               <p className="type-hint">Evitar esse hábito conta como boa escolha</p>
             )}
 
+            {/* Título */}
             <input
-              id="task-title"
               className="add-input"
               placeholder="Nome da tarefa"
               value={title}
               onChange={e => setTitle(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleCreate()}
+              onKeyDown={e => e.key === 'Enter' && !isRecurring && handleSubmit()}
               autoFocus
               aria-label="Nome da tarefa"
             />
+
+            {/* Descrição */}
             <textarea
-              id="task-desc"
               className="add-input"
               placeholder="Descrição (opcional)"
               rows={2}
@@ -172,15 +228,80 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
               onChange={e => setDescription(e.target.value)}
               aria-label="Descrição da tarefa"
             />
+
+            {/* Toggle recorrência */}
+            <label className="recurrence-toggle-row">
+              <input
+                type="checkbox"
+                className="recurrence-checkbox"
+                checked={isRecurring}
+                onChange={e => setIsRecurring(e.target.checked)}
+              />
+              <span className="recurrence-toggle-icon"><RepeatIcon /></span>
+              <span className="recurrence-toggle-label">Tornar tarefa recorrente</span>
+            </label>
+
+            {/* Opções de recorrência */}
+            {isRecurring && (
+              <div className="recurrence-options">
+                <div className="type-toggle">
+                  <button
+                    type="button"
+                    className={`type-btn positive ${recurrenceType === 'DAILY' ? 'active' : ''}`}
+                    onClick={() => setRecurrenceType('DAILY')}
+                  >
+                    Diário
+                  </button>
+                  <button
+                    type="button"
+                    className={`type-btn positive ${recurrenceType === 'WEEKLY' ? 'active' : ''}`}
+                    onClick={() => setRecurrenceType('WEEKLY')}
+                  >
+                    Semanal
+                  </button>
+                </div>
+
+                {recurrenceType === 'WEEKLY' && (
+                  <div className="weekday-picker">
+                    {WEEK_DAYS.map(d => (
+                      <button
+                        key={d.value}
+                        type="button"
+                        className={`weekday-btn ${daysOfWeek.includes(d.value) ? 'active' : ''}`}
+                        onClick={() => toggleDay(d.value)}
+                      >
+                        {d.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <p className="type-hint">
+                  {recurrenceType === 'DAILY'
+                    ? 'Aparecerá automaticamente todos os dias'
+                    : daysOfWeek.length === 0
+                      ? 'Selecione ao menos um dia da semana'
+                      : `Aparecerá toda ${WEEK_DAYS.filter(d => daysOfWeek.includes(d.value)).map(d => d.label).join(', ')}`
+                  }
+                </p>
+              </div>
+            )}
+
+            {/* Ações */}
             <div className="add-form-actions">
               <button
                 className="btn-primary"
-                onClick={handleCreate}
-                disabled={!title.trim() || create.isPending}
+                onClick={handleSubmit}
+                disabled={!canSubmit || isPending}
               >
-                {create.isPending ? 'Salvando...' : 'Adicionar'}
+                {isPending
+                  ? 'Salvando...'
+                  : isRecurring
+                    ? 'Criar recorrente'
+                    : 'Adicionar'
+                }
               </button>
-              <button className="btn-ghost" onClick={cancelForm}>Cancelar</button>
+              <button className="btn-ghost" onClick={resetForm}>Cancelar</button>
             </div>
           </div>
         ) : (

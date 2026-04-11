@@ -8,7 +8,6 @@ import RegisterPage       from './pages/RegisterPage'
 import CalendarPage       from './pages/CalendarPage'
 import DashboardPage      from './pages/DashboardPage'
 import GraficosPage       from './pages/GraficosPage'
-import RecorrentesPage    from './pages/RecorrentesPage'
 import ContaPage          from './pages/ContaPage'
 import PersonalizarPage   from './pages/PersonalizarPage'
 import ConfiguracoesPage  from './pages/ConfiguracoesPage'
@@ -35,7 +34,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 <Route index                    element={<CalendarPage />} />
                 <Route path="dashboard"         element={<DashboardPage />} />
                 <Route path="graficos"          element={<GraficosPage />} />
-                <Route path="recorrentes"       element={<RecorrentesPage />} />
                 <Route path="conta"             element={<ContaPage />} />
                 <Route path="personalizar"      element={<PersonalizarPage />} />
                 <Route path="configuracoes"     element={<ConfiguracoesPage />} />

@@ -99,6 +99,22 @@ export function useCreateTemplate() {
   })
 }
 
+/**
+ * Cria um template recorrente e depois invalida as tasks do dia para
+ * que o backend auto-gere a instância via generateInstancesForDate().
+ */
+export function useCreateRecurringTask(date: string) {
+  const invalidate = useInvalidateBoth(date)
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: TaskTemplateRequest) => createTemplate(data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.templates() })
+      invalidate()
+    },
+  })
+}
+
 export function useUpdateTemplate() {
   const qc = useQueryClient()
   return useMutation({

@@ -1641,3 +1641,95 @@ a.sidebar-item.active::before {
     scroll-behavior: auto !important;
   }
 }
+
+/* ── 17. Calendar day number — subtle border chip ───────────────
+   Adds a minimal 1px border around the number so each day is
+   clearly delineated. Elegant, low-contrast, purely structural.
+─────────────────────────────────────────────────────────────── */
+.cal-day-num {
+  border: 1px solid var(--line-md);
+  border-radius: var(--r-xs);   /* 3px — barely rounded */
+  padding: 1px 5px;
+  min-width: 22px;
+  text-align: center;
+  transition: border-color 0.15s;
+}
+
+/* Today: accent-tinted border to reinforce the "now" indicator */
+.cal-day.today .cal-day-num {
+  border-color: var(--accent-border);
+}
+
+/* Selected: no number border (cell already has prominent border) */
+.cal-day.selected .cal-day-num {
+  border-color: transparent;
+}
+
+/* Colored days: border matches cell color so it blends naturally */
+.cal-day.day-green      .cal-day-num { border-color: var(--green-border); }
+.cal-day.day-lightgreen .cal-day-num { border-color: rgba(52,211,153,0.22); }
+.cal-day.day-yellow     .cal-day-num { border-color: rgba(251,191,36,0.22); }
+.cal-day.day-red        .cal-day-num { border-color: var(--red-border); }
+
+/* ── 18. Recurrence toggle row — inside task creation form ──────
+   Inline checkbox + icon + label row.
+─────────────────────────────────────────────────────────────── */
+.recurrence-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border-radius: var(--r);
+  border: 1px solid var(--line);
+  background: var(--raised);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+}
+.recurrence-toggle-row:hover {
+  border-color: var(--line-md);
+  background: var(--lift);
+}
+.recurrence-toggle-row:has(.recurrence-checkbox:checked) {
+  border-color: var(--accent-border);
+  background: var(--accent-glow);
+}
+
+.recurrence-checkbox {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.recurrence-toggle-icon {
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+}
+.recurrence-toggle-row:has(.recurrence-checkbox:checked) .recurrence-toggle-icon {
+  color: var(--accent);
+}
+
+.recurrence-toggle-label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-2);
+  letter-spacing: -0.1px;
+}
+.recurrence-toggle-row:has(.recurrence-checkbox:checked) .recurrence-toggle-label {
+  color: var(--accent);
+}
+
+/* Recurrence options block that expands below the toggle */
+.recurrence-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: var(--elevated);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--r);
+  animation: fadeUp 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
+}

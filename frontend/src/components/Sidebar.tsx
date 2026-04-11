@@ -31,16 +31,6 @@ function IconChart() {
     </svg>
   )
 }
-function IconRepeat() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="17 1 21 5 17 9"/>
-      <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-      <polyline points="7 23 3 19 7 15"/>
-      <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
-    </svg>
-  )
-}
 function IconUser() {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -121,7 +111,6 @@ export default function Sidebar() {
         <NavItem to="/"          icon={<IconCalendar />} label="Calendário" end />
         <NavItem to="/dashboard"   icon={<IconGrid />}    label="Dashboard" />
         <NavItem to="/graficos"    icon={<IconChart />}   label="Gráficos" />
-        <NavItem to="/recorrentes" icon={<IconRepeat />}  label="Recorrentes" />
 
         <p className="sidebar-section-label" style={{ marginTop: 12 }}>Conta</p>
         <NavItem to="/conta"         icon={<IconUser />}     label="Meu Perfil" />
