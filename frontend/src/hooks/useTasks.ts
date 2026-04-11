@@ -6,12 +6,18 @@ import {
   getTasksByDate,
   toggleTask,
   updateTask,
+  getTemplates,
+  createTemplate,
+  updateTemplate,
+  toggleTemplate,
+  deleteTemplate,
 } from '../api/tasks'
-import type { TaskRequest } from '../types'
+import type { TaskRequest, TaskTemplateRequest } from '../types'
 
 export const queryKeys = {
-  tasks:   (date: string)                => ['tasks', date]          as const,
-  summary: (year: number, month: number) => ['summary', year, month] as const,
+  tasks:     (date: string)                => ['tasks', date]          as const,
+  summary:   (year: number, month: number) => ['summary', year, month] as const,
+  templates: ()                            => ['templates']            as const,
 }
 
 /** Extrai year/month de uma string "YYYY-MM-DD" */
@@ -73,5 +79,46 @@ export function useUpdateTask(date: string) {
   return useMutation({
     mutationFn: ({ id, data }: { id: number; data: TaskRequest }) => updateTask(id, data),
     onSuccess:  invalidate,
+  })
+}
+
+// ── Template hooks ─────────────────────────────────────────────
+
+export function useTemplates() {
+  return useQuery({
+    queryKey: queryKeys.templates(),
+    queryFn:  getTemplates,
+  })
+}
+
+export function useCreateTemplate() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: TaskTemplateRequest) => createTemplate(data),
+    onSuccess:  () => qc.invalidateQueries({ queryKey: queryKeys.templates() }),
+  })
+}
+
+export function useUpdateTemplate() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: TaskTemplateRequest }) => updateTemplate(id, data),
+    onSuccess:  () => qc.invalidateQueries({ queryKey: queryKeys.templates() }),
+  })
+}
+
+export function useToggleTemplate() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => toggleTemplate(id),
+    onSuccess:  () => qc.invalidateQueries({ queryKey: queryKeys.templates() }),
+  })
+}
+
+export function useDeleteTemplate() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => deleteTemplate(id),
+    onSuccess:  () => qc.invalidateQueries({ queryKey: queryKeys.templates() }),
   })
 }

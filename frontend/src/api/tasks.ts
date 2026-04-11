@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { Task, TaskRequest, DaySummary, AuthResponse, LoginRequest, RegisterRequest } from '../types'
+import type { Task, TaskRequest, DaySummary, AuthResponse, LoginRequest, RegisterRequest, TaskTemplate, TaskTemplateRequest } from '../types'
 
 const api = axios.create({
   baseURL: '/api',
@@ -60,3 +60,20 @@ export const getMonthlySummary = (
   month: number,
 ): Promise<Record<string, DaySummary>> =>
   api.get('/tasks/summary', { params: { year, month } }).then(r => r.data)
+
+// ── Templates recorrentes ──────────────────────────────────────
+
+export const getTemplates = (): Promise<TaskTemplate[]> =>
+  api.get<TaskTemplate[]>('/templates').then(r => r.data)
+
+export const createTemplate = (data: TaskTemplateRequest): Promise<TaskTemplate> =>
+  api.post<TaskTemplate>('/templates', data).then(r => r.data)
+
+export const updateTemplate = (id: number, data: TaskTemplateRequest): Promise<TaskTemplate> =>
+  api.put<TaskTemplate>(`/templates/${id}`, data).then(r => r.data)
+
+export const toggleTemplate = (id: number): Promise<TaskTemplate> =>
+  api.patch<TaskTemplate>(`/templates/${id}/toggle`).then(r => r.data)
+
+export const deleteTemplate = (id: number): Promise<void> =>
+  api.delete(`/templates/${id}`).then(() => undefined)

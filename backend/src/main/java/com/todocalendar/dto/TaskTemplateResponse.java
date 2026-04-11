@@ -1,22 +1,22 @@
 package com.todocalendar.dto;
 
+import com.todocalendar.entity.RecurrenceType;
 import com.todocalendar.entity.TaskType;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class TaskResponse {
+public class TaskTemplateResponse {
     private Long id;
     private String title;
     private String description;
-    private LocalDate date;
-    private boolean completed;
     private TaskType type;
-    private Long sourceTemplateId;
+    private RecurrenceType recurrenceType;
+    private String daysOfWeek;
+    private boolean active;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

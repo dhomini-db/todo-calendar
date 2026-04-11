@@ -10,6 +10,7 @@ import com.todocalendar.repository.TaskRepository;
 import com.todocalendar.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,15 +21,32 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
 public class TaskService {
 
-    private final TaskRepository taskRepository;
-    private final UserRepository userRepository;
+    private final TaskRepository      taskRepository;
+    private final UserRepository      userRepository;
+    private final TaskTemplateService templateService;
+
+    public TaskService(TaskRepository taskRepository,
+                       UserRepository userRepository,
+                       @Lazy TaskTemplateService templateService) {
+        this.taskRepository  = taskRepository;
+        this.userRepository  = userRepository;
+        this.templateService = templateService;
+    }
 
     // ── CRUD ───────────────────────────────────────────────────
 
+    /**
+     * Retorna as tarefas do dia, gerando automaticamente instâncias de
+     * templates recorrentes que ainda não existam para a data.
+     */
+    @Transactional
     public List<TaskResponse> getTasksByDate(LocalDate date, Long userId) {
+        // 1. Gerar instâncias de templates ativos (idempotente)
+        templateService.generateInstancesForDate(date, userId);
+
+        // 2. Retornar todas as tarefas do dia
         return taskRepository.findByDateAndUserIdOrderByCreatedAtAsc(date, userId)
                 .stream()
                 .map(this::toResponse)
@@ -74,14 +92,6 @@ public class TaskService {
 
     // ── Resumo mensal ──────────────────────────────────────────
 
-    /**
-     * Calcula o score diário considerando tipos:
-     *   - POSITIVE concluída       → boa escolha
-     *   - NEGATIVE não concluída   → boa escolha (resistiu ao hábito ruim)
-     *   - Demais combinações       → má escolha
-     *
-     * score = boas_escolhas / total × 100
-     */
     public Map<String, DaySummaryResponse> getMonthlySummary(int year, int month, Long userId) {
         YearMonth yearMonth = YearMonth.of(year, month);
         LocalDate start = yearMonth.atDay(1);
@@ -100,7 +110,7 @@ public class TaskService {
             summary.put(date.toString(), DaySummaryResponse.builder()
                     .date(date)
                     .total((int) total)
-                    .completed((int) goodOutcomes) // campo reutilizado para boas escolhas
+                    .completed((int) goodOutcomes)
                     .percentage(Math.round(percentage * 10.0) / 10.0)
                     .color(color)
                     .build());
@@ -118,7 +128,7 @@ public class TaskService {
         return "RED";
     }
 
-    private Task findOrThrow(Long id, Long userId) {
+    Task findOrThrow(Long id, Long userId) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tarefa não encontrada: " + id));
         if (task.getUser() != null && !task.getUser().getId().equals(userId)) {
@@ -135,6 +145,7 @@ public class TaskService {
                 .date(task.getDate())
                 .completed(task.isCompleted())
                 .type(task.getType())
+                .sourceTemplateId(task.getSourceTemplateId())
                 .createdAt(task.getCreatedAt())
                 .updatedAt(task.getUpdatedAt())
                 .build();

@@ -1261,3 +1261,145 @@ a.sidebar-item.active .sidebar-item-icon {
 .placeholder-banner-icon  { font-size: 32px; margin-bottom: 14px; opacity: 0.6; }
 .placeholder-banner-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 7px; letter-spacing: -0.2px; }
 .placeholder-banner-desc  { font-size: 13px; color: var(--text-2); max-width: 400px; margin: 0 auto; line-height: 1.6; }
+
+/* ═══════════════════════════════════════════════════════════════
+   RECURRING TASKS PAGE
+═══════════════════════════════════════════════════════════════ */
+
+/* Form wrapper */
+.template-form-wrapper {
+  background: var(--elevated);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.template-form { display: flex; flex-direction: column; gap: 8px; }
+
+/* Weekday picker */
+.weekday-picker {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.weekday-btn {
+  padding: 5px 10px;
+  border-radius: var(--r-sm);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--line-md);
+  background: none;
+  color: var(--text-2);
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  font-family: inherit;
+}
+.weekday-btn:hover  { background: var(--raised); color: var(--text); }
+.weekday-btn.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-border); }
+
+/* Template list */
+.template-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Template card */
+.template-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 14px;
+  border-radius: var(--r);
+  background: var(--elevated);
+  border: 1px solid var(--line);
+  transition: background 0.12s, border-color 0.12s;
+  gap: 12px;
+}
+.template-card:hover { background: var(--raised); border-color: var(--line-md); }
+.template-card.inactive { opacity: 0.5; }
+
+.template-card-left {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  flex: 1;
+}
+
+.template-type-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.template-type-dot.positive { background: var(--accent); }
+.template-type-dot.negative { background: var(--red); }
+
+.template-card-info { min-width: 0; }
+.template-card-title {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -0.1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.template-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+.template-recurrence-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-2);
+}
+.template-card-desc {
+  font-size: 11px;
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.template-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* Toggle switch */
+.template-toggle-btn {
+  width: 34px;
+  height: 19px;
+  border-radius: 99px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.18s;
+  position: relative;
+  flex-shrink: 0;
+}
+.template-toggle-btn.on  { background: var(--accent); }
+.template-toggle-btn.off { background: var(--line-hi); }
+
+.template-toggle-knob {
+  position: absolute;
+  top: 2px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #fff;
+  transition: left 0.18s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+.template-toggle-btn.on  .template-toggle-knob { left: 17px; }
+.template-toggle-btn.off .template-toggle-knob { left: 2px; }

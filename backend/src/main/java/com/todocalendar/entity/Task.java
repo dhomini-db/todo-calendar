@@ -46,6 +46,13 @@ public class Task {
     @JoinColumn(name = "user_id", nullable = true)
     private User user;
 
+    /**
+     * Referência ao template que gerou esta instância (nullable).
+     * null = tarefa criada manualmente pelo usuário.
+     */
+    @Column(name = "source_template_id")
+    private Long sourceTemplateId;
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
