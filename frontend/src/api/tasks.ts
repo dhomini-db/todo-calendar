@@ -1,8 +1,15 @@
 import axios from 'axios'
 import type { Task, TaskRequest, DaySummary, AuthResponse, LoginRequest, RegisterRequest, TaskTemplate, TaskTemplateRequest } from '../types'
 
+/**
+ * Em dev  → Vite proxy redireciona /api para localhost:8081 (sem CORS)
+ * Em Docker → Nginx proxy redireciona /api para backend:8081
+ * Em produção (Vercel) → VITE_API_URL aponta para o backend hospedado
+ */
+const BASE = import.meta.env.VITE_API_URL ?? '/api'
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: BASE,
   headers: { 'Content-Type': 'application/json' },
 })
 

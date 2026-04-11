@@ -1,51 +1,201 @@
 # TodoCalendar
 
-Sistema estilo To-Do List com Calendário, inspirado no Notion.
+> Sistema de gestão de tarefas diárias com calendário inteligente, recorrência automática e múltiplos temas visuais.
 
-## Stack
+🌐 **Acesse o projeto:** [todo-calendar.vercel.app](https://todo-calendar.vercel.app)
 
-| Camada    | Tecnologia                          |
-|-----------|-------------------------------------|
-| Backend   | Java 21 + Spring Boot 3.2 + JPA     |
-| Banco     | PostgreSQL 16                       |
-| Frontend  | React 18 + TypeScript + Vite        |
-| Estilo    | TailwindCSS                         |
-| Estado    | TanStack Query (React Query)        |
-| Infra     | Docker + Docker Compose             |
+---
 
-## Portas
+## Visão Geral
 
-| Serviço    | Host   | Container |
-|------------|--------|-----------|
-| PostgreSQL | 5433   | 5432      |
-| API        | 8081   | 8081      |
-| Frontend   | 3001   | 80        |
+TodoCalendar é uma aplicação full-stack para organização de hábitos e tarefas diárias. Cada dia do calendário reflete visualmente o desempenho do usuário com base nas tarefas concluídas. Suporta tarefas positivas (metas), negativas (hábitos a evitar) e recorrentes (geradas automaticamente).
 
-## Como rodar
+### Funcionalidades
+
+- **Calendário interativo** com cores por desempenho diário (verde → vermelho)
+- **Painel de tarefas** por dia com score de boas escolhas
+- **Tarefas recorrentes** — crie uma vez, apareça todos os dias automaticamente
+- **Recorrência Diária ou Semanal** com seleção de dias da semana
+- **Sidebar redimensionável** com persistência no navegador
+- **4 temas visuais**: Studio Dark, Arctic, Rose Dawn e Amber Night
+- **Autenticação JWT** com registro e login por usuário
+
+---
+
+## Stack Tecnológica
+
+| Camada      | Tecnologia                                         |
+|-------------|----------------------------------------------------|
+| Frontend    | React 18 + TypeScript + Vite                       |
+| Estilização | TailwindCSS 3 + CSS Custom Properties              |
+| Estado      | TanStack Query v5 (React Query)                    |
+| Roteamento  | React Router v6                                    |
+| Backend     | Java 21 + Spring Boot 3.2 + Spring Security        |
+| Banco       | PostgreSQL 16                                      |
+| Auth        | JWT (JJWT)                                         |
+| Infra       | Docker + Docker Compose + Nginx                    |
+| Deploy      | Vercel (frontend) + servidor próprio (backend)     |
+
+---
+
+## Executar Localmente
+
+### Pré-requisitos
+
+- [Docker](https://www.docker.com/) e Docker Compose
+- Node.js 20+ (somente para desenvolvimento frontend)
+- Java 21+ e Maven (somente para desenvolvimento backend)
+
+### Com Docker (recomendado)
 
 ```bash
+# Clonar o repositório
+git clone https://github.com/dhomini-db/todo-calendar.git
+cd todo-calendar
+
+# Subir todos os serviços
 docker compose up --build
 ```
 
-Acesse: http://localhost:3001
+| Serviço    | URL                       |
+|------------|---------------------------|
+| Frontend   | http://localhost:3001      |
+| Backend    | http://localhost:8081      |
+| PostgreSQL | localhost:5433             |
 
-## API Endpoints
+### Frontend (desenvolvimento)
 
-| Método | Rota                            | Descrição                     |
-|--------|---------------------------------|-------------------------------|
-| GET    | /api/tasks?date=YYYY-MM-DD      | Tarefas de um dia             |
-| POST   | /api/tasks                      | Criar tarefa                  |
-| PUT    | /api/tasks/{id}                 | Atualizar tarefa              |
-| PATCH  | /api/tasks/{id}/toggle          | Alternar conclusão            |
-| DELETE | /api/tasks/{id}                 | Excluir tarefa                |
-| GET    | /api/tasks/summary?year=&month= | Resumo mensal com cores       |
+```bash
+cd frontend
+npm install
+npm run dev       # http://localhost:5173
+```
 
-## Regras de cor
+O Vite faz proxy automático de `/api` para `localhost:8081`.
 
-| Porcentagem | Cor          |
-|-------------|--------------|
-| 100%        | Verde        |
-| 70–99%      | Verde claro  |
-| 50–69%      | Amarelo      |
-| 1–49%       | Vermelho     |
-| Sem tarefas | Sem cor      |
+### Backend (desenvolvimento)
+
+```bash
+cd backend
+mvn spring-boot:run
+```
+
+Requer PostgreSQL rodando localmente na porta 5433.
+
+---
+
+## Variáveis de Ambiente
+
+### Frontend (`.env`)
+
+```env
+# URL do backend em produção (Vercel não tem proxy de servidor)
+# Em dev e Docker, deixe em branco — /api é resolvido pelo proxy local
+VITE_API_URL=https://api.seudominio.com/api
+```
+
+Copie `.env.example` como ponto de partida:
+
+```bash
+cp frontend/.env.example frontend/.env
+```
+
+### Backend
+
+| Variável          | Padrão                      | Descrição                             |
+|-------------------|-----------------------------|---------------------------------------|
+| `DB_URL`          | `jdbc:postgresql://...`     | URL JDBC do PostgreSQL                |
+| `DB_USER`         | `postgres`                  | Usuário do banco                      |
+| `DB_PASSWORD`     | `postgres`                  | Senha do banco                        |
+| `JWT_SECRET`      | (chave de dev embutida)     | Chave secreta para assinar tokens JWT |
+| `ALLOWED_ORIGINS` | `http://localhost:3001,...` | Origens CORS separadas por vírgula    |
+
+> **Em produção**: defina `ALLOWED_ORIGINS=https://seu-app.vercel.app` no ambiente do backend.
+
+---
+
+## Deploy no Vercel
+
+O frontend está configurado para deploy direto no Vercel.
+
+### Passos
+
+1. Faça fork ou importe este repositório no [Vercel](https://vercel.com)
+2. Configure o **Root Directory** como `frontend`
+3. O Vercel detecta Vite automaticamente:
+   - **Build Command:** `npm run build`
+   - **Output Directory:** `dist`
+4. Adicione a variável de ambiente:
+   - `VITE_API_URL` → URL pública do seu backend (ex: `https://api.seudominio.com/api`)
+5. Deploy
+
+O arquivo `frontend/vercel.json` já configura o fallback de rotas para SPA (React Router).
+
+---
+
+## API — Endpoints
+
+### Autenticação
+
+| Método | Rota                 | Descrição         |
+|--------|----------------------|-------------------|
+| POST   | `/api/auth/register` | Criar conta       |
+| POST   | `/api/auth/login`    | Login + token JWT |
+
+### Tarefas
+
+| Método | Rota                              | Descrição                        |
+|--------|-----------------------------------|----------------------------------|
+| GET    | `/api/tasks?date=YYYY-MM-DD`      | Tarefas de um dia                |
+| POST   | `/api/tasks`                      | Criar tarefa                     |
+| PUT    | `/api/tasks/{id}`                 | Atualizar tarefa                 |
+| PATCH  | `/api/tasks/{id}/toggle`          | Alternar conclusão               |
+| DELETE | `/api/tasks/{id}`                 | Excluir tarefa                   |
+| GET    | `/api/tasks/summary?year=&month=` | Resumo mensal com score de cores |
+
+### Tarefas Recorrentes
+
+| Método | Rota                         | Descrição                    |
+|--------|------------------------------|------------------------------|
+| GET    | `/api/templates`             | Listar templates do usuário  |
+| POST   | `/api/templates`             | Criar template recorrente    |
+| PUT    | `/api/templates/{id}`        | Atualizar template           |
+| PATCH  | `/api/templates/{id}/toggle` | Ativar / pausar template     |
+| DELETE | `/api/templates/{id}`        | Excluir template             |
+
+---
+
+## Estrutura do Projeto
+
+```
+todo-calendar/
+├── backend/                    # Spring Boot API
+│   ├── src/main/java/
+│   │   └── com/todocalendar/
+│   │       ├── controller/     # REST endpoints
+│   │       ├── service/        # Regras de negócio
+│   │       ├── entity/         # Entidades JPA
+│   │       ├── dto/            # Request / Response DTOs
+│   │       ├── repository/     # Spring Data JPA
+│   │       ├── security/       # JWT filter
+│   │       └── config/         # SecurityConfig, AppConfig
+│   └── Dockerfile
+├── frontend/                   # React + Vite
+│   ├── src/
+│   │   ├── components/         # Sidebar, Calendar, TaskPanel, TaskItem
+│   │   ├── pages/              # CalendarPage, Dashboard, Graficos, etc.
+│   │   ├── hooks/              # useTasks, useTemplates
+│   │   ├── api/                # Axios client
+│   │   ├── contexts/           # AuthContext, ThemeContext
+│   │   └── types/              # TypeScript types
+│   ├── public/                 # Logo SVG, favicon
+│   ├── vercel.json             # Configuração de deploy (SPA routing)
+│   └── Dockerfile
+└── docker-compose.yml
+```
+
+---
+
+## Licença
+
+MIT
