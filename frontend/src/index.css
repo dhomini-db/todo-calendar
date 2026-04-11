@@ -641,9 +641,9 @@ a.sidebar-item.active .sidebar-item-icon {
   padding: 4px 0;
 }
 
-.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
 
-/* Day cell */
+/* Day cell — each day is a discrete card with subtle border */
 .cal-day {
   position: relative;
   aspect-ratio: 1 / 0.85;
@@ -651,9 +651,9 @@ a.sidebar-item.active .sidebar-item-icon {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: var(--r-sm);
-  border: 1px solid transparent;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  border-radius: var(--r);          /* 8px */
+  border: 1px solid var(--line-md); /* subtle card definition */
+  transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
   gap: 1px;
   background: none;
   font-family: inherit;
@@ -693,7 +693,7 @@ a.sidebar-item.active .sidebar-item-icon {
 }
 
 /* States */
-.cal-day:hover { background: var(--raised); }
+.cal-day:hover { background: var(--raised); border-color: var(--line-hi); }
 .cal-day:hover .cal-day-num { color: var(--text); }
 
 .cal-day.today .cal-day-num { color: var(--accent); font-weight: 700; }
@@ -1642,34 +1642,14 @@ a.sidebar-item.active::before {
   }
 }
 
-/* ── 17. Calendar day number — subtle border chip ───────────────
-   Adds a minimal 1px border around the number so each day is
-   clearly delineated. Elegant, low-contrast, purely structural.
+/* ── 17. Calendar day card borders ─────────────────────────────
+   Border is applied to the full .cal-day card, not the number.
+   Colored state borders override the base line-md.
 ─────────────────────────────────────────────────────────────── */
-.cal-day-num {
-  border: 1px solid var(--line-md);
-  border-radius: var(--r-xs);   /* 3px — barely rounded */
-  padding: 1px 5px;
-  min-width: 22px;
-  text-align: center;
-  transition: border-color 0.15s;
-}
-
-/* Today: accent-tinted border to reinforce the "now" indicator */
-.cal-day.today .cal-day-num {
+/* Today: accent card border */
+.cal-day.today:not(.selected) {
   border-color: var(--accent-border);
 }
-
-/* Selected: no number border (cell already has prominent border) */
-.cal-day.selected .cal-day-num {
-  border-color: transparent;
-}
-
-/* Colored days: border matches cell color so it blends naturally */
-.cal-day.day-green      .cal-day-num { border-color: var(--green-border); }
-.cal-day.day-lightgreen .cal-day-num { border-color: rgba(52,211,153,0.22); }
-.cal-day.day-yellow     .cal-day-num { border-color: rgba(251,191,36,0.22); }
-.cal-day.day-red        .cal-day-num { border-color: var(--red-border); }
 
 /* ── 18. Recurrence toggle row — inside task creation form ──────
    Inline checkbox + icon + label row.
