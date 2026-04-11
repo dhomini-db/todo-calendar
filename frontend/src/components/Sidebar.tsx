@@ -1,5 +1,11 @@
+import { useEffect, useRef, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+
+const SIDEBAR_MIN     = 200
+const SIDEBAR_MAX     = 400
+const SIDEBAR_DEFAULT = 260
+const STORAGE_KEY     = 'sidebar-width'
 
 /* ── SVG Icons ────────────────────────────────────────────────
    16×16, stroke-based, strokeWidth 1.75 for refined look
@@ -88,6 +94,59 @@ export default function Sidebar() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
+  /* ── Resize logic ─────────────────────────────────────────── */
+  const [width, setWidth] = useState<number>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (saved) {
+      const n = parseInt(saved, 10)
+      if (!isNaN(n)) return Math.max(SIDEBAR_MIN, Math.min(SIDEBAR_MAX, n))
+    }
+    return SIDEBAR_DEFAULT
+  })
+
+  const dragging   = useRef(false)
+  const startX     = useRef(0)
+  const startW     = useRef(0)
+  const currentW   = useRef(width)
+  const handleRef  = useRef<HTMLDivElement>(null)
+
+  // Keep ref in sync for use inside event handlers
+  useEffect(() => { currentW.current = width }, [width])
+
+  useEffect(() => {
+    function onMove(e: MouseEvent) {
+      if (!dragging.current) return
+      const next = Math.max(SIDEBAR_MIN, Math.min(SIDEBAR_MAX, startW.current + e.clientX - startX.current))
+      currentW.current = next
+      setWidth(next)
+    }
+    function onUp() {
+      if (!dragging.current) return
+      dragging.current = false
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+      handleRef.current?.classList.remove('dragging')
+      localStorage.setItem(STORAGE_KEY, String(currentW.current))
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup',   onUp)
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup',   onUp)
+    }
+  }, [])
+
+  function startResize(e: React.MouseEvent) {
+    e.preventDefault()
+    dragging.current = true
+    startX.current   = e.clientX
+    startW.current   = width
+    document.body.style.cursor     = 'col-resize'
+    document.body.style.userSelect = 'none'
+    handleRef.current?.classList.add('dragging')
+  }
+
+  /* ── Helpers ──────────────────────────────────────────────── */
   const initials = user?.name
     ? user.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
     : '?'
@@ -98,7 +157,7 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="sidebar">
+    <aside className="sidebar" style={{ width }}>
       {/* Logo */}
       <div className="sidebar-logo">
         <img src="/logo-icon.svg" alt="TodoCalendar" className="sidebar-logo-img" />
@@ -134,6 +193,14 @@ export default function Sidebar() {
           Sair
         </button>
       </div>
+
+      {/* Drag handle — right edge */}
+      <div
+        ref={handleRef}
+        className="sidebar-resize-handle"
+        onMouseDown={startResize}
+        aria-hidden="true"
+      />
     </aside>
   )
 }

@@ -387,7 +387,8 @@ body {
 ─────────────────────────────────────────────── */
 
 .sidebar {
-  width: 236px;
+  /* width controlled by inline style (resizable); 260px is the JS default */
+  width: 260px;
   flex-shrink: 0;
   background: var(--surface);
   border-right: 1px solid var(--line);
@@ -395,6 +396,42 @@ body {
   flex-direction: column;
   padding: 0;
   overflow: hidden;
+  position: relative; /* needed for absolute handle */
+  min-width: 200px;
+  max-width: 400px;
+}
+
+/* ── Resize handle — right edge of sidebar ─────────────────── */
+.sidebar-resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 5px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 20;
+  /* visual indicator line centered in the handle zone */
+}
+.sidebar-resize-handle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 1px;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 36px;
+  border-radius: 99px;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.18s;
+}
+.sidebar-resize-handle:hover::after,
+.sidebar-resize-handle.dragging::after {
+  opacity: 0.55;
+}
+.sidebar-resize-handle.dragging::after {
+  opacity: 0.9;
+  height: 52px;
 }
 
 /* Logo */
