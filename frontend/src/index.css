@@ -130,22 +130,49 @@
 }
 
 [data-theme="rose-dawn"] {
-  --bg:         #f8f7f5;
-  --surface:    #f0ede9;
-  --elevated:   #ffffff;
-  --raised:     #f5f3f0;
-  --lift:       #ebe8e4;
-  --lift-hover: #e3dfd9;
-  --line:       rgba(0, 0, 0, 0.06);
-  --line-md:    rgba(0, 0, 0, 0.10);
-  --line-hi:    rgba(0, 0, 0, 0.16);
-  --accent:         #e11d48;
-  --accent-soft:    rgba(225, 29, 72, 0.08);
-  --accent-glow:    rgba(225, 29, 72, 0.04);
-  --accent-border:  rgba(225, 29, 72, 0.20);
-  --text:        #1a1a1a;
-  --text-2:      #6b6b6b;
-  --text-3:      #b0b0b0;
+  /* Surfaces — warm linen scale, more contrast between layers */
+  --bg:         #f2ede8;   /* warm linen — slightly darker base */
+  --surface:    #ede7e1;   /* sidebar, panel bg */
+  --elevated:   #faf7f4;   /* cards, modals — near-white warm */
+  --raised:     #f0ebe5;   /* hover states inside cards */
+  --lift:       #e8e1d9;   /* nested elements */
+  --lift-hover: #dfd7ce;   /* deeper hover */
+
+  /* Borders — more visible, still soft */
+  --line:       rgba(100, 60, 40, 0.10);
+  --line-md:    rgba(100, 60, 40, 0.18);
+  --line-hi:    rgba(100, 60, 40, 0.28);
+
+  /* Accent — rose, slightly deeper for contrast */
+  --accent:         #be123c;   /* rose-700 — readable on light */
+  --accent-soft:    rgba(190, 18, 60, 0.09);
+  --accent-glow:    rgba(190, 18, 60, 0.05);
+  --accent-border:  rgba(190, 18, 60, 0.25);
+
+  /* Text — strong 3-level hierarchy */
+  --text:        #1c1410;   /* near-black with warm tint — 16:1 on --elevated */
+  --text-2:      #5c4a3a;   /* warm brown-grey — 5.5:1 on --elevated */
+  --text-3:      #9c8878;   /* muted — 3:1, used only for placeholders/labels */
+
+  /* Status colors adjusted for light bg readability */
+  --green:        #15803d;  /* green-700 */
+  --green-soft:   rgba(21, 128, 61, 0.10);
+  --green-border: rgba(21, 128, 61, 0.22);
+  --teal:         #0f766e;  /* teal-700 */
+  --teal-soft:    rgba(15, 118, 110, 0.10);
+  --yellow:       #a16207;  /* amber-700 */
+  --yellow-soft:  rgba(161, 98, 7, 0.10);
+  --red:          #b91c1c;  /* red-700 */
+  --red-soft:     rgba(185, 28, 28, 0.09);
+  --red-border:   rgba(185, 28, 28, 0.22);
+
+  /* Shadows — warm-tinted for light theme */
+  --shadow-sm: 0 1px 3px rgba(100, 60, 40, 0.12);
+  --shadow:    0 2px 8px rgba(100, 60, 40, 0.14);
+  --shadow-md: 0 4px 16px rgba(100, 60, 40, 0.16);
+  --shadow-lg: 0 8px 40px rgba(100, 60, 40, 0.20);
+
+  /* Compatibility aliases */
   --card:          var(--elevated);
   --card-hover:    var(--raised);
   --border:        var(--line-md);
@@ -153,9 +180,12 @@
   --text-muted:    var(--text-2);
   --text-dim:      var(--text-3);
   --accent-dim:    var(--accent-soft);
-  --red-soft:      rgba(239, 68, 68, 0.08);
-  --red-border:    rgba(239, 68, 68, 0.20);
+  --positive:      var(--green);
+  --positive-dim:  var(--green-soft);
+  --negative:      var(--red);
+  --negative-dim:  var(--red-soft);
   --red-dim:       var(--red-soft);
+  --emerald:       var(--teal);
   --amber:         var(--accent);
   --amber-dim:     var(--accent-soft);
   --amber-glow:    var(--accent-glow);
