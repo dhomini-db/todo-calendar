@@ -2,6 +2,7 @@ package com.todocalendar.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -39,8 +40,12 @@ public class Task {
      * false = instância gerada automaticamente por template, ainda não tocada.
      *
      * Apenas tarefas com interacted=true entram no cálculo de progresso.
+     * @ColumnDefault garante que o Hibernate gere DEFAULT false no ALTER TABLE
+     * ao rodar ddl-auto=update em bancos com dados existentes.
      */
     @Column(nullable = false)
+    @ColumnDefault("false")
+    @Builder.Default
     private boolean interacted = false;
 
     /**
