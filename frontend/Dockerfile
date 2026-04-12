@@ -1,14 +1,17 @@
-# ── Estágio 1: build com Node ────────────────────────────────────────────────
-FROM node:20-alpine AS build
+# ── Estágio 1: instalar dependências ─────────────────────────────────────────
+FROM node:20-alpine AS deps
 
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm install
 
+# ── Estágio 2: build de produção ──────────────────────────────────────────────
+FROM deps AS build
+
 COPY . .
 RUN npm run build
 
-# ── Estágio 2: servir com Nginx ───────────────────────────────────────────────
+# ── Estágio 3: servir com Nginx ───────────────────────────────────────────────
 FROM nginx:1.25-alpine
 
 COPY --from=build /app/dist /usr/share/nginx/html

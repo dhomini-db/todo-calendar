@@ -1,0 +1,29 @@
+version: '3.9'
+
+# ════════════════════════════════════════════════════════════════════════════
+# Modo desenvolvimento — substitui o frontend Nginx por Vite dev server.
+# Qualquer alteração em src/ ou public/ aparece instantaneamente (HMR).
+#
+# Uso:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+#
+# O backend e o banco são idênticos ao modo produção.
+# Frontend disponível em http://localhost:3001
+# ════════════════════════════════════════════════════════════════════════════
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      target: deps          # para na instalação das dependências (sem build)
+    container_name: todocalendar-web-dev
+    command: npx vite --host 0.0.0.0 --port 3001
+    volumes:
+      - ./frontend:/app           # monta o source inteiro (HMR ao vivo)
+      - /app/node_modules         # preserva node_modules do container
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend
