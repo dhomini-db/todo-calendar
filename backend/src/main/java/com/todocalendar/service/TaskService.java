@@ -61,7 +61,7 @@ public class TaskService {
                 .description(request.getDescription())
                 .date(request.getDate())
                 .completed(false)
-                .interacted(true)  // tarefa criada manualmente → sempre conta no progresso
+                // interacted=false: tarefa começa como PENDING — só conta ao marcar o checkbox
                 .type(request.getType() != null ? request.getType() : TaskType.POSITIVE)
                 .user(user)
                 .build();
@@ -81,8 +81,11 @@ public class TaskService {
     @Transactional
     public TaskResponse toggleCompletion(Long id, Long userId) {
         Task task = findOrThrow(id, userId);
-        task.setCompleted(!task.isCompleted());
-        task.setInteracted(true);  // qualquer toggle marca como interagido
+        boolean newCompleted = !task.isCompleted();
+        task.setCompleted(newCompleted);
+        // Marcar (true)  → interacted=true  (entra no cálculo de progresso)
+        // Desmarcar (false) → interacted=false (volta para PENDING, sem contar)
+        task.setInteracted(newCompleted);
         return toResponse(taskRepository.save(task));
     }
 

@@ -20,12 +20,10 @@ function progressColor(pct: number): string {
 }
 
 function calcScore(tasks: { completed: boolean; interacted: boolean; type: TaskType }[]) {
-  const interacted = tasks.filter(t => t.interacted)
+  const interacted = tasks.filter(t => t.interacted)   // só tarefas marcadas
   if (interacted.length === 0) return 0
-  const good = interacted.filter(t =>
-    (t.type === 'POSITIVE' && t.completed) ||
-    (t.type === 'NEGATIVE' && !t.completed),
-  ).length
+  const good = interacted.filter(t => t.type === 'POSITIVE' && t.completed).length
+  // POSITIVE marcada = boa; NEGATIVE marcada = ruim (conta no total, não no good → reduz %)
   return Math.round((good / interacted.length) * 100)
 }
 
@@ -81,10 +79,7 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
   // Score — baseado apenas em tarefas com interação do usuário
   const interactedTasks = tasks.filter(t => t.interacted)
   const pct       = calcScore(tasks)
-  const goodCount = interactedTasks.filter(t =>
-    (t.type === 'POSITIVE' && t.completed) ||
-    (t.type === 'NEGATIVE' && !t.completed),
-  ).length
+  const goodCount = interactedTasks.filter(t => t.type === 'POSITIVE' && t.completed).length
 
   const dayName   = format(selectedDate, "EEEE", { locale: ptBR })
   const dateLabel = format(selectedDate, "d 'de' MMMM", { locale: ptBR })

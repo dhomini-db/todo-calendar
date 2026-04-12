@@ -17,15 +17,13 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByDateAndUserIdAndSkippedFalseOrderByCreatedAtAsc(LocalDate date, Long userId);
 
     /**
-     * Retorna por dia: total de tarefas interagidas e total de "boas escolhas".
+     * Retorna por dia: total de tarefas marcadas (interacted=true) e boas escolhas.
      *
-     * Apenas tarefas onde interacted=true entram no cálculo.
-     * Tarefas geradas automaticamente (interacted=false) são ignoradas até
-     * que o usuário interaja com elas.
-     *
-     * Boa escolha (entre as interagidas) =
-     *   - Tarefa POSITIVE concluída   (você fez o que devia)
-     *   - Tarefa NEGATIVE não concluída (você evitou o hábito ruim)
+     * Regras:
+     *   - Apenas tarefas com interacted=true entram no cálculo (checkbox marcado).
+     *   - Tarefa POSITIVE marcada (completed=true)  → boa escolha (+1 good, +1 total)
+     *   - Tarefa NEGATIVE marcada (completed=true)  → má escolha  (+0 good, +1 total) → reduz %
+     *   - Qualquer tarefa PENDING (interacted=false) → ignorada completamente
      *
      * Porcentagem = goodOutcomes / totalInteracted × 100
      */
@@ -33,8 +31,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             SELECT t.date,
                    SUM(CASE WHEN t.interacted = true THEN 1 ELSE 0 END),
                    SUM(CASE
-                         WHEN t.interacted = true AND t.type = 'POSITIVE' AND t.completed = true  THEN 1
-                         WHEN t.interacted = true AND t.type = 'NEGATIVE' AND t.completed = false THEN 1
+                         WHEN t.interacted = true AND t.type = 'POSITIVE' AND t.completed = true THEN 1
                          ELSE 0
                        END)
             FROM Task t

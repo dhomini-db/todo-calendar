@@ -16,9 +16,9 @@ export default function TaskItem({ task, date }: TaskItemProps) {
   const remove = useDeleteTask(date)
   const update = useUpdateTask(date)
 
-  const isPositive    = task.type === 'POSITIVE'
-  const isPending     = !task.interacted && task.sourceTemplateId != null
-  const isGoodOutcome = isPositive ? task.completed : !task.completed
+  const isPositive = task.type === 'POSITIVE'
+  // PENDING = ainda não marcado (interacted=false, qualquer origem)
+  const isPending  = !task.interacted
 
   function handleEditSave() {
     const trimmed = editTitle.trim()
@@ -67,14 +67,12 @@ export default function TaskItem({ task, date }: TaskItemProps) {
           <>
             <p className={`task-title ${task.completed ? 'done' : ''}`}>{task.title}</p>
             {task.description && <p className="task-desc">{task.description}</p>}
-            {isPending && (
+            {isPending && task.sourceTemplateId != null && (
               <span className="task-outcome pending">Pendente</span>
             )}
-            {!isPending && task.interacted && (
-              <span className={`task-outcome ${isGoodOutcome ? 'good' : 'bad'}`}>
-                {isPositive
-                  ? task.completed ? 'Concluída' : 'Não realizada'
-                  : task.completed ? 'Hábito realizado' : 'Hábito evitado'}
+            {!isPending && (
+              <span className={`task-outcome ${isPositive ? 'good' : 'bad'}`}>
+                {isPositive ? 'Concluída' : 'Hábito realizado'}
               </span>
             )}
           </>
