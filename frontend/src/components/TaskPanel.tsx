@@ -20,11 +20,11 @@ function progressColor(pct: number): string {
 }
 
 function calcScore(tasks: { completed: boolean; interacted: boolean; type: TaskType }[]) {
-  const interacted = tasks.filter(t => t.interacted)   // só tarefas marcadas
-  if (interacted.length === 0) return 0
-  const good = interacted.filter(t => t.type === 'POSITIVE' && t.completed).length
-  // POSITIVE marcada = boa; NEGATIVE marcada = ruim (conta no total, não no good → reduz %)
-  return Math.round((good / interacted.length) * 100)
+  if (tasks.length === 0) return 0
+  // Denominador = todas as tarefas (não apenas as interagidas).
+  // Isso evita que 1 positiva marcada = 100% quando há outras tarefas pendentes.
+  const good = tasks.filter(t => t.interacted && t.type === 'POSITIVE' && t.completed).length
+  return Math.round((good / tasks.length) * 100)
 }
 
 const WEEK_DAYS = [

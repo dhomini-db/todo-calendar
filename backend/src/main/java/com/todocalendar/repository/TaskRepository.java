@@ -17,23 +17,25 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByDateAndUserIdAndSkippedFalseOrderByCreatedAtAsc(LocalDate date, Long userId);
 
     /**
-     * Retorna por dia: total de tarefas marcadas (interacted=true) e boas escolhas.
+     * Retorna por dia: total de tarefas, boas escolhas e qtd interagidas.
      *
      * Regras:
-     *   - Apenas tarefas com interacted=true entram no cálculo (checkbox marcado).
-     *   - Tarefa POSITIVE marcada (completed=true)  → boa escolha (+1 good, +1 total)
-     *   - Tarefa NEGATIVE marcada (completed=true)  → má escolha  (+0 good, +1 total) → reduz %
-     *   - Qualquer tarefa PENDING (interacted=false) → ignorada completamente
+     *   - Denominador = TODAS as tarefas do dia (não apenas as interagidas).
+     *   - Numerador   = POSITIVE + completed + interacted (boa escolha explícita).
+     *   - Cor/% só aparece quando interacted_count > 0 (usuário interagiu ao menos 1 vez).
+     *   - NEGATIVE desmarcada (interacted=false) → conta no denominador → reduz %.
+     *   - Isso corrige o bug "1 positiva marcada = 100%" quando existem outras tarefas.
      *
-     * Porcentagem = goodOutcomes / totalInteracted × 100
+     * Porcentagem = goodOutcomes / allTasks × 100   (mas só exibe se interacted > 0)
      */
     @Query("""
             SELECT t.date,
-                   SUM(CASE WHEN t.interacted = true THEN 1 ELSE 0 END),
+                   COUNT(t),
                    SUM(CASE
-                         WHEN t.interacted = true AND t.type = 'POSITIVE' AND t.completed = true THEN 1
+                         WHEN t.type = 'POSITIVE' AND t.completed = true AND t.interacted = true THEN 1
                          ELSE 0
-                       END)
+                       END),
+                   SUM(CASE WHEN t.interacted = true THEN 1 ELSE 0 END)
             FROM Task t
             WHERE t.date BETWEEN :start AND :end
               AND t.user.id = :userId

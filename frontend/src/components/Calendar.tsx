@@ -22,7 +22,7 @@ interface CalendarProps {
 
 /** Retorna a classe CSS e a cor do bar para o dia */
 function dayStyle(summary: DaySummary | undefined): { cls: string; bar: string } {
-  if (!summary || summary.total === 0) return { cls: '', bar: '' }
+  if (!summary || summary.color === 'NONE') return { cls: '', bar: '' }
   switch (summary.color) {
     case 'GREEN':       return { cls: 'day-green',      bar: '#4ade80' }
     case 'LIGHT_GREEN': return { cls: 'day-lightgreen', bar: '#34d399' }
@@ -72,7 +72,7 @@ export default function Calendar({ selectedDate, onSelectDate, currentMonth, onC
           const isSelected = isSameDay(day, selectedDate)
           const isTodayDay = isToday(day)
           const { cls, bar } = dayStyle(daySumm)
-          const hasTasks   = daySumm && daySumm.total > 0
+          const hasTasks   = daySumm && daySumm.color !== 'NONE'
           const pct        = hasTasks ? Math.round(daySumm!.percentage) : 0
 
           return (
