@@ -15,6 +15,7 @@ public class TaskResponse {
     private String description;
     private LocalDate date;
     private boolean completed;
+    private boolean interacted;
     private TaskType type;
     private Long sourceTemplateId;
     private LocalDateTime createdAt;

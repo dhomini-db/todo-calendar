@@ -34,6 +34,16 @@ public class Task {
     private boolean completed = false;
 
     /**
+     * true  = usuário interagiu com a tarefa (toggle chamado ao menos uma vez,
+     *         ou tarefa criada manualmente).
+     * false = instância gerada automaticamente por template, ainda não tocada.
+     *
+     * Apenas tarefas com interacted=true entram no cálculo de progresso.
+     */
+    @Column(nullable = false)
+    private boolean interacted = false;
+
+    /**
      * Tipo da tarefa: POSITIVE (fazer) ou NEGATIVE (evitar).
      * Padrão POSITIVE para manter compatibilidade com tarefas existentes.
      */

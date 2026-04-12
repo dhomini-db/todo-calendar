@@ -958,8 +958,9 @@ a.sidebar-item.active .sidebar-item-icon {
   margin-top: 4px;
   letter-spacing: 0.1px;
 }
-.task-outcome.good { background: var(--green-soft);  color: var(--green); }
-.task-outcome.bad  { background: var(--red-soft);    color: var(--red);   }
+.task-outcome.good    { background: var(--green-soft);  color: var(--green); }
+.task-outcome.bad     { background: var(--red-soft);    color: var(--red);   }
+.task-outcome.pending { background: var(--line);        color: var(--text-2); opacity: 0.7; }
 
 /* Actions */
 .task-actions { display: flex; gap: 3px; align-items: center; flex-shrink: 0; opacity: 0; transition: opacity 0.12s; }

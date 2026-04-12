@@ -61,6 +61,7 @@ public class TaskService {
                 .description(request.getDescription())
                 .date(request.getDate())
                 .completed(false)
+                .interacted(true)  // tarefa criada manualmente → sempre conta no progresso
                 .type(request.getType() != null ? request.getType() : TaskType.POSITIVE)
                 .user(user)
                 .build();
@@ -81,6 +82,7 @@ public class TaskService {
     public TaskResponse toggleCompletion(Long id, Long userId) {
         Task task = findOrThrow(id, userId);
         task.setCompleted(!task.isCompleted());
+        task.setInteracted(true);  // qualquer toggle marca como interagido
         return toResponse(taskRepository.save(task));
     }
 
@@ -96,6 +98,10 @@ public class TaskService {
         YearMonth yearMonth = YearMonth.of(year, month);
         LocalDate start = yearMonth.atDay(1);
         LocalDate end   = yearMonth.atEndOfMonth();
+
+        // Dias futuros nunca têm cor — capa o fim no dia de hoje
+        LocalDate today = LocalDate.now();
+        if (end.isAfter(today)) end = today;
 
         List<Object[]> rows = taskRepository.findDailySummary(start, end, userId);
 
@@ -144,6 +150,7 @@ public class TaskService {
                 .description(task.getDescription())
                 .date(task.getDate())
                 .completed(task.isCompleted())
+                .interacted(task.isInteracted())
                 .type(task.getType())
                 .sourceTemplateId(task.getSourceTemplateId())
                 .createdAt(task.getCreatedAt())

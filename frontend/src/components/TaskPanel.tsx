@@ -19,13 +19,14 @@ function progressColor(pct: number): string {
   return 'var(--line)'
 }
 
-function calcScore(tasks: { completed: boolean; type: TaskType }[]) {
-  if (tasks.length === 0) return 0
-  const good = tasks.filter(t =>
+function calcScore(tasks: { completed: boolean; interacted: boolean; type: TaskType }[]) {
+  const interacted = tasks.filter(t => t.interacted)
+  if (interacted.length === 0) return 0
+  const good = interacted.filter(t =>
     (t.type === 'POSITIVE' && t.completed) ||
     (t.type === 'NEGATIVE' && !t.completed),
   ).length
-  return Math.round((good / tasks.length) * 100)
+  return Math.round((good / interacted.length) * 100)
 }
 
 const WEEK_DAYS = [
@@ -77,9 +78,10 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
   const [recurrenceType, setRecurrenceType] = useState<RecurrenceType>('DAILY')
   const [daysOfWeek,     setDaysOfWeek]     = useState<string[]>([])
 
-  // Score
+  // Score — baseado apenas em tarefas com interação do usuário
+  const interactedTasks = tasks.filter(t => t.interacted)
   const pct       = calcScore(tasks)
-  const goodCount = tasks.filter(t =>
+  const goodCount = interactedTasks.filter(t =>
     (t.type === 'POSITIVE' && t.completed) ||
     (t.type === 'NEGATIVE' && !t.completed),
   ).length
@@ -142,7 +144,7 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
           {dayName} · {dateLabel}
         </p>
         <p className="panel-count">
-          {goodCount} <span>/ {tasks.length} {tasks.length === 1 ? 'tarefa' : 'tarefas'}</span>
+          {goodCount} <span>/ {interactedTasks.length} {interactedTasks.length === 1 ? 'interagida' : 'interagidas'}</span>
         </p>
         <div className="progress-track">
           <div
@@ -150,7 +152,7 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
             style={{ width: `${pct}%`, backgroundColor: progressColor(pct) }}
           />
         </div>
-        {tasks.length > 0 && (
+        {interactedTasks.length > 0 && (
           <p className="panel-score-label">{pct}% de boas escolhas hoje</p>
         )}
       </div>

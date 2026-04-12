@@ -10,6 +10,7 @@ export interface Task {
   description?: string
   date: string        // "YYYY-MM-DD"
   completed: boolean
+  interacted: boolean                // false = gerada por template, ainda não tocada (PENDING)
   type: TaskType
   sourceTemplateId?: number | null   // null = tarefa manual
   createdAt: string
