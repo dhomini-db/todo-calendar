@@ -118,14 +118,16 @@ public class TaskService {
         Map<String, DaySummaryResponse> summary = new LinkedHashMap<>();
         for (Object[] row : rows) {
             LocalDate date        = (LocalDate) row[0];
-            long total            = (Long) row[1];
+            long allTasks         = (Long) row[1];
             long goodOutcomes     = (Long) row[2];
-            double percentage     = total == 0 ? 0 : (goodOutcomes * 100.0) / total;
-            String color          = resolveColor(percentage, total);
+            long interactedCount  = (Long) row[3];
+            // Denominador = todas as tarefas; % só exibe se usuário interagiu com ao menos 1
+            double percentage     = allTasks == 0 ? 0 : (goodOutcomes * 100.0) / allTasks;
+            String color          = resolveColor(percentage, interactedCount);
 
             summary.put(date.toString(), DaySummaryResponse.builder()
                     .date(date)
-                    .total((int) total)
+                    .total((int) allTasks)
                     .completed((int) goodOutcomes)
                     .percentage(Math.round(percentage * 10.0) / 10.0)
                     .color(color)
@@ -136,11 +138,11 @@ public class TaskService {
 
     // ── Utilitários privados ───────────────────────────────────
 
-    private String resolveColor(double percentage, long total) {
-        if (total == 0)        return "NONE";
-        if (percentage == 100) return "GREEN";
-        if (percentage >= 70)  return "LIGHT_GREEN";
-        if (percentage >= 50)  return "YELLOW";
+    private String resolveColor(double percentage, long interactedCount) {
+        if (interactedCount == 0) return "NONE";   // nenhuma interação → sem cor
+        if (percentage == 100)    return "GREEN";
+        if (percentage >= 70)     return "LIGHT_GREEN";
+        if (percentage >= 50)     return "YELLOW";
         return "RED";
     }
 
