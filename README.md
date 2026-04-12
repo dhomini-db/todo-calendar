@@ -4,8 +4,6 @@
 
 🌐 **Acesse o projeto (online):** [taskflow-dhomini.vercel.app](https://taskflow-dhomini.vercel.app)
 
-🖥️ **Acesse localmente (Docker):** [localhost:3001](http://localhost:3001)
-
 ---
 
 ## Visão Geral
@@ -59,11 +57,11 @@ cd todo-calendar
 docker compose up --build
 ```
 
-| Serviço    | URL                       |
-|------------|---------------------------|
-| Frontend   | http://localhost:3001      |
-| Backend    | http://localhost:8081      |
-| PostgreSQL | localhost:5433             |
+| Serviço    | URL                                        |
+|------------|--------------------------------------------|
+| Frontend   | [localhost:3001](http://localhost:3001)     |
+| Backend    | [localhost:8081](http://localhost:8081)     |
+| PostgreSQL | localhost:5433                             |
 
 ### Frontend (desenvolvimento)
 
