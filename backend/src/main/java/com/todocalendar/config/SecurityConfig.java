@@ -36,8 +36,9 @@ public class SecurityConfig {
     private final UserService   userService;
     private final PasswordEncoder passwordEncoder; // injetado do AppConfig — quebra o ciclo
 
-    /** Origens permitidas — separadas por vírgula.
-     *  Ex: ALLOWED_ORIGINS=https://meu-app.vercel.app,http://localhost:3001 */
+    /** Origens exatas — separadas por vírgula (usado como fallback local).
+     *  Em produção, ALLOWED_ORIGINS pode continuar sendo setado, mas
+     *  allowedOriginPatterns cobre *.vercel.app automaticamente. */
     @Value("${cors.allowed-origins:http://localhost:3001,http://localhost:5173}")
     private String allowedOriginsRaw;
 
@@ -78,13 +79,21 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsSource() {
-        List<String> origins = Arrays.stream(allowedOriginsRaw.split(","))
+        // Origens da env var (ex: http://localhost:3001)
+        List<String> envOrigins = Arrays.stream(allowedOriginsRaw.split(","))
                 .map(String::trim)
                 .filter(s -> !s.isBlank())
                 .toList();
 
+        // Combina patterns fixos com origens da env var
+        List<String> patterns = new java.util.ArrayList<>(List.of(
+                "https://*.vercel.app",   // cobre qualquer subdomínio Vercel
+                "http://localhost:[*]"    // cobre qualquer porta localhost
+        ));
+        patterns.addAll(envOrigins);
+
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(origins);
+        config.setAllowedOriginPatterns(patterns);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
