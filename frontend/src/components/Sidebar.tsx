@@ -160,8 +160,8 @@ export default function Sidebar() {
     <aside className="sidebar" style={{ width }}>
       {/* Logo */}
       <div className="sidebar-logo">
-        <img src="/logo-icon.svg" alt="TodoCalendar" className="sidebar-logo-img" />
-        <span className="sidebar-logo-text">TodoCalendar</span>
+        <img src="/logo-icon.svg" alt="TaskFlow" className="sidebar-logo-img" />
+        <span className="sidebar-logo-text">TaskFlow</span>
       </div>
 
       {/* Nav */}
