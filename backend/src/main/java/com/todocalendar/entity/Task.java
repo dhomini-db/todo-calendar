@@ -62,6 +62,19 @@ public class Task {
     private User user;
 
     /**
+     * Tarefa recorrente "excluída" pelo usuário para uma data específica.
+     * true  = invisível ao usuário + bloqueia regeneração para esta data.
+     * false = normal (padrão).
+     *
+     * Tarefas manuais (sourceTemplateId=null) são deletadas fisicamente;
+     * tarefas recorrentes recebem skipped=true para evitar regeneração.
+     */
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    @Builder.Default
+    private boolean skipped = false;
+
+    /**
      * Referência ao template que gerou esta instância (nullable).
      * null = tarefa criada manualmente pelo usuário.
      */

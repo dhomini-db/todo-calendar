@@ -46,8 +46,8 @@ public class TaskService {
         // 1. Gerar instâncias de templates ativos (idempotente)
         templateService.generateInstancesForDate(date, userId);
 
-        // 2. Retornar todas as tarefas do dia
-        return taskRepository.findByDateAndUserIdOrderByCreatedAtAsc(date, userId)
+        // 2. Retornar apenas tarefas visíveis (excluindo skipped)
+        return taskRepository.findByDateAndUserIdAndSkippedFalseOrderByCreatedAtAsc(date, userId)
                 .stream()
                 .map(this::toResponse)
                 .toList();
@@ -88,8 +88,15 @@ public class TaskService {
 
     @Transactional
     public void deleteTask(Long id, Long userId) {
-        findOrThrow(id, userId);
-        taskRepository.deleteById(id);
+        Task task = findOrThrow(id, userId);
+        if (task.getSourceTemplateId() != null) {
+            // Tarefa recorrente: marcar como skipped para bloquear regeneração
+            task.setSkipped(true);
+            taskRepository.save(task);
+        } else {
+            // Tarefa manual: deletar fisicamente
+            taskRepository.deleteById(id);
+        }
     }
 
     // ── Resumo mensal ──────────────────────────────────────────
