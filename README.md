@@ -1,14 +1,14 @@
-# TodoCalendar
+# TaskFlow
 
 > Sistema de gestão de tarefas diárias com calendário inteligente, recorrência automática e múltiplos temas visuais.
 
-🌐 **Acesse o projeto:** [todo-calendar-dhomini.vercel.app](https://todo-calendar-dhomini.vercel.app)
+🌐 **Acesse o projeto:** [taskflow-dhomini.vercel.app](https://taskflow-dhomini.vercel.app)
 
 ---
 
 ## Visão Geral
 
-TodoCalendar é uma aplicação full-stack para organização de hábitos e tarefas diárias. Cada dia do calendário reflete visualmente o desempenho do usuário com base nas tarefas concluídas. Suporta tarefas positivas (metas), negativas (hábitos a evitar) e recorrentes (geradas automaticamente).
+TaskFlow é uma aplicação full-stack para organização de hábitos e tarefas diárias. Cada dia do calendário reflete visualmente o desempenho do usuário com base nas tarefas concluídas. Suporta tarefas positivas (metas), negativas (hábitos a evitar) e recorrentes (geradas automaticamente).
 
 ### Funcionalidades
 
@@ -27,14 +27,14 @@ TodoCalendar é uma aplicação full-stack para organização de hábitos e tare
 | Camada      | Tecnologia                                         |
 |-------------|----------------------------------------------------|
 | Frontend    | React 18 + TypeScript + Vite                       |
-| Estilização | TailwindCSS 3 + CSS Custom Properties              |
+| Estilização | CSS Custom Properties                              |
 | Estado      | TanStack Query v5 (React Query)                    |
 | Roteamento  | React Router v6                                    |
 | Backend     | Java 21 + Spring Boot 3.2 + Spring Security        |
 | Banco       | PostgreSQL 16                                      |
 | Auth        | JWT (JJWT)                                         |
 | Infra       | Docker + Docker Compose + Nginx                    |
-| Deploy      | Vercel (frontend) + servidor próprio (backend)     |
+| Deploy      | Vercel (frontend) + Railway (backend)              |
 
 ---
 
@@ -91,7 +91,7 @@ Requer PostgreSQL rodando localmente na porta 5433.
 ```env
 # URL do backend em produção (Vercel não tem proxy de servidor)
 # Em dev e Docker, deixe em branco — /api é resolvido pelo proxy local
-VITE_API_URL=https://api.seudominio.com/api
+VITE_API_URL=https://todo-calendar-production-30b9.up.railway.app/api
 ```
 
 Copie `.env.example` como ponto de partida:
@@ -110,26 +110,26 @@ cp frontend/.env.example frontend/.env
 | `JWT_SECRET`      | (chave de dev embutida)     | Chave secreta para assinar tokens JWT |
 | `ALLOWED_ORIGINS` | `http://localhost:3001,...` | Origens CORS separadas por vírgula    |
 
-> **Em produção**: defina `ALLOWED_ORIGINS=https://seu-app.vercel.app` no ambiente do backend.
+> **Em produção**: `ALLOWED_ORIGINS` é gerenciado pelo Railway. O backend aceita automaticamente qualquer subdomínio `*.vercel.app`.
 
 ---
 
-## Deploy no Vercel
+## Deploy
 
-O frontend está configurado para deploy direto no Vercel.
+### Frontend — Vercel
 
-### Passos
-
-1. Faça fork ou importe este repositório no [Vercel](https://vercel.com)
-2. Configure o **Root Directory** como `frontend`
-3. O Vercel detecta Vite automaticamente:
-   - **Build Command:** `npm run build`
-   - **Output Directory:** `dist`
-4. Adicione a variável de ambiente:
-   - `VITE_API_URL` → URL pública do seu backend (ex: `https://api.seudominio.com/api`)
-5. Deploy
+```bash
+cd frontend
+npx vercel --prod
+```
 
 O arquivo `frontend/vercel.json` já configura o fallback de rotas para SPA (React Router).
+
+### Backend — Railway
+
+Deploy automático via GitHub. Qualquer `push` na branch `main` aciona o redeploy no Railway.
+
+**URL do backend:** `https://todo-calendar-production-30b9.up.railway.app`
 
 ---
 
