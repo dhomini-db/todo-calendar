@@ -35,7 +35,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
                          WHEN t.type = 'POSITIVE' AND t.completed = true AND t.interacted = true THEN 1
                          ELSE 0
                        END),
-                   SUM(CASE WHEN t.interacted = true THEN 1 ELSE 0 END)
+                   SUM(CASE WHEN t.completed = true AND t.interacted = true THEN 1 ELSE 0 END)
             FROM Task t
             WHERE t.date BETWEEN :start AND :end
               AND t.user.id = :userId
