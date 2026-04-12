@@ -46,7 +46,7 @@ export default function RegisterPage() {
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-logo">
-          <span className="auth-logo-icon">◈</span>
+          <img src="/logo-icon.svg" alt="TaskFlow" className="auth-logo-img" />
           <span className="auth-logo-text">TaskFlow</span>
         </div>
 

@@ -258,15 +258,17 @@ body {
   gap: 9px;
   margin-bottom: 36px;
 }
-.auth-logo-icon {
-  font-size: 20px;
-  color: var(--accent);
+.auth-logo-img {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 7px;
 }
 .auth-logo-text {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 700;
   color: var(--text);
-  letter-spacing: -0.2px;
+  letter-spacing: -0.3px;
 }
 
 .auth-title {
