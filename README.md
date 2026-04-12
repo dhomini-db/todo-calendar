@@ -2,7 +2,9 @@
 
 > Sistema de gestão de tarefas diárias com calendário inteligente, recorrência automática e múltiplos temas visuais.
 
-🌐 **Acesse o projeto:** [taskflow-dhomini.vercel.app](https://taskflow-dhomini.vercel.app)
+🌐 **Acesse o projeto (online):** [taskflow-dhomini.vercel.app](https://taskflow-dhomini.vercel.app)
+
+🖥️ **Acesse localmente (Docker):** [localhost:3001](http://localhost:3001)
 
 ---
 
