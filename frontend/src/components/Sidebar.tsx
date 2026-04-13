@@ -106,6 +106,17 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
+  /* ── Mobile detection — skips inline width so CSS controls drawer ── */
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches
+  )
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)')
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+
   /* ── Resize logic (desktop only) ──────────────────────────── */
   const [width, setWidth] = useState<number>(() => {
     const saved = localStorage.getItem(STORAGE_KEY)
@@ -173,7 +184,7 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   return (
     <aside
       className={`sidebar${mobileOpen ? ' mobile-open' : ''}`}
-      style={{ width }}
+      style={isMobile ? undefined : { width }}
     >
       {/* Logo */}
       <div className="sidebar-logo">

@@ -1756,25 +1756,41 @@ a.sidebar-item.active::before {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   RESPONSIVE — Mobile-first layout
-   Mobile  : ≤ 768px
-   Tablet  : ≤ 1024px
-   Desktop : default (no query needed — existing styles)
+   RESPONSIVE — Mobile-first
+   Desktop : sem media query (estilos atuais intocados)
+   Tablet  : ≤ 1024px  (ajustes menores)
+   Mobile  : ≤ 768px   (layout totalmente reorganizado)
+   Tiny    : ≤ 380px   (iPhones SE / pequenos)
 ═══════════════════════════════════════════════════════════════ */
 
-/* ── Mobile top bar (always in DOM, hidden on desktop) ─────── */
+/* ──────────────────────────────────────────────────────────────
+   ELEMENTOS QUE EXISTEM NO DOM MAS SÃO INVISÍVEIS NO DESKTOP
+────────────────────────────────────────────────────────────── */
+
+/* Header mobile: oculto no desktop, aparece no mobile */
 .mobile-header {
   display: none;
   align-items: center;
   gap: 10px;
-  padding: 0 16px;
+  padding: 0 14px;
   height: 52px;
   background: var(--surface);
   border-bottom: 1px solid var(--line);
   flex-shrink: 0;
-  position: relative;
   z-index: 50;
+  /* Não usa position fixed — é um flex item normal no topo */
 }
+
+/* Ícone TaskFlow no mobile header */
+.mobile-logo-img  { width: 22px; height: 22px; flex-shrink: 0; }
+.mobile-logo-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.2px;
+}
+
+/* Botão hamburger */
 .mobile-hamburger {
   display: flex;
   align-items: center;
@@ -1791,150 +1807,167 @@ a.sidebar-item.active::before {
 }
 .mobile-hamburger:hover  { background: var(--raised); color: var(--text); }
 .mobile-hamburger:active { transform: scale(0.93); }
-.mobile-logo-img  { width: 22px; height: 22px; flex-shrink: 0; }
-.mobile-logo-text {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-  letter-spacing: -0.2px;
-}
 
-/* ── Sidebar overlay (dim backdrop on mobile) ──────────────── */
+/* Overlay escurecido por trás da sidebar aberta */
 .sidebar-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.5);
   z-index: 90;
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  /* Animação suave */
+  opacity: 0;
+  transition: opacity 0.25s;
 }
-.sidebar-overlay.visible { display: block; }
+.sidebar-overlay.visible {
+  display: block;
+  opacity: 1;
+}
 
-/* ── Tablet (769px – 1024px) ───────────────────────────────── */
+/* ──────────────────────────────────────────────────────────────
+   TABLET — ≤ 1024px (ajustes menores, desktop quase igual)
+────────────────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .panel-area    { width: 280px; }
   .calendar-area { padding: 16px 18px 20px; }
   .inner-page    { padding: 20px 24px; }
 }
 
-/* ── Mobile (≤ 768px) ──────────────────────────────────────── */
+/* ──────────────────────────────────────────────────────────────
+   MOBILE — ≤ 768px
+   Filosofia:
+     • Sidebar vira um drawer que desliza da esquerda
+     • Layout vira coluna: [header] [calendário] [tarefas]
+     • Sem nada lado a lado
+────────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
 
-  /* App shell: vertical stack */
+  /* ── App shell: coluna vertical ─────────────────────────── */
   .app-shell {
     flex-direction: column;
     height: 100vh;
-    height: 100dvh; /* dynamic viewport height on iOS Safari */
-    overflow: hidden;
+    height: 100dvh;   /* iOS Safari: usa altura real sem a barra do browser */
+    overflow: hidden; /* scroll acontece dentro de .main-content */
   }
 
-  /* Show mobile header */
+  /* ── Mobile header: visível ─────────────────────────────── */
   .mobile-header { display: flex; }
 
-  /* Sidebar: fixed slide-in drawer */
+  /* ── Sidebar: drawer fixo fora da tela por padrão ───────── */
+  /*
+     IMPORTANTE: o componente Sidebar.tsx detecta mobile via
+     window.matchMedia e NÃO aplica style={{ width }} no mobile,
+     então o CSS tem controle total sobre a largura aqui.
+  */
   .sidebar {
-    position: fixed !important;
+    position: fixed;
     top: 0;
-    left: -100%;
     bottom: 0;
-    width: 280px !important;
-    min-width: unset !important;
-    max-width: unset !important;
+    left: -290px;          /* começa fora da tela (largura + 10px segurança) */
+    width: 280px;
     z-index: 100;
-    transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-                box-shadow 0.25s;
+    transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.28s;
     box-shadow: none;
+    overflow-y: auto;
   }
   .sidebar.mobile-open {
     left: 0;
-    box-shadow: 6px 0 32px rgba(0, 0, 0, 0.35);
+    box-shadow: 8px 0 40px rgba(0, 0, 0, 0.4);
   }
 
-  /* Hide desktop-only resize handle on mobile */
+  /* Ocultar handle de resize (só desktop) */
   .sidebar-resize-handle { display: none !important; }
 
-  /* Main content: full width, column, scrollable */
+  /* ── Main content: coluna, scrolla verticalmente ────────── */
   .main-content {
+    flex: 1;
     flex-direction: column;
     overflow-y: auto;
     overflow-x: hidden;
-    height: 0; /* flex:1 controls actual height */
-    flex: 1;
+    min-height: 0; /* necessário para flex:1 funcionar dentro de coluna */
   }
 
-  /* Calendar page layout: stack vertically */
+  /* ── Calendário: largura total, empilhado primeiro ──────── */
   .calendar-area {
-    padding: 14px 14px 16px;
-    overflow: visible;
+    width: 100%;
     flex-shrink: 0;
+    padding: 12px 12px 0;
+    overflow: visible;
+    min-width: 0;
   }
+
+  /* ── Painel de tarefas: abaixo do calendário, largura total  */
   .panel-area {
     width: 100% !important;
+    flex-shrink: 0;
     border-left: none;
     border-top: 1px solid var(--line);
     overflow-y: visible;
-    flex-shrink: 0;
+    background: var(--surface);
   }
 
-  /* Task panel: remove fixed height so it flows */
-  .task-panel { height: auto; min-height: 0; }
-  .panel-body {
-    overflow-y: visible;
-    flex: none;
-    max-height: none;
-  }
+  /* Task panel interno: altura automática (não fixa) */
+  .task-panel { height: auto; }
+  .panel-body { overflow-y: visible; flex: none; }
 
-  /* ── Calendar cell adjustments ──────────────────────────── */
-  .calendar-wrap { padding: 10px 8px 8px; border-radius: var(--r-lg); }
-  .cal-grid      { column-gap: 2px; row-gap: 2px; }
-  .cal-weekday   { font-size: 8px; padding: 2px 0; }
-  .cal-day-num   { font-size: 11.5px; }
-  .cal-day-pct   { font-size: 7px; }
-  .cal-legend    { gap: 8px; margin-top: 10px; font-size: 10px; }
-
-  /* Touch-friendly calendar nav */
-  .cal-nav {
-    width: 38px;
-    height: 38px;
-    font-size: 18px;
+  /* ── Calendário: células menores, sem corte ─────────────── */
+  .calendar-wrap  {
+    padding: 10px 8px 8px;
+    border-radius: var(--r-lg);
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
   }
+  .cal-grid     { column-gap: 2px; row-gap: 2px; }
+  .cal-weekday  { font-size: 8px; padding: 2px 0; }
+  .cal-day-num  { font-size: 11px; }
+  .cal-day-pct  { font-size: 7px; }
+  .cal-legend   { gap: 8px; margin-top: 8px; padding-top: 8px; }
+  .legend-item  { font-size: 10px; }
+
+  /* Botões de navegar mês: maior área de toque */
+  .cal-nav      { width: 40px; height: 40px; font-size: 18px; }
+  .calendar-month { font-size: 14px; }
 
   /* ── Panel header ───────────────────────────────────────── */
-  .panel-header  { padding: 14px 14px 12px; }
-  .panel-date    { font-size: 10px; }
-  .panel-count   { font-size: 17px; margin-bottom: 9px; }
-  .panel-body    { padding: 8px; }
-  .panel-footer  { padding: 8px; }
+  .panel-header { padding: 14px 14px 12px; }
+  .panel-date   { font-size: 10px; }
+  .panel-count  { font-size: 16px; margin-bottom: 8px; }
+  .panel-body   { padding: 8px 10px; }
+  .panel-footer { padding: 8px 10px; }
 
-  /* ── Task items — bigger touch targets ──────────────────── */
-  .task-item      { padding: 10px 9px; gap: 10px; }
-  .task-checkbox  { width: 22px; height: 22px; border-radius: 6px; margin-top: 0; }
-  .task-title     { font-size: 14px; }
-  .task-actions   { opacity: 1; } /* always visible on touch */
-  .task-action-btn { width: 34px; height: 34px; }
+  /* ── Tasks: alvos de toque maiores (≥ 44px) ─────────────── */
+  .task-item       { padding: 11px 10px; gap: 11px; }
+  .task-checkbox   { width: 22px; height: 22px; border-radius: 6px; margin-top: 1px; }
+  .task-title      { font-size: 14px; }
+  .task-desc       { font-size: 12.5px; }
+  .task-actions    { opacity: 1; } /* sempre visível (sem hover no touch) */
+  .task-action-btn { width: 36px; height: 36px; }
 
-  /* ── Add / form buttons ─────────────────────────────────── */
-  .add-btn       { padding: 11px 12px; font-size: 13.5px; min-height: 44px; }
-  .add-input     { font-size: 16px; padding: 10px 12px; } /* 16px prevents iOS zoom */
-  .btn-primary   { padding: 10px 14px; min-height: 44px; font-size: 13.5px; }
-  .btn-ghost     { padding: 10px 14px; min-height: 44px; font-size: 13.5px; }
-  .type-btn      { padding: 8px 10px; min-height: 38px; font-size: 12.5px; }
+  /* ── Formulário de nova tarefa ──────────────────────────── */
+  .add-btn     { padding: 12px; font-size: 13.5px; min-height: 44px; }
+  .add-input   { font-size: 16px; padding: 10px 12px; } /* 16px: evita zoom no iOS */
+  .btn-primary { padding: 11px 14px; min-height: 44px; font-size: 13.5px; }
+  .btn-ghost   { padding: 11px 14px; min-height: 44px; font-size: 13.5px; }
+  .type-btn    { padding: 8px 10px; min-height: 40px; font-size: 12.5px; }
 
-  /* ── Page titles ────────────────────────────────────────── */
-  .page-title  { font-size: 17px; }
-  .page-sub    { font-size: 12px; margin-bottom: 12px; }
-  .inner-page  { padding: 16px 14px; }
+  /* ── Títulos das páginas ────────────────────────────────── */
+  .page-title { font-size: 17px; }
+  .page-sub   { font-size: 12px; margin-bottom: 10px; }
+  .inner-page { padding: 16px 14px; }
 
-  /* ── Recurring page ─────────────────────────────────────── */
-  .recurring-form-wrapper { padding: 14px; }
+  /* ── Página de recorrentes ──────────────────────────────── */
+  .recurring-form-wrapper { padding: 12px; }
   .template-card          { padding: 12px 14px; }
 
-  /* ── Auth pages ─────────────────────────────────────────── */
-  .auth-card  { padding: 28px 20px; margin: 16px; }
+  /* ── Auth (login / registro) ────────────────────────────── */
+  .auth-card  { padding: 28px 20px; margin: 16px; max-width: none; }
   .auth-title { font-size: 20px; }
 
-  /* ── Settings / inner pages ─────────────────────────────── */
+  /* ── Aparência / configurações ──────────────────────────── */
   .theme-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
 
   /* ── Weekday picker ─────────────────────────────────────── */
@@ -1942,12 +1975,16 @@ a.sidebar-item.active::before {
   .weekday-btn    { min-height: 40px; padding: 6px 10px; font-size: 12px; }
 }
 
-/* ── Small phones (≤ 380px) ────────────────────────────────── */
+/* ──────────────────────────────────────────────────────────────
+   TINY — ≤ 380px (iPhone SE, telas muito pequenas)
+────────────────────────────────────────────────────────────── */
 @media (max-width: 380px) {
-  .calendar-wrap  { padding: 8px 6px 6px; }
+  .calendar-area  { padding: 8px 8px 0; }
   .cal-grid       { column-gap: 1px; row-gap: 1px; }
   .cal-day-num    { font-size: 10px; }
   .cal-weekday    { font-size: 7px; letter-spacing: 0; }
   .calendar-month { font-size: 13px; }
-  .cal-nav        { width: 34px; height: 34px; }
+  .cal-nav        { width: 36px; height: 36px; }
+  .panel-body     { padding: 6px 8px; }
+  .panel-footer   { padding: 6px 8px; }
 }
