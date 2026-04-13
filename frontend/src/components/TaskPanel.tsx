@@ -21,10 +21,14 @@ function progressColor(pct: number): string {
 
 function calcScore(tasks: { completed: boolean; interacted: boolean; type: TaskType }[]) {
   if (tasks.length === 0) return 0
-  // Denominador = todas as tarefas (não apenas as interagidas).
-  // Isso evita que 1 positiva marcada = 100% quando há outras tarefas pendentes.
-  const good = tasks.filter(t => t.interacted && t.type === 'POSITIVE' && t.completed).length
-  return Math.round((good / tasks.length) * 100)
+  // Denominador efetivo = positivas (todas) + negativas CHECADAS (falhou no hábito).
+  // Negativas não-checadas são neutras — não penalizam o score.
+  const positives        = tasks.filter(t => t.type === 'POSITIVE')
+  const checkedNegatives = tasks.filter(t => t.type === 'NEGATIVE' && t.interacted && t.completed)
+  const denominator      = positives.length + checkedNegatives.length
+  if (denominator === 0) return 0
+  const good = positives.filter(t => t.interacted && t.completed).length
+  return Math.round((good / denominator) * 100)
 }
 
 const WEEK_DAYS = [
@@ -76,10 +80,9 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
   const [recurrenceType, setRecurrenceType] = useState<RecurrenceType>('DAILY')
   const [daysOfWeek,     setDaysOfWeek]     = useState<string[]>([])
 
-  // Score — baseado apenas em tarefas com interação do usuário
   const interactedTasks = tasks.filter(t => t.interacted)
   const pct       = calcScore(tasks)
-  const goodCount = interactedTasks.filter(t => t.type === 'POSITIVE' && t.completed).length
+  const goodCount = tasks.filter(t => t.interacted && t.type === 'POSITIVE' && t.completed).length
 
   const dayName   = format(selectedDate, "EEEE", { locale: ptBR })
   const dateLabel = format(selectedDate, "d 'de' MMMM", { locale: ptBR })
@@ -139,7 +142,7 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
           {dayName} · {dateLabel}
         </p>
         <p className="panel-count">
-          {goodCount} <span>/ {interactedTasks.length} {interactedTasks.length === 1 ? 'interagida' : 'interagidas'}</span>
+          {goodCount} <span>/ {tasks.length} {tasks.length === 1 ? 'tarefa' : 'tarefas'}</span>
         </p>
         <div className="progress-track">
           <div
@@ -202,7 +205,7 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
             </div>
 
             {taskType === 'NEGATIVE' && (
-              <p className="type-hint">Evitar esse hábito conta como boa escolha</p>
+              <p className="type-hint">Marcar esse hábito indica que você o realizou (conta negativamente)</p>
             )}
 
             {/* Título */}
