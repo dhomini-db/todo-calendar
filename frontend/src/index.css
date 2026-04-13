@@ -130,6 +130,7 @@
 }
 
 [data-theme="rose-dawn"] {
+  --cal-wrap-bg: #fdfaf7;  /* neutro: branco-quente sem tinta */
   /* Surfaces — warm linen scale, more contrast between layers */
   --bg:         #f2ede8;   /* warm linen — slightly darker base */
   --surface:    #ede7e1;   /* sidebar, panel bg */
@@ -356,6 +357,7 @@
    Inspirado em: Banana Cream #FBEDAD + Tyrian Purple #700143
 ───────────────────────────────────────────────────────────── */
 [data-theme="banana-cream"] {
+  --cal-wrap-bg: #fffefb;  /* neutro: branco sem amarelo */
   --bg:           #fdf6d5;
   --surface:      #fef9e5;
   --elevated:     #fffef8;
@@ -419,6 +421,7 @@
    Inspirado em: Blue Mirage #6E88B0 + Amber Smoke #F2E0D0
 ───────────────────────────────────────────────────────────── */
 [data-theme="blue-mirage"] {
+  --cal-wrap-bg: #fdfcfa;  /* neutro: branco sem bege */
   --bg:           #eee8e0;
   --surface:      #f5f0e8;
   --elevated:     #fdfaf6;
@@ -482,6 +485,7 @@
    Inspirado em: Pistachio Frost #C5E384 + Moss Velvet #385144
 ───────────────────────────────────────────────────────────── */
 [data-theme="pistachio"] {
+  --cal-wrap-bg: #fbfef8;  /* neutro: branco sem verde */
   --bg:           #edf5d8;
   --surface:      #f4fae6;
   --elevated:     #fcfef5;
@@ -978,7 +982,7 @@ a.sidebar-item.active .sidebar-item-icon {
 ═══════════════════════════════════════════════════════════════ */
 
 .calendar-wrap {
-  background: var(--elevated);
+  background: var(--cal-wrap-bg, var(--elevated));
   border: 1px solid var(--line);
   border-radius: var(--r-xl);
   padding: 14px 14px 10px;
