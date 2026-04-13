@@ -1842,10 +1842,6 @@ a.sidebar-item.active::before {
    + @media como fallback para browsers sem JS ou SSR
 ────────────────────────────────────────────────────────────── */
 
-/* Seletor duplo: JS-class OU media query — qualquer um ativa */
-.app-shell.mobile,
-@media (max-width: 768px) { .app-shell { flex-direction: column; height: 100dvh; overflow: hidden; } }
-
 /* ── App shell mobile: coluna vertical ──────────────────── */
 .app-shell.mobile {
   flex-direction: column;
@@ -1853,24 +1849,15 @@ a.sidebar-item.active::before {
   height: 100dvh;
   overflow: hidden;
 }
+@media (max-width: 768px) {
+  .app-shell { flex-direction: column; height: 100dvh; overflow: hidden; }
+}
 
 /* ── Mobile header ──────────────────────────────────────── */
 .app-shell.mobile .mobile-header { display: flex; }
 @media (max-width: 768px) { .mobile-header { display: flex; } }
 
 /* ── Sidebar: drawer fixo, começa fora da tela ──────────── */
-.app-shell.mobile .sidebar,
-@media (max-width: 768px) { .sidebar {
-  position: fixed;
-  top: 0; bottom: 0;
-  left: -290px;
-  width: 280px;
-  z-index: 100;
-  overflow-y: auto;
-  transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.28s;
-  box-shadow: none;
-} }
-
 .app-shell.mobile .sidebar {
   position: fixed;
   top: 0;
@@ -1881,6 +1868,18 @@ a.sidebar-item.active::before {
   overflow-y: auto;
   transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.28s;
   box-shadow: none;
+}
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0; bottom: 0;
+    left: -290px;
+    width: 280px;
+    z-index: 100;
+    overflow-y: auto;
+    transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.28s;
+    box-shadow: none;
+  }
 }
 
 /* Drawer aberto */
