@@ -1757,10 +1757,11 @@ a.sidebar-item.active::before {
 
 /* ═══════════════════════════════════════════════════════════════
    RESPONSIVE — Mobile-first
-   Desktop : sem media query (estilos atuais intocados)
-   Tablet  : ≤ 1024px  (ajustes menores)
-   Mobile  : ≤ 768px   (layout totalmente reorganizado)
-   Tiny    : ≤ 380px   (iPhones SE / pequenos)
+   Desktop : sem query — estilos existentes intocados
+   Tablet  : ≤ 1024px — ajustes menores via @media
+   Mobile  : classe .mobile no .app-shell (adicionada por JS/React)
+             + @media (max-width:768px) como fallback
+   Tiny    : ≤ 380px — ajustes extras via @media
 ═══════════════════════════════════════════════════════════════ */
 
 /* ──────────────────────────────────────────────────────────────
@@ -1836,147 +1837,186 @@ a.sidebar-item.active::before {
 }
 
 /* ──────────────────────────────────────────────────────────────
-   MOBILE — ≤ 768px
-   Filosofia:
-     • Sidebar vira um drawer que desliza da esquerda
-     • Layout vira coluna: [header] [calendário] [tarefas]
-     • Sem nada lado a lado
+   MOBILE — controlado por JS via classe .app-shell.mobile
+   (adicionada pelo useMobile hook quando window.innerWidth ≤ 768)
+   + @media como fallback para browsers sem JS ou SSR
 ────────────────────────────────────────────────────────────── */
+
+/* Seletor duplo: JS-class OU media query — qualquer um ativa */
+.app-shell.mobile,
+@media (max-width: 768px) { .app-shell { flex-direction: column; height: 100dvh; overflow: hidden; } }
+
+/* ── App shell mobile: coluna vertical ──────────────────── */
+.app-shell.mobile {
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* ── Mobile header ──────────────────────────────────────── */
+.app-shell.mobile .mobile-header { display: flex; }
+@media (max-width: 768px) { .mobile-header { display: flex; } }
+
+/* ── Sidebar: drawer fixo, começa fora da tela ──────────── */
+.app-shell.mobile .sidebar,
+@media (max-width: 768px) { .sidebar {
+  position: fixed;
+  top: 0; bottom: 0;
+  left: -290px;
+  width: 280px;
+  z-index: 100;
+  overflow-y: auto;
+  transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.28s;
+  box-shadow: none;
+} }
+
+.app-shell.mobile .sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: -290px;
+  width: 280px;
+  z-index: 100;
+  overflow-y: auto;
+  transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.28s;
+  box-shadow: none;
+}
+
+/* Drawer aberto */
+.app-shell.mobile .sidebar.mobile-open { left: 0; box-shadow: 8px 0 40px rgba(0,0,0,0.4); }
+@media (max-width: 768px) { .sidebar.mobile-open { left: 0; box-shadow: 8px 0 40px rgba(0,0,0,0.4); } }
+
+/* Handle de resize: oculto no mobile */
+.app-shell.mobile .sidebar-resize-handle { display: none; }
+@media (max-width: 768px) { .sidebar-resize-handle { display: none; } }
+
+/* ── Main content: coluna, scrollável ───────────────────── */
+.app-shell.mobile .main-content {
+  flex: 1;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+}
 @media (max-width: 768px) {
+  .main-content { flex: 1; flex-direction: column; overflow-y: auto; overflow-x: hidden; min-height: 0; }
+}
 
-  /* ── App shell: coluna vertical ─────────────────────────── */
-  .app-shell {
-    flex-direction: column;
-    height: 100vh;
-    height: 100dvh;   /* iOS Safari: usa altura real sem a barra do browser */
-    overflow: hidden; /* scroll acontece dentro de .main-content */
-  }
+/* ── Calendário: largura total ──────────────────────────── */
+.app-shell.mobile .calendar-area {
+  width: 100%;
+  flex-shrink: 0;
+  padding: 12px 12px 0;
+  overflow: visible;
+}
+@media (max-width: 768px) {
+  .calendar-area { width: 100%; flex-shrink: 0; padding: 12px 12px 0; overflow: visible; }
+}
 
-  /* ── Mobile header: visível ─────────────────────────────── */
-  .mobile-header { display: flex; }
+/* ── Painel de tarefas: abaixo do calendário ────────────── */
+.app-shell.mobile .panel-area {
+  width: 100%;
+  flex-shrink: 0;
+  border-left: none;
+  border-top: 1px solid var(--line);
+  overflow-y: visible;
+}
+@media (max-width: 768px) {
+  .panel-area { width: 100%; flex-shrink: 0; border-left: none; border-top: 1px solid var(--line); overflow-y: visible; }
+}
 
-  /* ── Sidebar: drawer fixo fora da tela por padrão ───────── */
-  /*
-     IMPORTANTE: o componente Sidebar.tsx detecta mobile via
-     window.matchMedia e NÃO aplica style={{ width }} no mobile,
-     então o CSS tem controle total sobre a largura aqui.
-  */
-  .sidebar {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: -290px;          /* começa fora da tela (largura + 10px segurança) */
-    width: 280px;
-    z-index: 100;
-    transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-                box-shadow 0.28s;
-    box-shadow: none;
-    overflow-y: auto;
-  }
-  .sidebar.mobile-open {
-    left: 0;
-    box-shadow: 8px 0 40px rgba(0, 0, 0, 0.4);
-  }
+/* Task panel: altura auto */
+.app-shell.mobile .task-panel { height: auto; }
+.app-shell.mobile .panel-body { overflow-y: visible; flex: none; }
+@media (max-width: 768px) { .task-panel { height: auto; } .panel-body { overflow-y: visible; flex: none; } }
 
-  /* Ocultar handle de resize (só desktop) */
-  .sidebar-resize-handle { display: none !important; }
-
-  /* ── Main content: coluna, scrolla verticalmente ────────── */
-  .main-content {
-    flex: 1;
-    flex-direction: column;
-    overflow-y: auto;
-    overflow-x: hidden;
-    min-height: 0; /* necessário para flex:1 funcionar dentro de coluna */
-  }
-
-  /* ── Calendário: largura total, empilhado primeiro ──────── */
-  .calendar-area {
-    width: 100%;
-    flex-shrink: 0;
-    padding: 12px 12px 0;
-    overflow: visible;
-    min-width: 0;
-  }
-
-  /* ── Painel de tarefas: abaixo do calendário, largura total  */
-  .panel-area {
-    width: 100% !important;
-    flex-shrink: 0;
-    border-left: none;
-    border-top: 1px solid var(--line);
-    overflow-y: visible;
-    background: var(--surface);
-  }
-
-  /* Task panel interno: altura automática (não fixa) */
-  .task-panel { height: auto; }
-  .panel-body { overflow-y: visible; flex: none; }
-
-  /* ── Calendário: células menores, sem corte ─────────────── */
-  .calendar-wrap  {
-    padding: 10px 8px 8px;
-    border-radius: var(--r-lg);
-    border-left: none;
-    border-right: none;
-    border-radius: 0;
-  }
-  .cal-grid     { column-gap: 2px; row-gap: 2px; }
-  .cal-weekday  { font-size: 8px; padding: 2px 0; }
-  .cal-day-num  { font-size: 11px; }
-  .cal-day-pct  { font-size: 7px; }
-  .cal-legend   { gap: 8px; margin-top: 8px; padding-top: 8px; }
-  .legend-item  { font-size: 10px; }
-
-  /* Botões de navegar mês: maior área de toque */
-  .cal-nav      { width: 40px; height: 40px; font-size: 18px; }
+/* ── Calendário: ajustes de tamanho ─────────────────────── */
+.app-shell.mobile .calendar-wrap { padding: 10px 8px 8px; border-radius: 0; }
+.app-shell.mobile .cal-grid      { column-gap: 2px; row-gap: 2px; }
+.app-shell.mobile .cal-weekday   { font-size: 8px; }
+.app-shell.mobile .cal-day-num   { font-size: 11px; }
+.app-shell.mobile .cal-day-pct   { font-size: 7px; }
+.app-shell.mobile .cal-nav       { width: 40px; height: 40px; }
+.app-shell.mobile .calendar-month { font-size: 14px; }
+.app-shell.mobile .cal-legend    { gap: 8px; margin-top: 8px; }
+.app-shell.mobile .legend-item   { font-size: 10px; }
+@media (max-width: 768px) {
+  .calendar-wrap  { padding: 10px 8px 8px; border-radius: 0; }
+  .cal-grid       { column-gap: 2px; row-gap: 2px; }
+  .cal-weekday    { font-size: 8px; }
+  .cal-day-num    { font-size: 11px; }
+  .cal-day-pct    { font-size: 7px; }
+  .cal-nav        { width: 40px; height: 40px; }
   .calendar-month { font-size: 14px; }
+  .cal-legend     { gap: 8px; margin-top: 8px; }
+  .legend-item    { font-size: 10px; }
+}
 
-  /* ── Panel header ───────────────────────────────────────── */
+/* ── Panel header ───────────────────────────────────────── */
+.app-shell.mobile .panel-header { padding: 14px 14px 12px; }
+.app-shell.mobile .panel-date   { font-size: 10px; }
+.app-shell.mobile .panel-count  { font-size: 16px; margin-bottom: 8px; }
+.app-shell.mobile .panel-body   { padding: 8px 10px; }
+.app-shell.mobile .panel-footer { padding: 8px 10px; }
+@media (max-width: 768px) {
   .panel-header { padding: 14px 14px 12px; }
   .panel-date   { font-size: 10px; }
   .panel-count  { font-size: 16px; margin-bottom: 8px; }
   .panel-body   { padding: 8px 10px; }
   .panel-footer { padding: 8px 10px; }
+}
 
-  /* ── Tasks: alvos de toque maiores (≥ 44px) ─────────────── */
+/* ── Task items: touch-friendly ─────────────────────────── */
+.app-shell.mobile .task-item       { padding: 11px 10px; gap: 11px; }
+.app-shell.mobile .task-checkbox   { width: 22px; height: 22px; border-radius: 6px; margin-top: 1px; }
+.app-shell.mobile .task-title      { font-size: 14px; }
+.app-shell.mobile .task-actions    { opacity: 1; }
+.app-shell.mobile .task-action-btn { width: 36px; height: 36px; }
+@media (max-width: 768px) {
   .task-item       { padding: 11px 10px; gap: 11px; }
   .task-checkbox   { width: 22px; height: 22px; border-radius: 6px; margin-top: 1px; }
   .task-title      { font-size: 14px; }
-  .task-desc       { font-size: 12.5px; }
-  .task-actions    { opacity: 1; } /* sempre visível (sem hover no touch) */
+  .task-actions    { opacity: 1; }
   .task-action-btn { width: 36px; height: 36px; }
+}
 
-  /* ── Formulário de nova tarefa ──────────────────────────── */
-  .add-btn     { padding: 12px; font-size: 13.5px; min-height: 44px; }
-  .add-input   { font-size: 16px; padding: 10px 12px; } /* 16px: evita zoom no iOS */
-  .btn-primary { padding: 11px 14px; min-height: 44px; font-size: 13.5px; }
-  .btn-ghost   { padding: 11px 14px; min-height: 44px; font-size: 13.5px; }
-  .type-btn    { padding: 8px 10px; min-height: 40px; font-size: 12.5px; }
+/* ── Botões e formulários ───────────────────────────────── */
+.app-shell.mobile .add-btn     { min-height: 44px; font-size: 13.5px; }
+.app-shell.mobile .add-input   { font-size: 16px; padding: 10px 12px; }
+.app-shell.mobile .btn-primary { min-height: 44px; padding: 11px 14px; }
+.app-shell.mobile .btn-ghost   { min-height: 44px; padding: 11px 14px; }
+.app-shell.mobile .type-btn    { min-height: 40px; padding: 8px 10px; }
+@media (max-width: 768px) {
+  .add-btn     { min-height: 44px; font-size: 13.5px; }
+  .add-input   { font-size: 16px; padding: 10px 12px; }
+  .btn-primary { min-height: 44px; padding: 11px 14px; }
+  .btn-ghost   { min-height: 44px; padding: 11px 14px; }
+  .type-btn    { min-height: 40px; padding: 8px 10px; }
+}
 
-  /* ── Títulos das páginas ────────────────────────────────── */
-  .page-title { font-size: 17px; }
-  .page-sub   { font-size: 12px; margin-bottom: 10px; }
-  .inner-page { padding: 16px 14px; }
+/* ── Títulos e páginas internas ─────────────────────────── */
+.app-shell.mobile .page-title { font-size: 17px; }
+.app-shell.mobile .page-sub   { font-size: 12px; margin-bottom: 10px; }
+.app-shell.mobile .inner-page { padding: 16px 14px; }
+.app-shell.mobile .theme-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+.app-shell.mobile .weekday-btn { min-height: 40px; }
+@media (max-width: 768px) {
+  .page-title  { font-size: 17px; }
+  .page-sub    { font-size: 12px; }
+  .inner-page  { padding: 16px 14px; }
+  .theme-grid  { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .weekday-btn { min-height: 40px; }
+}
 
-  /* ── Página de recorrentes ──────────────────────────────── */
-  .recurring-form-wrapper { padding: 12px; }
-  .template-card          { padding: 12px 14px; }
-
-  /* ── Auth (login / registro) ────────────────────────────── */
-  .auth-card  { padding: 28px 20px; margin: 16px; max-width: none; }
+/* ── Auth ───────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .auth-card  { padding: 28px 20px; margin: 16px; }
   .auth-title { font-size: 20px; }
-
-  /* ── Aparência / configurações ──────────────────────────── */
-  .theme-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
-
-  /* ── Weekday picker ─────────────────────────────────────── */
-  .weekday-picker { gap: 4px; flex-wrap: wrap; }
-  .weekday-btn    { min-height: 40px; padding: 6px 10px; font-size: 12px; }
 }
 
 /* ──────────────────────────────────────────────────────────────
-   TINY — ≤ 380px (iPhone SE, telas muito pequenas)
+   TINY — ≤ 380px (iPhone SE)
 ────────────────────────────────────────────────────────────── */
 @media (max-width: 380px) {
   .calendar-area  { padding: 8px 8px 0; }
@@ -1985,6 +2025,4 @@ a.sidebar-item.active::before {
   .cal-weekday    { font-size: 7px; letter-spacing: 0; }
   .calendar-month { font-size: 13px; }
   .cal-nav        { width: 36px; height: 36px; }
-  .panel-body     { padding: 6px 8px; }
-  .panel-footer   { padding: 6px 8px; }
 }

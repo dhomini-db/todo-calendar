@@ -98,24 +98,14 @@ function NavItem({ to, icon, label, end, onClick }: NavItemProps) {
 
 /* ── Sidebar ──────────────────────────────────────────────────── */
 interface SidebarProps {
+  isMobile: boolean
   mobileOpen: boolean
   onMobileClose: () => void
 }
 
-export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
+export default function Sidebar({ isMobile, mobileOpen, onMobileClose }: SidebarProps) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
-
-  /* ── Mobile detection — skips inline width so CSS controls drawer ── */
-  const [isMobile, setIsMobile] = useState(() =>
-    typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches
-  )
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 768px)')
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [])
 
   /* ── Resize logic (desktop only) ──────────────────────────── */
   const [width, setWidth] = useState<number>(() => {

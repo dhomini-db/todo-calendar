@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
 import { useAuth } from './contexts/AuthContext'
+import { useMobile } from './hooks/useMobile'
 
 function HamburgerIcon({ open }: { open: boolean }) {
   return (
@@ -24,34 +25,41 @@ function HamburgerIcon({ open }: { open: boolean }) {
 
 export default function App() {
   const { isAuthenticated } = useAuth()
+  const isMobile = useMobile()                          // JS-driven: adiciona classe .mobile
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   if (!isAuthenticated) return <Navigate to="/login" replace />
 
   return (
-    <div className="app-shell">
-      {/* Mobile top bar — hidden on desktop via CSS */}
-      <header className="mobile-header">
-        <button
-          className="mobile-hamburger"
-          onClick={() => setMobileNavOpen(o => !o)}
-          aria-label={mobileNavOpen ? 'Fechar menu' : 'Abrir menu'}
-          aria-expanded={mobileNavOpen}
-        >
-          <HamburgerIcon open={mobileNavOpen} />
-        </button>
-        <img src="/logo-icon.svg" alt="TaskFlow" className="mobile-logo-img" />
-        <span className="mobile-logo-text">TaskFlow</span>
-      </header>
+    <div className={`app-shell${isMobile ? ' mobile' : ''}`}>
 
-      {/* Dim overlay — closes sidebar when tapped outside */}
-      <div
-        className={`sidebar-overlay${mobileNavOpen ? ' visible' : ''}`}
-        onClick={() => setMobileNavOpen(false)}
-        aria-hidden="true"
-      />
+      {/* ── Header mobile — só aparece quando isMobile=true ── */}
+      {isMobile && (
+        <header className="mobile-header">
+          <button
+            className="mobile-hamburger"
+            onClick={() => setMobileNavOpen(o => !o)}
+            aria-label={mobileNavOpen ? 'Fechar menu' : 'Abrir menu'}
+            aria-expanded={mobileNavOpen}
+          >
+            <HamburgerIcon open={mobileNavOpen} />
+          </button>
+          <img src="/logo-icon.svg" alt="TaskFlow" className="mobile-logo-img" />
+          <span className="mobile-logo-text">TaskFlow</span>
+        </header>
+      )}
+
+      {/* ── Overlay que fecha o drawer ao tocar fora ─────── */}
+      {isMobile && mobileNavOpen && (
+        <div
+          className="sidebar-overlay visible"
+          onClick={() => setMobileNavOpen(false)}
+          aria-hidden="true"
+        />
+      )}
 
       <Sidebar
+        isMobile={isMobile}
         mobileOpen={mobileNavOpen}
         onMobileClose={() => setMobileNavOpen(false)}
       />
