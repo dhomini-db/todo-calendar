@@ -84,6 +84,9 @@ export default function TaskItem({ task, date }: TaskItemProps) {
         <div className="task-actions">
           {confirmDelete ? (
             <div className="delete-confirm">
+              {task.sourceTemplateId != null && (
+                <span className="delete-recurring-label">Todos os dias?</span>
+              )}
               <button className="confirm-yes" onClick={() => remove.mutate(task.id)}>Excluir</button>
               <button className="confirm-no"  onClick={() => setConfirmDelete(false)}>Cancelar</button>
             </div>

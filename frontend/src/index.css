@@ -996,6 +996,17 @@ a.sidebar-item.active .sidebar-item-icon {
 
 /* Delete confirm */
 .delete-confirm { display: flex; gap: 4px; align-items: center; }
+.delete-recurring-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--red);
+  background: var(--red-soft);
+  border: 1px solid var(--red-border);
+  border-radius: 99px;
+  padding: 2px 7px;
+  white-space: nowrap;
+  letter-spacing: 0.1px;
+}
 .confirm-yes, .confirm-no {
   padding: 3px 8px;
   border-radius: var(--r-xs);

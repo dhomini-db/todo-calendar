@@ -17,6 +17,12 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByDateAndUserIdAndSkippedFalseOrderByCreatedAtAsc(LocalDate date, Long userId);
 
     /**
+     * Todas as instâncias de um template recorrente do usuário (todos os dias),
+     * incluindo as já skipped. Usado para exclusão em massa ao deletar tarefa recorrente.
+     */
+    List<Task> findBySourceTemplateIdAndUserIdOrderByDateAsc(Long sourceTemplateId, Long userId);
+
+    /**
      * Retorna por dia: total de tarefas, boas escolhas e qtd interagidas.
      *
      * Regras:
