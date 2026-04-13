@@ -21,6 +21,7 @@
 
 :root,
 [data-theme="amber-night"] {
+  --cal-wrap-bg: #161616;  /* neutro: cinza escuro sem tinta */
   /* Surfaces — elevation model (Notion/Apple) */
   --bg:         #0d0d0d;
   --surface:    #111111;
@@ -96,6 +97,7 @@
 }
 
 [data-theme="arctic"] {
+  --cal-wrap-bg: #131418;  /* neutro: sem tinta azul */
   --bg:         #08090f;
   --surface:    #0e0f18;
   --elevated:   #13151f;
@@ -201,6 +203,7 @@
    Inspirado em: Tyrian Purple #700143 + Cloud Milk #F8F5F2
 ───────────────────────────────────────────────────────────── */
 [data-theme="tyrian-purple"] {
+  --cal-wrap-bg: #161616;  /* neutro: sem tinta vinho */
   --bg:           #0e0b10;
   --surface:      #170c14;
   --elevated:     #1f101a;
@@ -253,6 +256,7 @@
    Inspirado em: Moss Velvet #385144 + Matcha Mist #C2D8C4
 ───────────────────────────────────────────────────────────── */
 [data-theme="moss-velvet"] {
+  --cal-wrap-bg: #131613;  /* neutro: sem tinta verde */
   --bg:           #090e0a;
   --surface:      #0e1610;
   --elevated:     #131e15;
@@ -305,6 +309,7 @@
    Inspirado em: Midnight Espresso #200F07 + Goldenrod #E8A736
 ───────────────────────────────────────────────────────────── */
 [data-theme="midnight-espresso"] {
+  --cal-wrap-bg: #161514;  /* neutro: sem tinta marrom */
   --bg:           #0e0905;
   --surface:      #160d06;
   --elevated:     #1e1208;
