@@ -74,14 +74,21 @@ function IconLogout() {
 }
 
 /* ── NavItem ──────────────────────────────────────────────────── */
-interface NavItemProps { to: string; icon: React.ReactNode; label: string; end?: boolean }
+interface NavItemProps {
+  to: string
+  icon: React.ReactNode
+  label: string
+  end?: boolean
+  onClick?: () => void
+}
 
-function NavItem({ to, icon, label, end }: NavItemProps) {
+function NavItem({ to, icon, label, end, onClick }: NavItemProps) {
   return (
     <NavLink
       to={to}
       end={end}
       className={({ isActive }) => `sidebar-item${isActive ? ' active' : ''}`}
+      onClick={onClick}
     >
       <span className="sidebar-item-icon">{icon}</span>
       {label}
@@ -90,11 +97,16 @@ function NavItem({ to, icon, label, end }: NavItemProps) {
 }
 
 /* ── Sidebar ──────────────────────────────────────────────────── */
-export default function Sidebar() {
+interface SidebarProps {
+  mobileOpen: boolean
+  onMobileClose: () => void
+}
+
+export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
-  /* ── Resize logic ─────────────────────────────────────────── */
+  /* ── Resize logic (desktop only) ──────────────────────────── */
   const [width, setWidth] = useState<number>(() => {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) {
@@ -104,13 +116,12 @@ export default function Sidebar() {
     return SIDEBAR_DEFAULT
   })
 
-  const dragging   = useRef(false)
-  const startX     = useRef(0)
-  const startW     = useRef(0)
-  const currentW   = useRef(width)
-  const handleRef  = useRef<HTMLDivElement>(null)
+  const dragging  = useRef(false)
+  const startX    = useRef(0)
+  const startW    = useRef(0)
+  const currentW  = useRef(width)
+  const handleRef = useRef<HTMLDivElement>(null)
 
-  // Keep ref in sync for use inside event handlers
   useEffect(() => { currentW.current = width }, [width])
 
   useEffect(() => {
@@ -123,7 +134,7 @@ export default function Sidebar() {
     function onUp() {
       if (!dragging.current) return
       dragging.current = false
-      document.body.style.cursor = ''
+      document.body.style.cursor     = ''
       document.body.style.userSelect = ''
       handleRef.current?.classList.remove('dragging')
       localStorage.setItem(STORAGE_KEY, String(currentW.current))
@@ -138,9 +149,9 @@ export default function Sidebar() {
 
   function startResize(e: React.MouseEvent) {
     e.preventDefault()
-    dragging.current = true
-    startX.current   = e.clientX
-    startW.current   = width
+    dragging.current  = true
+    startX.current    = e.clientX
+    startW.current    = width
     document.body.style.cursor     = 'col-resize'
     document.body.style.userSelect = 'none'
     handleRef.current?.classList.add('dragging')
@@ -156,8 +167,14 @@ export default function Sidebar() {
     navigate('/login', { replace: true })
   }
 
+  // Close mobile nav on every nav click
+  const handleNavClick = () => onMobileClose()
+
   return (
-    <aside className="sidebar" style={{ width }}>
+    <aside
+      className={`sidebar${mobileOpen ? ' mobile-open' : ''}`}
+      style={{ width }}
+    >
       {/* Logo */}
       <div className="sidebar-logo">
         <img src="/logo-icon.svg" alt="TaskFlow" className="sidebar-logo-img" />
@@ -167,14 +184,14 @@ export default function Sidebar() {
       {/* Nav */}
       <nav className="sidebar-nav">
         <p className="sidebar-section-label">Workspace</p>
-        <NavItem to="/"          icon={<IconCalendar />} label="Calendário" end />
-        <NavItem to="/dashboard"   icon={<IconGrid />}    label="Dashboard" />
-        <NavItem to="/graficos"    icon={<IconChart />}   label="Gráficos" />
+        <NavItem to="/"            icon={<IconCalendar />} label="Calendário"    end onClick={handleNavClick} />
+        <NavItem to="/dashboard"   icon={<IconGrid />}     label="Dashboard"         onClick={handleNavClick} />
+        <NavItem to="/graficos"    icon={<IconChart />}    label="Gráficos"          onClick={handleNavClick} />
 
         <p className="sidebar-section-label" style={{ marginTop: 12 }}>Conta</p>
-        <NavItem to="/conta"         icon={<IconUser />}     label="Meu Perfil" />
-        <NavItem to="/personalizar"  icon={<IconPalette />}  label="Aparência" />
-        <NavItem to="/configuracoes" icon={<IconSettings />} label="Configurações" />
+        <NavItem to="/conta"         icon={<IconUser />}     label="Meu Perfil"    onClick={handleNavClick} />
+        <NavItem to="/personalizar"  icon={<IconPalette />}  label="Aparência"     onClick={handleNavClick} />
+        <NavItem to="/configuracoes" icon={<IconSettings />} label="Configurações" onClick={handleNavClick} />
       </nav>
 
       {/* Footer */}
@@ -194,7 +211,7 @@ export default function Sidebar() {
         </button>
       </div>
 
-      {/* Drag handle — right edge */}
+      {/* Drag handle — desktop only (hidden on mobile via CSS) */}
       <div
         ref={handleRef}
         className="sidebar-resize-handle"
