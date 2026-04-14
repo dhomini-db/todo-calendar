@@ -11,7 +11,7 @@ export default function TaskItem({ task, date }: TaskItemProps) {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [editing,       setEditing]       = useState(false)
   const [editTitle,     setEditTitle]     = useState(task.title)
-  const [showXP,        setShowXP]        = useState(false)
+  const [xpType,        setXpType]        = useState<'positive' | 'negative' | null>(null)
   const xpTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const toggle = useToggleTask(date)
@@ -22,11 +22,13 @@ export default function TaskItem({ task, date }: TaskItemProps) {
   const isPending  = !task.interacted
 
   function handleToggle() {
-    // FloatingXP só ao marcar uma positiva (não ao desmarcar)
-    if (isPositive && !task.completed) {
-      setShowXP(true)
+    // FloatingXP: +1 ao marcar positiva, -1 ao marcar negativa
+    if (!task.completed) {
+      setXpType(isPositive ? 'positive' : 'negative')
       if (xpTimer.current) clearTimeout(xpTimer.current)
-      xpTimer.current = setTimeout(() => setShowXP(false), 900)
+      xpTimer.current = setTimeout(() => setXpType(null), 900)
+    } else {
+      setXpType(null)
     }
     toggle.mutate(task.id)
   }
@@ -52,7 +54,11 @@ export default function TaskItem({ task, date }: TaskItemProps) {
   return (
     <div className={`task-item ${typeClass} ${doneClass}`} style={{ position: 'relative' }}>
       {/* FloatingXP */}
-      {showXP && <span className="floating-xp">+1</span>}
+      {xpType && (
+        <span className={`floating-xp ${xpType === 'negative' ? 'floating-xp--neg' : ''}`}>
+          {xpType === 'positive' ? '+1' : '-1'}
+        </span>
+      )}
 
       {/* Checkbox */}
       <button
@@ -99,9 +105,6 @@ export default function TaskItem({ task, date }: TaskItemProps) {
         <div className="task-actions">
           {confirmDelete ? (
             <div className="delete-confirm">
-              {isRecurring && (
-                <p className="delete-confirm-warning">Todos os dias serão removidos</p>
-              )}
               <button className="confirm-yes" onClick={() => remove.mutate(task.id)}>Excluir</button>
               <button className="confirm-no"  onClick={() => setConfirmDelete(false)}>Cancelar</button>
             </div>

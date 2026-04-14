@@ -74,21 +74,15 @@ function IconLogout() {
 }
 
 /* ── NavItem ──────────────────────────────────────────────────── */
-interface NavItemProps {
-  to: string
-  icon: React.ReactNode
-  label: string
-  end?: boolean
-  onClick?: () => void
-}
+interface NavItemProps { to: string; icon: React.ReactNode; label: string; end?: boolean; onClick?: () => void }
 
 function NavItem({ to, icon, label, end, onClick }: NavItemProps) {
   return (
     <NavLink
       to={to}
       end={end}
-      className={({ isActive }) => `sidebar-item${isActive ? ' active' : ''}`}
       onClick={onClick}
+      className={({ isActive }) => `sidebar-item${isActive ? ' active' : ''}`}
     >
       <span className="sidebar-item-icon">{icon}</span>
       {label}
@@ -97,17 +91,13 @@ function NavItem({ to, icon, label, end, onClick }: NavItemProps) {
 }
 
 /* ── Sidebar ──────────────────────────────────────────────────── */
-interface SidebarProps {
-  isMobile: boolean
-  mobileOpen: boolean
-  onMobileClose: () => void
-}
+interface SidebarProps { mobileOpen?: boolean; onMobileClose?: () => void }
 
-export default function Sidebar({ isMobile, mobileOpen, onMobileClose }: SidebarProps) {
+export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
-  /* ── Resize logic (desktop only) ──────────────────────────── */
+  /* ── Resize logic ─────────────────────────────────────────── */
   const [width, setWidth] = useState<number>(() => {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) {
@@ -117,12 +107,13 @@ export default function Sidebar({ isMobile, mobileOpen, onMobileClose }: Sidebar
     return SIDEBAR_DEFAULT
   })
 
-  const dragging  = useRef(false)
-  const startX    = useRef(0)
-  const startW    = useRef(0)
-  const currentW  = useRef(width)
-  const handleRef = useRef<HTMLDivElement>(null)
+  const dragging   = useRef(false)
+  const startX     = useRef(0)
+  const startW     = useRef(0)
+  const currentW   = useRef(width)
+  const handleRef  = useRef<HTMLDivElement>(null)
 
+  // Keep ref in sync for use inside event handlers
   useEffect(() => { currentW.current = width }, [width])
 
   useEffect(() => {
@@ -135,7 +126,7 @@ export default function Sidebar({ isMobile, mobileOpen, onMobileClose }: Sidebar
     function onUp() {
       if (!dragging.current) return
       dragging.current = false
-      document.body.style.cursor     = ''
+      document.body.style.cursor = ''
       document.body.style.userSelect = ''
       handleRef.current?.classList.remove('dragging')
       localStorage.setItem(STORAGE_KEY, String(currentW.current))
@@ -150,9 +141,9 @@ export default function Sidebar({ isMobile, mobileOpen, onMobileClose }: Sidebar
 
   function startResize(e: React.MouseEvent) {
     e.preventDefault()
-    dragging.current  = true
-    startX.current    = e.clientX
-    startW.current    = width
+    dragging.current = true
+    startX.current   = e.clientX
+    startW.current   = width
     document.body.style.cursor     = 'col-resize'
     document.body.style.userSelect = 'none'
     handleRef.current?.classList.add('dragging')
@@ -168,13 +159,16 @@ export default function Sidebar({ isMobile, mobileOpen, onMobileClose }: Sidebar
     navigate('/login', { replace: true })
   }
 
-  // Close mobile nav on every nav click
-  const handleNavClick = () => onMobileClose()
-
   return (
+    <>
+      {/* Mobile backdrop */}
+      {mobileOpen && (
+        <div className="sidebar-backdrop" onClick={onMobileClose} aria-hidden="true" />
+      )}
+
     <aside
-      className={`sidebar${mobileOpen ? ' mobile-open' : ''}`}
-      style={isMobile ? undefined : { width }}
+      className={`sidebar${mobileOpen ? ' sidebar--open' : ''}`}
+      style={{ width }}
     >
       {/* Logo */}
       <div className="sidebar-logo">
@@ -185,14 +179,14 @@ export default function Sidebar({ isMobile, mobileOpen, onMobileClose }: Sidebar
       {/* Nav */}
       <nav className="sidebar-nav">
         <p className="sidebar-section-label">Workspace</p>
-        <NavItem to="/"            icon={<IconCalendar />} label="Calendário"    end onClick={handleNavClick} />
-        <NavItem to="/dashboard"   icon={<IconGrid />}     label="Dashboard"         onClick={handleNavClick} />
-        <NavItem to="/graficos"    icon={<IconChart />}    label="Gráficos"          onClick={handleNavClick} />
+        <NavItem to="/"          icon={<IconCalendar />} label="Calendário" end         onClick={onMobileClose} />
+        <NavItem to="/dashboard" icon={<IconGrid />}     label="Dashboard"              onClick={onMobileClose} />
+        <NavItem to="/graficos"  icon={<IconChart />}    label="Gráficos"               onClick={onMobileClose} />
 
         <p className="sidebar-section-label" style={{ marginTop: 12 }}>Conta</p>
-        <NavItem to="/conta"         icon={<IconUser />}     label="Meu Perfil"    onClick={handleNavClick} />
-        <NavItem to="/personalizar"  icon={<IconPalette />}  label="Aparência"     onClick={handleNavClick} />
-        <NavItem to="/configuracoes" icon={<IconSettings />} label="Configurações" onClick={handleNavClick} />
+        <NavItem to="/conta"         icon={<IconUser />}     label="Meu Perfil"    onClick={onMobileClose} />
+        <NavItem to="/personalizar"  icon={<IconPalette />}  label="Aparência"     onClick={onMobileClose} />
+        <NavItem to="/configuracoes" icon={<IconSettings />} label="Configurações" onClick={onMobileClose} />
       </nav>
 
       {/* Footer */}
@@ -212,7 +206,7 @@ export default function Sidebar({ isMobile, mobileOpen, onMobileClose }: Sidebar
         </button>
       </div>
 
-      {/* Drag handle — desktop only (hidden on mobile via CSS) */}
+      {/* Drag handle — right edge */}
       <div
         ref={handleRef}
         className="sidebar-resize-handle"
@@ -220,5 +214,6 @@ export default function Sidebar({ isMobile, mobileOpen, onMobileClose }: Sidebar
         aria-hidden="true"
       />
     </aside>
+    </>
   )
 }

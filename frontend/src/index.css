@@ -1756,123 +1756,89 @@ a.sidebar-item.active::before {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   STREAK BADGE
+   STREAK BAR — compact single-row pill
 ═══════════════════════════════════════════════════════════════ */
 
-.streak-badge {
+.streak-bar {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 12px 14px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
   margin-bottom: 12px;
   background: var(--elevated);
   border: 1px solid var(--line);
   border-radius: var(--r);
 }
 
-.streak-header {
+.streak-bar-left {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  align-items: baseline;
+  gap: 5px;
+  min-width: 0;
 }
 
-.streak-flame-wrap {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.streak-flame {
-  font-size: 20px;
-  filter: grayscale(0.6) opacity(0.5);
-  transition: filter 0.2s ease, transform 0.2s ease;
+.streak-bar-flame {
+  font-size: 16px;
   line-height: 1;
+  filter: grayscale(1) opacity(0.4);
+  transition: filter 0.2s ease;
+  flex-shrink: 0;
 }
-.streak-flame.active {
+.streak-bar-flame.on {
   filter: none;
-  transform: scale(1.1);
 }
 
-.streak-count {
-  font-size: 22px;
+.streak-bar-count {
+  font-size: 18px;
   font-weight: 700;
   color: var(--text);
   letter-spacing: -0.5px;
   line-height: 1;
+  flex-shrink: 0;
 }
 
-.streak-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.streak-label {
+.streak-bar-label {
   font-size: 12px;
-  font-weight: 500;
   color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.streak-best {
+.streak-bar-best {
+  color: var(--text-3);
   font-size: 11px;
-  color: var(--text-3);
 }
 
-/* Week grid */
-.streak-week {
+/* Week dots */
+.streak-dots {
   display: flex;
-  gap: 4px;
-}
-
-.streak-day {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
+  flex-shrink: 0;
 }
 
-.streak-day-name {
-  font-size: 10px;
-  font-weight: 500;
-  color: var(--text-3);
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.streak-day--today .streak-day-name {
-  color: var(--accent);
-}
-
-.streak-day-dot {
-  width: 8px;
-  height: 8px;
+.streak-dot {
+  display: block;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--lift);
-  transition: background 0.15s ease;
+  transition: background 0.15s;
 }
-
-.streak-day--done .streak-day-dot {
-  background: #4ade80;
-}
-
-.streak-day--today:not(.streak-day--done) .streak-day-dot {
-  background: var(--line-md);
-  border: 1.5px solid var(--accent);
-}
-
-.streak-day--future .streak-day-dot {
-  opacity: 0.35;
-}
+.streak-dot.done   { background: #4ade80; }
+.streak-dot.today  { background: var(--line-md); box-shadow: 0 0 0 1.5px var(--accent); }
+.streak-dot.future { opacity: 0.3; }
 
 /* ═══════════════════════════════════════════════════════════════
    FLOATING XP ANIMATION
 ═══════════════════════════════════════════════════════════════ */
 
 @keyframes floatUp {
-  0%   { opacity: 1;   transform: translateY(0)    scale(1); }
-  60%  { opacity: 1;   transform: translateY(-18px) scale(1.15); }
-  100% { opacity: 0;   transform: translateY(-32px) scale(0.9); }
+  0%   { opacity: 1;   transform: translateY(0)     scale(1);    }
+  60%  { opacity: 1;   transform: translateY(-18px)  scale(1.15); }
+  100% { opacity: 0;   transform: translateY(-32px)  scale(0.9);  }
 }
 
 .floating-xp {
@@ -1886,11 +1852,118 @@ a.sidebar-item.active::before {
   animation: floatUp 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   z-index: 10;
 }
+.floating-xp--neg { color: #f87171; }
 
-/* Delete confirm warning for recurring tasks */
-.delete-confirm-warning {
-  font-size: 11px;
-  color: var(--red, #f87171);
-  margin-bottom: 4px;
-  text-align: center;
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE — responsive layout (≤ 768px)
+═══════════════════════════════════════════════════════════════ */
+
+/* Mobile top bar — hidden on desktop */
+.mobile-topbar {
+  display: none;
+}
+
+/* Sidebar backdrop */
+.sidebar-backdrop {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* ── App shell becomes column ── */
+  .app-shell {
+    flex-direction: column;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  /* ── Sidebar becomes a fixed overlay drawer ── */
+  .sidebar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 260px !important;
+    z-index: 200;
+    transform: translateX(-100%);
+    transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: none;
+  }
+  .sidebar--open {
+    transform: translateX(0);
+    box-shadow: 4px 0 32px rgba(0,0,0,0.32);
+  }
+
+  /* Resize handle invisible on mobile */
+  .sidebar-resize-handle { display: none; }
+
+  /* ── Backdrop: shown when sidebar is open ── */
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 199;
+    backdrop-filter: blur(1px);
+  }
+
+  /* ── Main content fills full width ── */
+  .main-content {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Mobile top bar ── */
+  .mobile-topbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+    flex-shrink: 0;
+    z-index: 10;
+  }
+  .mobile-menu-btn {
+    background: none;
+    border: none;
+    color: var(--text-2);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: var(--r-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.12s, background 0.12s;
+  }
+  .mobile-menu-btn:hover { color: var(--text); background: var(--lift); }
+  .mobile-topbar-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.2px;
+  }
+
+  /* ── CalendarPage: stack calendar + panel ── */
+  .calendar-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 14px 16px;
+  }
+  .panel-area {
+    width: 100% !important;
+    border-left: none;
+    border-top: 1px solid var(--line);
+    flex-shrink: 0;
+    max-height: 50dvh;
+    overflow-y: auto;
+  }
+
+  /* ── Page titles ── */
+  .page-title { font-size: 18px; }
+  .page-sub   { font-size: 12px; }
+
+  /* ── Streak bar less padding ── */
+  .streak-bar { padding: 7px 10px; }
 }
