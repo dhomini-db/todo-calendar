@@ -5,38 +5,35 @@ export default function StreakBadge() {
 
   if (isLoading || !streak) return null
 
+  const { currentStreak, bestStreak, completedToday, weekDays } = streak
+
   return (
-    <div className="streak-badge">
-      {/* Cabeçalho: fogo + streak atual + melhor */}
-      <div className="streak-header">
-        <div className="streak-flame-wrap">
-          <span className={`streak-flame ${streak.completedToday ? 'active' : ''}`}>🔥</span>
-          <span className="streak-count">{streak.currentStreak}</span>
-        </div>
-        <div className="streak-meta">
-          <span className="streak-label">dias seguidos</span>
-          {streak.bestStreak > 0 && (
-            <span className="streak-best">Recorde: {streak.bestStreak}</span>
+    <div className="streak-bar">
+      {/* Left: flame + count */}
+      <div className="streak-bar-left">
+        <span className={`streak-bar-flame ${completedToday ? 'on' : ''}`}>🔥</span>
+        <span className="streak-bar-count">{currentStreak}</span>
+        <span className="streak-bar-label">
+          {currentStreak === 1 ? 'dia' : 'dias'}
+          {bestStreak > 0 && (
+            <span className="streak-bar-best"> · recorde {bestStreak}</span>
           )}
-        </div>
+        </span>
       </div>
 
-      {/* Grid da semana */}
-      <div className="streak-week">
-        {streak.weekDays.map(day => (
-          <div
+      {/* Right: 7 dots (Mon–Sun), no labels */}
+      <div className="streak-dots">
+        {weekDays.map(day => (
+          <span
             key={day.date}
             className={[
-              'streak-day',
-              day.completed  ? 'streak-day--done'   : '',
-              day.isToday    ? 'streak-day--today'   : '',
-              day.isFuture   ? 'streak-day--future'  : '',
+              'streak-dot',
+              day.completed ? 'done'   : '',
+              day.isToday   ? 'today'  : '',
+              day.isFuture  ? 'future' : '',
             ].filter(Boolean).join(' ')}
-            title={day.date}
-          >
-            <span className="streak-day-name">{day.dayName}</span>
-            <span className="streak-day-dot" />
-          </div>
+            title={day.dayName}
+          />
         ))}
       </div>
     </div>

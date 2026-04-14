@@ -74,13 +74,14 @@ function IconLogout() {
 }
 
 /* ── NavItem ──────────────────────────────────────────────────── */
-interface NavItemProps { to: string; icon: React.ReactNode; label: string; end?: boolean }
+interface NavItemProps { to: string; icon: React.ReactNode; label: string; end?: boolean; onClick?: () => void }
 
-function NavItem({ to, icon, label, end }: NavItemProps) {
+function NavItem({ to, icon, label, end, onClick }: NavItemProps) {
   return (
     <NavLink
       to={to}
       end={end}
+      onClick={onClick}
       className={({ isActive }) => `sidebar-item${isActive ? ' active' : ''}`}
     >
       <span className="sidebar-item-icon">{icon}</span>
@@ -90,7 +91,9 @@ function NavItem({ to, icon, label, end }: NavItemProps) {
 }
 
 /* ── Sidebar ──────────────────────────────────────────────────── */
-export default function Sidebar() {
+interface SidebarProps { mobileOpen?: boolean; onMobileClose?: () => void }
+
+export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
@@ -157,7 +160,16 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="sidebar" style={{ width }}>
+    <>
+      {/* Mobile backdrop */}
+      {mobileOpen && (
+        <div className="sidebar-backdrop" onClick={onMobileClose} aria-hidden="true" />
+      )}
+
+    <aside
+      className={`sidebar${mobileOpen ? ' sidebar--open' : ''}`}
+      style={{ width }}
+    >
       {/* Logo */}
       <div className="sidebar-logo">
         <img src="/logo-icon.svg" alt="TaskFlow" className="sidebar-logo-img" />
@@ -167,14 +179,14 @@ export default function Sidebar() {
       {/* Nav */}
       <nav className="sidebar-nav">
         <p className="sidebar-section-label">Workspace</p>
-        <NavItem to="/"          icon={<IconCalendar />} label="Calendário" end />
-        <NavItem to="/dashboard"   icon={<IconGrid />}    label="Dashboard" />
-        <NavItem to="/graficos"    icon={<IconChart />}   label="Gráficos" />
+        <NavItem to="/"          icon={<IconCalendar />} label="Calendário" end         onClick={onMobileClose} />
+        <NavItem to="/dashboard" icon={<IconGrid />}     label="Dashboard"              onClick={onMobileClose} />
+        <NavItem to="/graficos"  icon={<IconChart />}    label="Gráficos"               onClick={onMobileClose} />
 
         <p className="sidebar-section-label" style={{ marginTop: 12 }}>Conta</p>
-        <NavItem to="/conta"         icon={<IconUser />}     label="Meu Perfil" />
-        <NavItem to="/personalizar"  icon={<IconPalette />}  label="Aparência" />
-        <NavItem to="/configuracoes" icon={<IconSettings />} label="Configurações" />
+        <NavItem to="/conta"         icon={<IconUser />}     label="Meu Perfil"    onClick={onMobileClose} />
+        <NavItem to="/personalizar"  icon={<IconPalette />}  label="Aparência"     onClick={onMobileClose} />
+        <NavItem to="/configuracoes" icon={<IconSettings />} label="Configurações" onClick={onMobileClose} />
       </nav>
 
       {/* Footer */}
@@ -202,5 +214,6 @@ export default function Sidebar() {
         aria-hidden="true"
       />
     </aside>
+    </>
   )
 }

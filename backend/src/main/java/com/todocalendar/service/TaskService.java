@@ -75,11 +75,37 @@ public class TaskService {
     @Transactional
     public TaskResponse updateTask(Long id, TaskRequest request, Long userId) {
         Task task = findOrThrow(id, userId);
-        task.setTitle(request.getTitle());
-        task.setDescription(request.getDescription());
-        task.setDate(request.getDate());
-        if (request.getType() != null) task.setType(request.getType());
-        return toResponse(taskRepository.save(task));
+
+        if (task.getSourceTemplateId() != null) {
+            // Tarefa recorrente: propaga título, descrição e tipo para TODAS as instâncias + template
+            Long templateId = task.getSourceTemplateId();
+
+            List<Task> allInstances = taskRepository
+                    .findBySourceTemplateIdAndUserIdOrderByDateAsc(templateId, userId);
+            for (Task t : allInstances) {
+                t.setTitle(request.getTitle());
+                t.setDescription(request.getDescription());
+                if (request.getType() != null) t.setType(request.getType());
+            }
+            taskRepository.saveAll(allInstances);
+
+            templateRepository.findById(templateId).ifPresent(tpl -> {
+                tpl.setTitle(request.getTitle());
+                tpl.setDescription(request.getDescription());
+                if (request.getType() != null) tpl.setType(request.getType());
+                templateRepository.save(tpl);
+            });
+
+        } else {
+            task.setTitle(request.getTitle());
+            task.setDescription(request.getDescription());
+            task.setDate(request.getDate());
+            if (request.getType() != null) task.setType(request.getType());
+            taskRepository.save(task);
+        }
+
+        // task foi atualizado in-place pelo loop (mesmo objeto via Hibernate identity map)
+        return toResponse(task);
     }
 
     @Transactional
