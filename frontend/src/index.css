@@ -1947,12 +1947,12 @@ a.sidebar-item.active::before {
 
   /* ── CalendarPage: calendar area fixed, only task panel scrolls ── */
   .calendar-area {
-    flex-shrink: 0;        /* altura natural, sem crescer */
-    overflow: hidden;      /* sem scroll aqui */
+    flex: none;            /* cancela flex:1 do desktop — altura é conteúdo natural */
+    overflow: visible;     /* não clipa nada */
     padding: 10px 12px 8px;
   }
   .panel-area {
-    flex: 1;               /* ocupa o restante */
+    flex: 1;               /* ocupa todo espaço restante */
     overflow: hidden;      /* panel-body interna cuida do scroll */
     width: 100% !important;
     border-left: none;
