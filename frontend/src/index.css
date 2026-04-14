@@ -1953,7 +1953,7 @@ a.sidebar-item.active::before {
   }
   .panel-area {
     flex: 1;               /* ocupa todo espaço restante */
-    overflow: hidden;      /* panel-body interna cuida do scroll */
+    overflow-y: auto;      /* a área toda rola — sem limite de altura interno */
     width: 100% !important;
     border-left: none;
     border-top: 1px solid var(--line);
@@ -1989,10 +1989,20 @@ a.sidebar-item.active::before {
     padding-bottom: 4px;
   }
 
-  /* ── task-panel deve preencher panel-area inteiramente ── */
+  /* ── task-panel: altura natural (panel-area rola, não o body interno) ── */
   .task-panel {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+    height: auto;
+    min-height: 0;
+  }
+  .panel-body {
+    overflow-y: visible;
+    flex: none;
+  }
+  .panel-footer {
+    position: sticky;
+    bottom: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    z-index: 5;
   }
 }
