@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import type { Task } from '../types'
 import { useToggleTask, useDeleteTask, useUpdateTask } from '../hooks/useTasks'
 
@@ -11,14 +11,25 @@ export default function TaskItem({ task, date }: TaskItemProps) {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [editing,       setEditing]       = useState(false)
   const [editTitle,     setEditTitle]     = useState(task.title)
+  const [showXP,        setShowXP]        = useState(false)
+  const xpTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const toggle = useToggleTask(date)
   const remove = useDeleteTask(date)
   const update = useUpdateTask(date)
 
   const isPositive = task.type === 'POSITIVE'
-  // PENDING = ainda não marcado (interacted=false, qualquer origem)
   const isPending  = !task.interacted
+
+  function handleToggle() {
+    // FloatingXP só ao marcar uma positiva (não ao desmarcar)
+    if (isPositive && !task.completed) {
+      setShowXP(true)
+      if (xpTimer.current) clearTimeout(xpTimer.current)
+      xpTimer.current = setTimeout(() => setShowXP(false), 900)
+    }
+    toggle.mutate(task.id)
+  }
 
   function handleEditSave() {
     const trimmed = editTitle.trim()
@@ -36,13 +47,17 @@ export default function TaskItem({ task, date }: TaskItemProps) {
 
   const typeClass = isPositive ? 'task-positive' : 'task-negative'
   const doneClass = task.completed ? 'done' : ''
+  const isRecurring = task.sourceTemplateId != null
 
   return (
-    <div className={`task-item ${typeClass} ${doneClass}`}>
+    <div className={`task-item ${typeClass} ${doneClass}`} style={{ position: 'relative' }}>
+      {/* FloatingXP */}
+      {showXP && <span className="floating-xp">+1</span>}
+
       {/* Checkbox */}
       <button
         className={`task-checkbox ${isPositive ? 'positive' : 'negative'} ${task.completed ? 'checked' : ''}`}
-        onClick={() => toggle.mutate(task.id)}
+        onClick={handleToggle}
         aria-label={task.completed ? 'Desmarcar' : 'Marcar'}
       >
         {task.completed && (
@@ -67,7 +82,7 @@ export default function TaskItem({ task, date }: TaskItemProps) {
           <>
             <p className={`task-title ${task.completed ? 'done' : ''}`}>{task.title}</p>
             {task.description && <p className="task-desc">{task.description}</p>}
-            {isPending && task.sourceTemplateId != null && (
+            {isPending && isRecurring && (
               <span className="task-outcome pending">Pendente</span>
             )}
             {!isPending && (
@@ -84,8 +99,8 @@ export default function TaskItem({ task, date }: TaskItemProps) {
         <div className="task-actions">
           {confirmDelete ? (
             <div className="delete-confirm">
-              {task.sourceTemplateId != null && (
-                <span className="delete-recurring-label">Todos os dias?</span>
+              {isRecurring && (
+                <p className="delete-confirm-warning">Todos os dias serão removidos</p>
               )}
               <button className="confirm-yes" onClick={() => remove.mutate(task.id)}>Excluir</button>
               <button className="confirm-no"  onClick={() => setConfirmDelete(false)}>Cancelar</button>

@@ -25,18 +25,18 @@ import java.util.Map;
 public class TaskService {
 
     private final TaskRepository         taskRepository;
-    private final UserRepository         userRepository;
     private final TaskTemplateRepository templateRepository;
+    private final UserRepository         userRepository;
     private final TaskTemplateService    templateService;
 
     public TaskService(TaskRepository taskRepository,
-                       UserRepository userRepository,
                        TaskTemplateRepository templateRepository,
+                       UserRepository userRepository,
                        @Lazy TaskTemplateService templateService) {
-        this.taskRepository    = taskRepository;
-        this.userRepository    = userRepository;
+        this.taskRepository     = taskRepository;
         this.templateRepository = templateRepository;
-        this.templateService   = templateService;
+        this.userRepository     = userRepository;
+        this.templateService    = templateService;
     }
 
     // ── CRUD ───────────────────────────────────────────────────
@@ -97,13 +97,11 @@ public class TaskService {
     public void deleteTask(Long id, Long userId) {
         Task task = findOrThrow(id, userId);
         if (task.getSourceTemplateId() != null) {
+            // Tarefa recorrente: skip TODAS as instâncias e deletar o template
             Long templateId = task.getSourceTemplateId();
-            // Marcar TODAS as instâncias desta tarefa recorrente como skipped (todos os dias)
-            List<Task> allInstances =
-                    taskRepository.findBySourceTemplateIdAndUserIdOrderByDateAsc(templateId, userId);
+            List<Task> allInstances = taskRepository.findBySourceTemplateIdAndUserIdOrderByDateAsc(templateId, userId);
             allInstances.forEach(t -> t.setSkipped(true));
             taskRepository.saveAll(allInstances);
-            // Deletar o template para bloquear geração de novas instâncias no futuro
             if (templateRepository.existsById(templateId)) {
                 templateRepository.deleteById(templateId);
             }

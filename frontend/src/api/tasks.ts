@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { Task, TaskRequest, DaySummary, AuthResponse, LoginRequest, RegisterRequest, TaskTemplate, TaskTemplateRequest } from '../types'
+import type { Task, TaskRequest, DaySummary, AuthResponse, LoginRequest, RegisterRequest, TaskTemplate, TaskTemplateRequest, StreakData } from '../types'
 
 /**
  * Em dev  → Vite proxy redireciona /api para localhost:8081 (sem CORS)
@@ -84,3 +84,8 @@ export const toggleTemplate = (id: number): Promise<TaskTemplate> =>
 
 export const deleteTemplate = (id: number): Promise<void> =>
   api.delete(`/templates/${id}`).then(() => undefined)
+
+// ── Streak ─────────────────────────────────────────────────────
+
+export const getStreak = (): Promise<StreakData> =>
+  api.get<StreakData>('/streak').then(r => r.data)

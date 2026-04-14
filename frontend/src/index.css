@@ -21,7 +21,6 @@
 
 :root,
 [data-theme="amber-night"] {
-  --cal-wrap-bg: #161616;  /* neutro: cinza escuro sem tinta */
   /* Surfaces — elevation model (Notion/Apple) */
   --bg:         #0d0d0d;
   --surface:    #111111;
@@ -97,7 +96,6 @@
 }
 
 [data-theme="arctic"] {
-  --cal-wrap-bg: #131418;  /* neutro: sem tinta azul */
   --bg:         #08090f;
   --surface:    #0e0f18;
   --elevated:   #13151f;
@@ -132,7 +130,6 @@
 }
 
 [data-theme="rose-dawn"] {
-  --cal-wrap-bg: #fdfaf7;  /* neutro: branco-quente sem tinta */
   /* Surfaces — warm linen scale, more contrast between layers */
   --bg:         #f2ede8;   /* warm linen — slightly darker base */
   --surface:    #ede7e1;   /* sidebar, panel bg */
@@ -176,357 +173,6 @@
   --shadow-lg: 0 8px 40px rgba(100, 60, 40, 0.20);
 
   /* Compatibility aliases */
-  --card:          var(--elevated);
-  --card-hover:    var(--raised);
-  --border:        var(--line-md);
-  --border-subtle: var(--line);
-  --text-muted:    var(--text-2);
-  --text-dim:      var(--text-3);
-  --accent-dim:    var(--accent-soft);
-  --positive:      var(--green);
-  --positive-dim:  var(--green-soft);
-  --negative:      var(--red);
-  --negative-dim:  var(--red-soft);
-  --red-dim:       var(--red-soft);
-  --emerald:       var(--teal);
-  --amber:         var(--accent);
-  --amber-dim:     var(--accent-soft);
-  --amber-glow:    var(--accent-glow);
-  --radius-sm:     var(--r-sm);
-  --radius:        var(--r);
-  --radius-lg:     var(--r-lg);
-  --radius-xl:     var(--r-xl);
-}
-
-/* ─────────────────────────────────────────────────────────────
-   TYRIAN PURPLE — Escuro, acento vinho/borgonha
-   Inspirado em: Tyrian Purple #700143 + Cloud Milk #F8F5F2
-───────────────────────────────────────────────────────────── */
-[data-theme="tyrian-purple"] {
-  --cal-wrap-bg: #161616;  /* neutro: sem tinta vinho */
-  --bg:           #0e0b10;
-  --surface:      #170c14;
-  --elevated:     #1f101a;
-  --raised:       #281521;
-  --lift:         #311a29;
-  --lift-hover:   #3a1f32;
-
-  --line:         rgba(200, 50, 100, 0.10);
-  --line-md:      rgba(200, 50, 100, 0.18);
-  --line-hi:      rgba(200, 50, 100, 0.30);
-
-  --accent:         #c0245c;
-  --accent-soft:    rgba(192, 36, 92, 0.12);
-  --accent-glow:    rgba(192, 36, 92, 0.06);
-  --accent-border:  rgba(192, 36, 92, 0.32);
-
-  --text:        #f2e8ef;
-  --text-2:      #b888a8;
-  --text-3:      #725068;
-
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.50);
-  --shadow:    0 2px 8px rgba(0, 0, 0, 0.55);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.60);
-  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.70);
-
-  --card:          var(--elevated);
-  --card-hover:    var(--raised);
-  --border:        var(--line-md);
-  --border-subtle: var(--line);
-  --text-muted:    var(--text-2);
-  --text-dim:      var(--text-3);
-  --accent-dim:    var(--accent-soft);
-  --positive:      var(--green);
-  --positive-dim:  var(--green-soft);
-  --negative:      var(--red);
-  --negative-dim:  var(--red-soft);
-  --red-dim:       var(--red-soft);
-  --emerald:       var(--teal);
-  --amber:         var(--accent);
-  --amber-dim:     var(--accent-soft);
-  --amber-glow:    var(--accent-glow);
-  --radius-sm:     var(--r-sm);
-  --radius:        var(--r);
-  --radius-lg:     var(--r-lg);
-  --radius-xl:     var(--r-xl);
-}
-
-/* ─────────────────────────────────────────────────────────────
-   MOSS VELVET — Escuro, acento verde-floresta
-   Inspirado em: Moss Velvet #385144 + Matcha Mist #C2D8C4
-───────────────────────────────────────────────────────────── */
-[data-theme="moss-velvet"] {
-  --cal-wrap-bg: #131613;  /* neutro: sem tinta verde */
-  --bg:           #090e0a;
-  --surface:      #0e1610;
-  --elevated:     #131e15;
-  --raised:       #192819;
-  --lift:         #1f311f;
-  --lift-hover:   #253b25;
-
-  --line:         rgba(80, 160, 100, 0.10);
-  --line-md:      rgba(80, 160, 100, 0.18);
-  --line-hi:      rgba(80, 160, 100, 0.30);
-
-  --accent:         #52b07a;
-  --accent-soft:    rgba(82, 176, 122, 0.12);
-  --accent-glow:    rgba(82, 176, 122, 0.06);
-  --accent-border:  rgba(82, 176, 122, 0.32);
-
-  --text:        #e8f2ea;
-  --text-2:      #88b898;
-  --text-3:      #4a7058;
-
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.50);
-  --shadow:    0 2px 8px rgba(0, 0, 0, 0.55);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.60);
-  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.70);
-
-  --card:          var(--elevated);
-  --card-hover:    var(--raised);
-  --border:        var(--line-md);
-  --border-subtle: var(--line);
-  --text-muted:    var(--text-2);
-  --text-dim:      var(--text-3);
-  --accent-dim:    var(--accent-soft);
-  --positive:      var(--green);
-  --positive-dim:  var(--green-soft);
-  --negative:      var(--red);
-  --negative-dim:  var(--red-soft);
-  --red-dim:       var(--red-soft);
-  --emerald:       var(--teal);
-  --amber:         var(--accent);
-  --amber-dim:     var(--accent-soft);
-  --amber-glow:    var(--accent-glow);
-  --radius-sm:     var(--r-sm);
-  --radius:        var(--r);
-  --radius-lg:     var(--r-lg);
-  --radius-xl:     var(--r-xl);
-}
-
-/* ─────────────────────────────────────────────────────────────
-   MIDNIGHT ESPRESSO — Escuro quente, acento dourado
-   Inspirado em: Midnight Espresso #200F07 + Goldenrod #E8A736
-───────────────────────────────────────────────────────────── */
-[data-theme="midnight-espresso"] {
-  --cal-wrap-bg: #161514;  /* neutro: sem tinta marrom */
-  --bg:           #0e0905;
-  --surface:      #160d06;
-  --elevated:     #1e1208;
-  --raised:       #27180b;
-  --lift:         #301e0f;
-  --lift-hover:   #3a2513;
-
-  --line:         rgba(232, 167, 54, 0.10);
-  --line-md:      rgba(232, 167, 54, 0.18);
-  --line-hi:      rgba(232, 167, 54, 0.30);
-
-  --accent:         #e8a736;
-  --accent-soft:    rgba(232, 167, 54, 0.12);
-  --accent-glow:    rgba(232, 167, 54, 0.06);
-  --accent-border:  rgba(232, 167, 54, 0.32);
-
-  --text:        #f5ede0;
-  --text-2:      #c4a878;
-  --text-3:      #7a6038;
-
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.55);
-  --shadow:    0 2px 8px rgba(0, 0, 0, 0.60);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.65);
-  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.75);
-
-  --card:          var(--elevated);
-  --card-hover:    var(--raised);
-  --border:        var(--line-md);
-  --border-subtle: var(--line);
-  --text-muted:    var(--text-2);
-  --text-dim:      var(--text-3);
-  --accent-dim:    var(--accent-soft);
-  --positive:      var(--green);
-  --positive-dim:  var(--green-soft);
-  --negative:      var(--red);
-  --negative-dim:  var(--red-soft);
-  --red-dim:       var(--red-soft);
-  --emerald:       var(--teal);
-  --amber:         var(--accent);
-  --amber-dim:     var(--accent-soft);
-  --amber-glow:    var(--accent-glow);
-  --radius-sm:     var(--r-sm);
-  --radius:        var(--r);
-  --radius-lg:     var(--r-lg);
-  --radius-xl:     var(--r-xl);
-}
-
-/* ─────────────────────────────────────────────────────────────
-   BANANA CREAM — Claro quente, acento vinho
-   Inspirado em: Banana Cream #FBEDAD + Tyrian Purple #700143
-───────────────────────────────────────────────────────────── */
-[data-theme="banana-cream"] {
-  --cal-wrap-bg: #fffefb;  /* neutro: branco sem amarelo */
-  --bg:           #fdf6d5;
-  --surface:      #fef9e5;
-  --elevated:     #fffef8;
-  --raised:       #f8eebe;
-  --lift:         #f2e5a8;
-  --lift-hover:   #eedc90;
-
-  --line:         rgba(112, 1, 67, 0.08);
-  --line-md:      rgba(112, 1, 67, 0.15);
-  --line-hi:      rgba(112, 1, 67, 0.26);
-
-  --accent:         #700143;
-  --accent-soft:    rgba(112, 1, 67, 0.10);
-  --accent-glow:    rgba(112, 1, 67, 0.05);
-  --accent-border:  rgba(112, 1, 67, 0.25);
-
-  --text:        #280a10;
-  --text-2:      #6b2840;
-  --text-3:      #a06070;
-
-  --green:        #15803d;
-  --green-soft:   rgba(21, 128, 61, 0.10);
-  --green-border: rgba(21, 128, 61, 0.22);
-  --teal:         #0f766e;
-  --teal-soft:    rgba(15, 118, 110, 0.10);
-  --yellow:       #a16207;
-  --yellow-soft:  rgba(161, 98, 7, 0.10);
-  --red:          #b91c1c;
-  --red-soft:     rgba(185, 28, 28, 0.09);
-  --red-border:   rgba(185, 28, 28, 0.22);
-
-  --shadow-sm: 0 1px 3px rgba(112, 1, 67, 0.08);
-  --shadow:    0 2px 8px rgba(112, 1, 67, 0.10);
-  --shadow-md: 0 4px 16px rgba(112, 1, 67, 0.12);
-  --shadow-lg: 0 8px 40px rgba(112, 1, 67, 0.18);
-
-  --card:          var(--elevated);
-  --card-hover:    var(--raised);
-  --border:        var(--line-md);
-  --border-subtle: var(--line);
-  --text-muted:    var(--text-2);
-  --text-dim:      var(--text-3);
-  --accent-dim:    var(--accent-soft);
-  --positive:      var(--green);
-  --positive-dim:  var(--green-soft);
-  --negative:      var(--red);
-  --negative-dim:  var(--red-soft);
-  --red-dim:       var(--red-soft);
-  --emerald:       var(--teal);
-  --amber:         var(--accent);
-  --amber-dim:     var(--accent-soft);
-  --amber-glow:    var(--accent-glow);
-  --radius-sm:     var(--r-sm);
-  --radius:        var(--r);
-  --radius-lg:     var(--r-lg);
-  --radius-xl:     var(--r-xl);
-}
-
-/* ─────────────────────────────────────────────────────────────
-   BLUE MIRAGE — Claro neutro-quente, acento azul-aço
-   Inspirado em: Blue Mirage #6E88B0 + Amber Smoke #F2E0D0
-───────────────────────────────────────────────────────────── */
-[data-theme="blue-mirage"] {
-  --cal-wrap-bg: #fdfcfa;  /* neutro: branco sem bege */
-  --bg:           #eee8e0;
-  --surface:      #f5f0e8;
-  --elevated:     #fdfaf6;
-  --raised:       #e8e0d5;
-  --lift:         #ddd5c8;
-  --lift-hover:   #d2c9ba;
-
-  --line:         rgba(90, 122, 170, 0.10);
-  --line-md:      rgba(90, 122, 170, 0.20);
-  --line-hi:      rgba(90, 122, 170, 0.35);
-
-  --accent:         #5a7aaa;
-  --accent-soft:    rgba(90, 122, 170, 0.12);
-  --accent-glow:    rgba(90, 122, 170, 0.06);
-  --accent-border:  rgba(90, 122, 170, 0.30);
-
-  --text:        #1a2030;
-  --text-2:      #456080;
-  --text-3:      #7890a8;
-
-  --green:        #15803d;
-  --green-soft:   rgba(21, 128, 61, 0.10);
-  --green-border: rgba(21, 128, 61, 0.22);
-  --teal:         #0f766e;
-  --teal-soft:    rgba(15, 118, 110, 0.10);
-  --yellow:       #a16207;
-  --yellow-soft:  rgba(161, 98, 7, 0.10);
-  --red:          #b91c1c;
-  --red-soft:     rgba(185, 28, 28, 0.09);
-  --red-border:   rgba(185, 28, 28, 0.22);
-
-  --shadow-sm: 0 1px 3px rgba(26, 32, 48, 0.08);
-  --shadow:    0 2px 8px rgba(26, 32, 48, 0.10);
-  --shadow-md: 0 4px 16px rgba(26, 32, 48, 0.12);
-  --shadow-lg: 0 8px 40px rgba(26, 32, 48, 0.16);
-
-  --card:          var(--elevated);
-  --card-hover:    var(--raised);
-  --border:        var(--line-md);
-  --border-subtle: var(--line);
-  --text-muted:    var(--text-2);
-  --text-dim:      var(--text-3);
-  --accent-dim:    var(--accent-soft);
-  --positive:      var(--green);
-  --positive-dim:  var(--green-soft);
-  --negative:      var(--red);
-  --negative-dim:  var(--red-soft);
-  --red-dim:       var(--red-soft);
-  --emerald:       var(--teal);
-  --amber:         var(--accent);
-  --amber-dim:     var(--accent-soft);
-  --amber-glow:    var(--accent-glow);
-  --radius-sm:     var(--r-sm);
-  --radius:        var(--r);
-  --radius-lg:     var(--r-lg);
-  --radius-xl:     var(--r-xl);
-}
-
-/* ─────────────────────────────────────────────────────────────
-   PISTACHIO FROST — Claro verde-suave, acento musgo
-   Inspirado em: Pistachio Frost #C5E384 + Moss Velvet #385144
-───────────────────────────────────────────────────────────── */
-[data-theme="pistachio"] {
-  --cal-wrap-bg: #fbfef8;  /* neutro: branco sem verde */
-  --bg:           #edf5d8;
-  --surface:      #f4fae6;
-  --elevated:     #fcfef5;
-  --raised:       #e0ecc0;
-  --lift:         #d3e4a8;
-  --lift-hover:   #c6db90;
-
-  --line:         rgba(56, 81, 68, 0.10);
-  --line-md:      rgba(56, 81, 68, 0.18);
-  --line-hi:      rgba(56, 81, 68, 0.30);
-
-  --accent:         #385144;
-  --accent-soft:    rgba(56, 81, 68, 0.10);
-  --accent-glow:    rgba(56, 81, 68, 0.05);
-  --accent-border:  rgba(56, 81, 68, 0.25);
-
-  --text:        #1a2d20;
-  --text-2:      #3d5a48;
-  --text-3:      #6a8a74;
-
-  --green:        #15803d;
-  --green-soft:   rgba(21, 128, 61, 0.10);
-  --green-border: rgba(21, 128, 61, 0.22);
-  --teal:         #0f766e;
-  --teal-soft:    rgba(15, 118, 110, 0.10);
-  --yellow:       #a16207;
-  --yellow-soft:  rgba(161, 98, 7, 0.10);
-  --red:          #b91c1c;
-  --red-soft:     rgba(185, 28, 28, 0.09);
-  --red-border:   rgba(185, 28, 28, 0.22);
-
-  --shadow-sm: 0 1px 3px rgba(26, 45, 32, 0.08);
-  --shadow:    0 2px 8px rgba(26, 45, 32, 0.10);
-  --shadow-md: 0 4px 16px rgba(26, 45, 32, 0.12);
-  --shadow-lg: 0 8px 40px rgba(26, 45, 32, 0.16);
-
   --card:          var(--elevated);
   --card-hover:    var(--raised);
   --border:        var(--line-md);
@@ -987,7 +633,7 @@ a.sidebar-item.active .sidebar-item-icon {
 ═══════════════════════════════════════════════════════════════ */
 
 .calendar-wrap {
-  background: var(--cal-wrap-bg, var(--elevated));
+  background: var(--elevated);
   border: 1px solid var(--line);
   border-radius: var(--r-xl);
   padding: 14px 14px 10px;
@@ -1350,17 +996,6 @@ a.sidebar-item.active .sidebar-item-icon {
 
 /* Delete confirm */
 .delete-confirm { display: flex; gap: 4px; align-items: center; }
-.delete-recurring-label {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--red);
-  background: var(--red-soft);
-  border: 1px solid var(--red-border);
-  border-radius: 99px;
-  padding: 2px 7px;
-  white-space: nowrap;
-  letter-spacing: 0.1px;
-}
 .confirm-yes, .confirm-no {
   padding: 3px 8px;
   border-radius: var(--r-xs);
@@ -1546,37 +1181,9 @@ a.sidebar-item.active .sidebar-item-icon {
 .theme-card:hover   { border-color: var(--line-md); }
 .theme-card.active  { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-soft); }
 
-.theme-preview {
-  height: 76px;
-  display: flex;
-  flex-direction: row;
-  overflow: hidden;
-  border-radius: var(--r-lg) var(--r-lg) 0 0;
-}
-
-/* Mini sidebar dentro do preview */
-.theme-preview-sidebar {
-  width: 28px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  padding: 8px 6px;
-  align-items: center;
-}
-.theme-preview-dot    { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.theme-preview-dot-sm { width: 14px; height: 3px;  border-radius: 99px; flex-shrink: 0; }
-
-/* Area de conteúdo dentro do preview */
-.theme-preview-content {
-  flex: 1;
-  padding: 8px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.theme-preview-bar   { height: 5px; border-radius: 99px; width: 52%; }
-.theme-preview-lines { display: flex; flex-direction: column; gap: 4px; margin-top: 2px; }
+.theme-preview { height: 68px; display: flex; flex-direction: column; gap: 6px; padding: 11px; }
+.theme-preview-bar   { height: 5px; border-radius: 99px; width: 48%; }
+.theme-preview-lines { display: flex; flex-direction: column; gap: 5px; margin-top: 4px; }
 .theme-preview-line  { height: 3.5px; border-radius: 99px; }
 .theme-preview-line.long  { width: 78%; }
 .theme-preview-line.short { width: 48%; }
@@ -2149,272 +1756,141 @@ a.sidebar-item.active::before {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   RESPONSIVE — Mobile-first
-   Desktop : sem query — estilos existentes intocados
-   Tablet  : ≤ 1024px — ajustes menores via @media
-   Mobile  : classe .mobile no .app-shell (adicionada por JS/React)
-             + @media (max-width:768px) como fallback
-   Tiny    : ≤ 380px — ajustes extras via @media
+   STREAK BADGE
 ═══════════════════════════════════════════════════════════════ */
 
-/* ──────────────────────────────────────────────────────────────
-   ELEMENTOS QUE EXISTEM NO DOM MAS SÃO INVISÍVEIS NO DESKTOP
-────────────────────────────────────────────────────────────── */
-
-/* Header mobile: oculto no desktop, aparece no mobile */
-.mobile-header {
-  display: none;
-  align-items: center;
+.streak-badge {
+  display: flex;
+  flex-direction: column;
   gap: 10px;
-  padding: 0 14px;
-  height: 52px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--line);
-  flex-shrink: 0;
-  z-index: 50;
-  /* Não usa position fixed — é um flex item normal no topo */
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  background: var(--elevated);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
 }
 
-/* Ícone TaskFlow no mobile header */
-.mobile-logo-img  { width: 22px; height: 22px; flex-shrink: 0; }
-.mobile-logo-text {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-  letter-spacing: -0.2px;
-}
-
-/* Botão hamburger */
-.mobile-hamburger {
+.streak-header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border: none;
-  background: none;
+  gap: 10px;
+}
+
+.streak-flame-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.streak-flame {
+  font-size: 20px;
+  filter: grayscale(0.6) opacity(0.5);
+  transition: filter 0.2s ease, transform 0.2s ease;
+  line-height: 1;
+}
+.streak-flame.active {
+  filter: none;
+  transform: scale(1.1);
+}
+
+.streak-count {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.streak-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.streak-label {
+  font-size: 12px;
+  font-weight: 500;
   color: var(--text-2);
-  cursor: pointer;
-  border-radius: var(--r);
-  transition: background 0.12s, color 0.12s;
-  flex-shrink: 0;
-}
-.mobile-hamburger:hover  { background: var(--raised); color: var(--text); }
-.mobile-hamburger:active { transform: scale(0.93); }
-
-/* Overlay escurecido por trás da sidebar aberta */
-.sidebar-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 90;
-  backdrop-filter: blur(1px);
-  -webkit-backdrop-filter: blur(1px);
-  /* Animação suave */
-  opacity: 0;
-  transition: opacity 0.25s;
-}
-.sidebar-overlay.visible {
-  display: block;
-  opacity: 1;
 }
 
-/* ──────────────────────────────────────────────────────────────
-   TABLET — ≤ 1024px (ajustes menores, desktop quase igual)
-────────────────────────────────────────────────────────────── */
-@media (max-width: 1024px) {
-  .panel-area    { width: 280px; }
-  .calendar-area { padding: 16px 18px 20px; }
-  .inner-page    { padding: 20px 24px; }
+.streak-best {
+  font-size: 11px;
+  color: var(--text-3);
 }
 
-/* ──────────────────────────────────────────────────────────────
-   MOBILE — controlado por JS via classe .app-shell.mobile
-   (adicionada pelo useMobile hook quando window.innerWidth ≤ 768)
-   + @media como fallback para browsers sem JS ou SSR
-────────────────────────────────────────────────────────────── */
-
-/* ── App shell mobile: coluna vertical ──────────────────── */
-.app-shell.mobile {
-  flex-direction: column;
-  height: 100vh;
-  height: 100dvh;
-  overflow: hidden;
-}
-@media (max-width: 768px) {
-  .app-shell { flex-direction: column; height: 100dvh; overflow: hidden; }
+/* Week grid */
+.streak-week {
+  display: flex;
+  gap: 4px;
 }
 
-/* ── Mobile header ──────────────────────────────────────── */
-.app-shell.mobile .mobile-header { display: flex; }
-@media (max-width: 768px) { .mobile-header { display: flex; } }
-
-/* ── Sidebar: drawer fixo, começa fora da tela ──────────── */
-.app-shell.mobile .sidebar {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: -290px;
-  width: 280px;
-  z-index: 100;
-  overflow-y: auto;
-  transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.28s;
-  box-shadow: none;
-}
-@media (max-width: 768px) {
-  .sidebar {
-    position: fixed;
-    top: 0; bottom: 0;
-    left: -290px;
-    width: 280px;
-    z-index: 100;
-    overflow-y: auto;
-    transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.28s;
-    box-shadow: none;
-  }
-}
-
-/* Drawer aberto */
-.app-shell.mobile .sidebar.mobile-open { left: 0; box-shadow: 8px 0 40px rgba(0,0,0,0.4); }
-@media (max-width: 768px) { .sidebar.mobile-open { left: 0; box-shadow: 8px 0 40px rgba(0,0,0,0.4); } }
-
-/* Handle de resize: oculto no mobile */
-.app-shell.mobile .sidebar-resize-handle { display: none; }
-@media (max-width: 768px) { .sidebar-resize-handle { display: none; } }
-
-/* ── Main content: coluna, scrollável ───────────────────── */
-.app-shell.mobile .main-content {
+.streak-day {
   flex: 1;
+  display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
-  min-height: 0;
-}
-@media (max-width: 768px) {
-  .main-content { flex: 1; flex-direction: column; overflow-y: auto; overflow-x: hidden; min-height: 0; }
+  align-items: center;
+  gap: 4px;
 }
 
-/* ── Calendário: largura total ──────────────────────────── */
-.app-shell.mobile .calendar-area {
-  width: 100%;
-  flex-shrink: 0;
-  padding: 12px 12px 0;
-  overflow: visible;
-}
-@media (max-width: 768px) {
-  .calendar-area { width: 100%; flex-shrink: 0; padding: 12px 12px 0; overflow: visible; }
+.streak-day-name {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
-/* ── Painel de tarefas: abaixo do calendário ────────────── */
-.app-shell.mobile .panel-area {
-  width: 100%;
-  flex-shrink: 0;
-  border-left: none;
-  border-top: 1px solid var(--line);
-  overflow-y: visible;
-}
-@media (max-width: 768px) {
-  .panel-area { width: 100%; flex-shrink: 0; border-left: none; border-top: 1px solid var(--line); overflow-y: visible; }
+.streak-day--today .streak-day-name {
+  color: var(--accent);
 }
 
-/* Task panel: altura auto */
-.app-shell.mobile .task-panel { height: auto; }
-.app-shell.mobile .panel-body { overflow-y: visible; flex: none; }
-@media (max-width: 768px) { .task-panel { height: auto; } .panel-body { overflow-y: visible; flex: none; } }
-
-/* ── Calendário: ajustes de tamanho ─────────────────────── */
-.app-shell.mobile .calendar-wrap { padding: 10px 8px 8px; border-radius: 0; }
-.app-shell.mobile .cal-grid      { column-gap: 2px; row-gap: 2px; }
-.app-shell.mobile .cal-weekday   { font-size: 8px; }
-.app-shell.mobile .cal-day-num   { font-size: 11px; }
-.app-shell.mobile .cal-day-pct   { font-size: 7px; }
-.app-shell.mobile .cal-nav       { width: 40px; height: 40px; }
-.app-shell.mobile .calendar-month { font-size: 14px; }
-.app-shell.mobile .cal-legend    { gap: 8px; margin-top: 8px; }
-.app-shell.mobile .legend-item   { font-size: 10px; }
-@media (max-width: 768px) {
-  .calendar-wrap  { padding: 10px 8px 8px; border-radius: 0; }
-  .cal-grid       { column-gap: 2px; row-gap: 2px; }
-  .cal-weekday    { font-size: 8px; }
-  .cal-day-num    { font-size: 11px; }
-  .cal-day-pct    { font-size: 7px; }
-  .cal-nav        { width: 40px; height: 40px; }
-  .calendar-month { font-size: 14px; }
-  .cal-legend     { gap: 8px; margin-top: 8px; }
-  .legend-item    { font-size: 10px; }
+.streak-day-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--lift);
+  transition: background 0.15s ease;
 }
 
-/* ── Panel header ───────────────────────────────────────── */
-.app-shell.mobile .panel-header { padding: 14px 14px 12px; }
-.app-shell.mobile .panel-date   { font-size: 10px; }
-.app-shell.mobile .panel-count  { font-size: 16px; margin-bottom: 8px; }
-.app-shell.mobile .panel-body   { padding: 8px 10px; }
-.app-shell.mobile .panel-footer { padding: 8px 10px; }
-@media (max-width: 768px) {
-  .panel-header { padding: 14px 14px 12px; }
-  .panel-date   { font-size: 10px; }
-  .panel-count  { font-size: 16px; margin-bottom: 8px; }
-  .panel-body   { padding: 8px 10px; }
-  .panel-footer { padding: 8px 10px; }
+.streak-day--done .streak-day-dot {
+  background: #4ade80;
 }
 
-/* ── Task items: touch-friendly ─────────────────────────── */
-.app-shell.mobile .task-item       { padding: 11px 10px; gap: 11px; }
-.app-shell.mobile .task-checkbox   { width: 22px; height: 22px; border-radius: 6px; margin-top: 1px; }
-.app-shell.mobile .task-title      { font-size: 14px; }
-.app-shell.mobile .task-actions    { opacity: 1; }
-.app-shell.mobile .task-action-btn { width: 36px; height: 36px; }
-@media (max-width: 768px) {
-  .task-item       { padding: 11px 10px; gap: 11px; }
-  .task-checkbox   { width: 22px; height: 22px; border-radius: 6px; margin-top: 1px; }
-  .task-title      { font-size: 14px; }
-  .task-actions    { opacity: 1; }
-  .task-action-btn { width: 36px; height: 36px; }
+.streak-day--today:not(.streak-day--done) .streak-day-dot {
+  background: var(--line-md);
+  border: 1.5px solid var(--accent);
 }
 
-/* ── Botões e formulários ───────────────────────────────── */
-.app-shell.mobile .add-btn     { min-height: 44px; font-size: 13.5px; }
-.app-shell.mobile .add-input   { font-size: 16px; padding: 10px 12px; }
-.app-shell.mobile .btn-primary { min-height: 44px; padding: 11px 14px; }
-.app-shell.mobile .btn-ghost   { min-height: 44px; padding: 11px 14px; }
-.app-shell.mobile .type-btn    { min-height: 40px; padding: 8px 10px; }
-@media (max-width: 768px) {
-  .add-btn     { min-height: 44px; font-size: 13.5px; }
-  .add-input   { font-size: 16px; padding: 10px 12px; }
-  .btn-primary { min-height: 44px; padding: 11px 14px; }
-  .btn-ghost   { min-height: 44px; padding: 11px 14px; }
-  .type-btn    { min-height: 40px; padding: 8px 10px; }
+.streak-day--future .streak-day-dot {
+  opacity: 0.35;
 }
 
-/* ── Títulos e páginas internas ─────────────────────────── */
-.app-shell.mobile .page-title { font-size: 17px; }
-.app-shell.mobile .page-sub   { font-size: 12px; margin-bottom: 10px; }
-.app-shell.mobile .inner-page { padding: 16px 14px; }
-.app-shell.mobile .theme-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
-.app-shell.mobile .weekday-btn { min-height: 40px; }
-@media (max-width: 768px) {
-  .page-title  { font-size: 17px; }
-  .page-sub    { font-size: 12px; }
-  .inner-page  { padding: 16px 14px; }
-  .theme-grid  { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
-  .weekday-btn { min-height: 40px; }
+/* ═══════════════════════════════════════════════════════════════
+   FLOATING XP ANIMATION
+═══════════════════════════════════════════════════════════════ */
+
+@keyframes floatUp {
+  0%   { opacity: 1;   transform: translateY(0)    scale(1); }
+  60%  { opacity: 1;   transform: translateY(-18px) scale(1.15); }
+  100% { opacity: 0;   transform: translateY(-32px) scale(0.9); }
 }
 
-/* ── Auth ───────────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .auth-card  { padding: 28px 20px; margin: 16px; }
-  .auth-title { font-size: 20px; }
+.floating-xp {
+  position: absolute;
+  top: 2px;
+  right: 36px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #4ade80;
+  pointer-events: none;
+  animation: floatUp 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  z-index: 10;
 }
 
-/* ──────────────────────────────────────────────────────────────
-   TINY — ≤ 380px (iPhone SE)
-────────────────────────────────────────────────────────────── */
-@media (max-width: 380px) {
-  .calendar-area  { padding: 8px 8px 0; }
-  .cal-grid       { column-gap: 1px; row-gap: 1px; }
-  .cal-day-num    { font-size: 10px; }
-  .cal-weekday    { font-size: 7px; letter-spacing: 0; }
-  .calendar-month { font-size: 13px; }
-  .cal-nav        { width: 36px; height: 36px; }
+/* Delete confirm warning for recurring tasks */
+.delete-confirm-warning {
+  font-size: 11px;
+  color: var(--red, #f87171);
+  margin-bottom: 4px;
+  text-align: center;
 }

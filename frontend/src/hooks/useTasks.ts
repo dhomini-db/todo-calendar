@@ -11,6 +11,7 @@ import {
   updateTemplate,
   toggleTemplate,
   deleteTemplate,
+  getStreak,
 } from '../api/tasks'
 import type { TaskRequest, TaskTemplateRequest } from '../types'
 
@@ -18,6 +19,7 @@ export const queryKeys = {
   tasks:     (date: string)                => ['tasks', date]          as const,
   summary:   (year: number, month: number) => ['summary', year, month] as const,
   templates: ()                            => ['templates']            as const,
+  streak:    ()                            => ['streak']               as const,
 }
 
 /** Extrai year/month de uma string "YYYY-MM-DD" */
@@ -41,17 +43,18 @@ export function useMonthSummary(year: number, month: number) {
   })
 }
 
-function useInvalidateBoth(date: string) {
+function useInvalidateAll(date: string) {
   const qc = useQueryClient()
   const { year, month } = ymFromDate(date)
   return () => {
     qc.invalidateQueries({ queryKey: queryKeys.tasks(date) })
     qc.invalidateQueries({ queryKey: queryKeys.summary(year, month) })
+    qc.invalidateQueries({ queryKey: queryKeys.streak() })
   }
 }
 
 export function useCreateTask(date: string) {
-  const invalidate = useInvalidateBoth(date)
+  const invalidate = useInvalidateAll(date)
   return useMutation({
     mutationFn: (data: TaskRequest) => createTask(data),
     onSuccess:  invalidate,
@@ -59,7 +62,7 @@ export function useCreateTask(date: string) {
 }
 
 export function useToggleTask(date: string) {
-  const invalidate = useInvalidateBoth(date)
+  const invalidate = useInvalidateAll(date)
   return useMutation({
     mutationFn: (id: number) => toggleTask(id),
     onSuccess:  invalidate,
@@ -67,7 +70,7 @@ export function useToggleTask(date: string) {
 }
 
 export function useDeleteTask(date: string) {
-  const invalidate = useInvalidateBoth(date)
+  const invalidate = useInvalidateAll(date)
   return useMutation({
     mutationFn: (id: number) => deleteTask(id),
     onSuccess:  invalidate,
@@ -75,7 +78,7 @@ export function useDeleteTask(date: string) {
 }
 
 export function useUpdateTask(date: string) {
-  const invalidate = useInvalidateBoth(date)
+  const invalidate = useInvalidateAll(date)
   return useMutation({
     mutationFn: ({ id, data }: { id: number; data: TaskRequest }) => updateTask(id, data),
     onSuccess:  invalidate,
@@ -104,7 +107,7 @@ export function useCreateTemplate() {
  * que o backend auto-gere a instância via generateInstancesForDate().
  */
 export function useCreateRecurringTask(date: string) {
-  const invalidate = useInvalidateBoth(date)
+  const invalidate = useInvalidateAll(date)
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (data: TaskTemplateRequest) => createTemplate(data),
@@ -136,5 +139,15 @@ export function useDeleteTemplate() {
   return useMutation({
     mutationFn: (id: number) => deleteTemplate(id),
     onSuccess:  () => qc.invalidateQueries({ queryKey: queryKeys.templates() }),
+  })
+}
+
+// ── Streak ─────────────────────────────────────────────────────
+
+export function useStreak() {
+  return useQuery({
+    queryKey: queryKeys.streak(),
+    queryFn:  getStreak,
+    staleTime: 0, // sempre refetch quando invalidado
   })
 }

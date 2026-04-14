@@ -56,6 +56,24 @@ export interface DaySummary {
 
 export type MonthSummary = Record<string, DaySummary>
 
+// ── Streak ─────────────────────────────────────────────────────
+
+export interface DayStatus {
+  date: string        // "yyyy-MM-dd"
+  dayName: string     // "Seg", "Ter", ...
+  completed: boolean  // atingiu >= 70%
+  isToday: boolean
+  isFuture: boolean
+}
+
+export interface StreakData {
+  currentStreak: number
+  bestStreak: number
+  lastCompletedDate: string | null
+  completedToday: boolean
+  weekDays: DayStatus[]
+}
+
 // ── Autenticação ───────────────────────────────────────────────
 
 export interface AuthUser {
