@@ -7,6 +7,7 @@ import com.todocalendar.entity.Task;
 import com.todocalendar.entity.TaskType;
 import com.todocalendar.entity.User;
 import com.todocalendar.repository.TaskRepository;
+import com.todocalendar.repository.TaskTemplateRepository;
 import com.todocalendar.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -23,16 +24,19 @@ import java.util.Map;
 @Service
 public class TaskService {
 
-    private final TaskRepository      taskRepository;
-    private final UserRepository      userRepository;
-    private final TaskTemplateService templateService;
+    private final TaskRepository         taskRepository;
+    private final TaskTemplateRepository templateRepository;
+    private final UserRepository         userRepository;
+    private final TaskTemplateService    templateService;
 
     public TaskService(TaskRepository taskRepository,
+                       TaskTemplateRepository templateRepository,
                        UserRepository userRepository,
                        @Lazy TaskTemplateService templateService) {
-        this.taskRepository  = taskRepository;
-        this.userRepository  = userRepository;
-        this.templateService = templateService;
+        this.taskRepository     = taskRepository;
+        this.templateRepository = templateRepository;
+        this.userRepository     = userRepository;
+        this.templateService    = templateService;
     }
 
     // ── CRUD ───────────────────────────────────────────────────
@@ -93,9 +97,14 @@ public class TaskService {
     public void deleteTask(Long id, Long userId) {
         Task task = findOrThrow(id, userId);
         if (task.getSourceTemplateId() != null) {
-            // Tarefa recorrente: marcar como skipped para bloquear regeneração
-            task.setSkipped(true);
-            taskRepository.save(task);
+            // Tarefa recorrente: skip TODAS as instâncias e deletar o template
+            Long templateId = task.getSourceTemplateId();
+            List<Task> allInstances = taskRepository.findBySourceTemplateIdAndUserIdOrderByDateAsc(templateId, userId);
+            allInstances.forEach(t -> t.setSkipped(true));
+            taskRepository.saveAll(allInstances);
+            if (templateRepository.existsById(templateId)) {
+                templateRepository.deleteById(templateId);
+            }
         } else {
             // Tarefa manual: deletar fisicamente
             taskRepository.deleteById(id);

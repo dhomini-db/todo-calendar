@@ -17,20 +17,29 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByDateAndUserIdAndSkippedFalseOrderByCreatedAtAsc(LocalDate date, Long userId);
 
     /**
-     * Retorna por dia: total de tarefas, boas escolhas e qtd interagidas.
+     * Todas as instâncias de um template recorrente do usuário (todos os dias),
+     * incluindo as já skipped. Usado para exclusão em massa ao deletar tarefa recorrente.
+     */
+    List<Task> findBySourceTemplateIdAndUserIdOrderByDateAsc(Long sourceTemplateId, Long userId);
+
+    /**
+     * Retorna por dia: denominador efetivo, boas escolhas e qtd interagidas.
      *
      * Regras:
-     *   - Denominador = TODAS as tarefas do dia (não apenas as interagidas).
+     *   - Denominador = POSITIVAS (todas) + NEGATIVAS checadas (completed+interacted).
+     *     Negativas não-checadas são NEUTRAS — não penalizam o score.
      *   - Numerador   = POSITIVE + completed + interacted (boa escolha explícita).
      *   - Cor/% só aparece quando interacted_count > 0 (usuário interagiu ao menos 1 vez).
-     *   - NEGATIVE desmarcada (interacted=false) → conta no denominador → reduz %.
-     *   - Isso corrige o bug "1 positiva marcada = 100%" quando existem outras tarefas.
      *
-     * Porcentagem = goodOutcomes / allTasks × 100   (mas só exibe se interacted > 0)
+     * Porcentagem = goodOutcomes / effectiveDenominator × 100
      */
     @Query("""
             SELECT t.date,
-                   COUNT(t),
+                   SUM(CASE
+                         WHEN t.type = 'POSITIVE'
+                           OR (t.type = 'NEGATIVE' AND t.completed = true AND t.interacted = true)
+                         THEN 1 ELSE 0
+                       END),
                    SUM(CASE
                          WHEN t.type = 'POSITIVE' AND t.completed = true AND t.interacted = true THEN 1
                          ELSE 0

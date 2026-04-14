@@ -1754,3 +1754,143 @@ a.sidebar-item.active::before {
   border-radius: var(--r);
   animation: fadeUp 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   STREAK BADGE
+═══════════════════════════════════════════════════════════════ */
+
+.streak-badge {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  background: var(--elevated);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+}
+
+.streak-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.streak-flame-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.streak-flame {
+  font-size: 20px;
+  filter: grayscale(0.6) opacity(0.5);
+  transition: filter 0.2s ease, transform 0.2s ease;
+  line-height: 1;
+}
+.streak-flame.active {
+  filter: none;
+  transform: scale(1.1);
+}
+
+.streak-count {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.streak-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.streak-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.streak-best {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+/* Week grid */
+.streak-week {
+  display: flex;
+  gap: 4px;
+}
+
+.streak-day {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.streak-day-name {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.streak-day--today .streak-day-name {
+  color: var(--accent);
+}
+
+.streak-day-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--lift);
+  transition: background 0.15s ease;
+}
+
+.streak-day--done .streak-day-dot {
+  background: #4ade80;
+}
+
+.streak-day--today:not(.streak-day--done) .streak-day-dot {
+  background: var(--line-md);
+  border: 1.5px solid var(--accent);
+}
+
+.streak-day--future .streak-day-dot {
+  opacity: 0.35;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FLOATING XP ANIMATION
+═══════════════════════════════════════════════════════════════ */
+
+@keyframes floatUp {
+  0%   { opacity: 1;   transform: translateY(0)    scale(1); }
+  60%  { opacity: 1;   transform: translateY(-18px) scale(1.15); }
+  100% { opacity: 0;   transform: translateY(-32px) scale(0.9); }
+}
+
+.floating-xp {
+  position: absolute;
+  top: 2px;
+  right: 36px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #4ade80;
+  pointer-events: none;
+  animation: floatUp 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  z-index: 10;
+}
+
+/* Delete confirm warning for recurring tasks */
+.delete-confirm-warning {
+  font-size: 11px;
+  color: var(--red, #f87171);
+  margin-bottom: 4px;
+  text-align: center;
+}
