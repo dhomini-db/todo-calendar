@@ -23,7 +23,7 @@ public class StreakService {
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
 
-    private static final double STREAK_THRESHOLD = 70.0;
+    private static final double STREAK_THRESHOLD = 50.0;
     private static final String[] DAY_NAMES = {"Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"};
 
     /**

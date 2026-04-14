@@ -80,10 +80,12 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
   const [recurrenceType, setRecurrenceType] = useState<RecurrenceType>('DAILY')
   const [daysOfWeek,     setDaysOfWeek]     = useState<string[]>([])
 
+  const positiveTasks   = tasks.filter(t => t.type === 'POSITIVE')
+  const negativeTasks   = tasks.filter(t => t.type === 'NEGATIVE')
+
   // Score — baseado apenas em tarefas com interação do usuário
   const interactedTasks = tasks.filter(t => t.interacted)
   const pct             = calcScore(tasks)
-  const positiveTasks   = tasks.filter(t => t.type === 'POSITIVE')
   const goodCount       = positiveTasks.filter(t => t.interacted && t.completed).length
 
   const dayName   = format(selectedDate, "EEEE", { locale: ptBR })
@@ -132,9 +134,6 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
   const isPending = createTask.isPending || createRecurring.isPending
   const canSubmit = title.trim() &&
     (!isRecurring || recurrenceType === 'DAILY' || daysOfWeek.length > 0)
-
-  const positiveTasks = tasks.filter(t => t.type === 'POSITIVE')
-  const negativeTasks = tasks.filter(t => t.type === 'NEGATIVE')
 
   return (
     <div className="task-panel">
