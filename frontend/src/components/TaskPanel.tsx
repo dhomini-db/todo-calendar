@@ -80,9 +80,11 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
   const [recurrenceType, setRecurrenceType] = useState<RecurrenceType>('DAILY')
   const [daysOfWeek,     setDaysOfWeek]     = useState<string[]>([])
 
+  // Score — baseado apenas em tarefas com interação do usuário
   const interactedTasks = tasks.filter(t => t.interacted)
-  const pct       = calcScore(tasks)
-  const goodCount = tasks.filter(t => t.interacted && t.type === 'POSITIVE' && t.completed).length
+  const pct             = calcScore(tasks)
+  const positiveTasks   = tasks.filter(t => t.type === 'POSITIVE')
+  const goodCount       = positiveTasks.filter(t => t.interacted && t.completed).length
 
   const dayName   = format(selectedDate, "EEEE", { locale: ptBR })
   const dateLabel = format(selectedDate, "d 'de' MMMM", { locale: ptBR })
@@ -142,7 +144,7 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
           {dayName} · {dateLabel}
         </p>
         <p className="panel-count">
-          {goodCount} <span>/ {tasks.length} {tasks.length === 1 ? 'tarefa' : 'tarefas'}</span>
+          {goodCount} <span>/ {positiveTasks.length} {positiveTasks.length === 1 ? 'tarefa' : 'tarefas'}</span>
         </p>
         <div className="progress-track">
           <div
@@ -205,7 +207,7 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
             </div>
 
             {taskType === 'NEGATIVE' && (
-              <p className="type-hint">Marcar esse hábito indica que você o realizou (conta negativamente)</p>
+              <p className="type-hint">Evitar esse hábito conta como boa escolha</p>
             )}
 
             {/* Título */}
