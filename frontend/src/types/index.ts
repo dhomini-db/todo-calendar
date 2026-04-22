@@ -74,6 +74,26 @@ export interface StreakData {
   weekDays: DayStatus[]
 }
 
+// ── Perfil do usuário ──────────────────────────────────────────
+
+export interface UserProfile {
+  id: number
+  name: string
+  email: string
+  createdAt: string
+}
+
+export interface UpdateProfileRequest {
+  name: string
+  email: string
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string
+  newPassword: string
+  confirmNewPassword: string
+}
+
 // ── Autenticação ───────────────────────────────────────────────
 
 export interface AuthUser {

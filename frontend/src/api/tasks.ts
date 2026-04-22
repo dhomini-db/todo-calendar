@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { Task, TaskRequest, DaySummary, AuthResponse, LoginRequest, RegisterRequest, TaskTemplate, TaskTemplateRequest, StreakData } from '../types'
+import type { Task, TaskRequest, DaySummary, AuthResponse, LoginRequest, RegisterRequest, TaskTemplate, TaskTemplateRequest, StreakData, UserProfile, UpdateProfileRequest, ChangePasswordRequest } from '../types'
 
 /**
  * Em dev  → Vite proxy redireciona /api para localhost:8081 (sem CORS)
@@ -84,6 +84,17 @@ export const toggleTemplate = (id: number): Promise<TaskTemplate> =>
 
 export const deleteTemplate = (id: number): Promise<void> =>
   api.delete(`/templates/${id}`).then(() => undefined)
+
+// ── Perfil ─────────────────────────────────────────────────────
+
+export const getProfile = (): Promise<UserProfile> =>
+  api.get<UserProfile>('/users/me').then(r => r.data)
+
+export const updateProfile = (data: UpdateProfileRequest): Promise<UserProfile> =>
+  api.put<UserProfile>('/users/me', data).then(r => r.data)
+
+export const changePassword = (data: ChangePasswordRequest): Promise<{ message: string }> =>
+  api.put<{ message: string }>('/users/me/password', data).then(r => r.data)
 
 // ── Streak ─────────────────────────────────────────────────────
 

@@ -1275,6 +1275,181 @@ a.sidebar-item.active .sidebar-item-icon {
   letter-spacing: 0.1px;
 }
 
+/* ── Conta page — new profile UI ────────────────────────── */
+.conta-avatar--lg {
+  width: 52px;
+  height: 52px;
+  font-size: 20px;
+}
+
+.conta-card {
+  align-items: center;
+}
+
+.conta-edit-btn {
+  margin-left: auto;
+  background: var(--raised);
+  border: 1px solid var(--line);
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.conta-edit-btn:hover { background: var(--elevated); color: var(--text); border-color: var(--line-md); }
+
+/* Form inside conta sections */
+.conta-form {
+  margin-top: 12px;
+  background: var(--elevated);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.conta-form--indent {
+  margin-top: 0;
+  border-top: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.conta-form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.conta-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.conta-input {
+  background: var(--base);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 8px 11px;
+  outline: none;
+  transition: border-color 0.12s;
+}
+.conta-input:focus { border-color: var(--accent); }
+.conta-input::placeholder { color: var(--text-3); }
+
+.conta-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+.conta-btn-cancel {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.conta-btn-cancel:hover { background: var(--raised); }
+
+.conta-btn-save {
+  background: var(--accent);
+  border: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: opacity 0.1s;
+}
+.conta-btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+.conta-btn-save:not(:disabled):hover { opacity: 0.85; }
+
+.conta-error   { font-size: 12px; color: #f87171; margin: 0; }
+.conta-success { font-size: 12px; color: #4ade80; margin: 0; }
+
+/* Action rows (collapsible) */
+.conta-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--elevated);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 14px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.12s;
+}
+.conta-action-row:hover { background: var(--raised); }
+.conta-action-title { font-size: 13px; font-weight: 500; color: var(--text); letter-spacing: -0.1px; }
+.conta-action-desc  { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+.conta-chevron { font-size: 10px; color: var(--text-3); }
+
+/* Password strength bar */
+.pwd-strength {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+.pwd-strength-bar {
+  display: flex;
+  gap: 3px;
+  flex: 1;
+}
+.pwd-strength-seg {
+  flex: 1;
+  height: 3px;
+  border-radius: 99px;
+  transition: background 0.2s;
+}
+.pwd-strength-label {
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+
+/* Logout row */
+.conta-logout-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--elevated);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 14px 16px;
+}
+.conta-btn-logout {
+  background: transparent;
+  border: 1px solid #f87171;
+  color: #f87171;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.conta-btn-logout:hover { background: rgba(248,113,113,0.08); }
+
 /* ── Dashboard stat grid ─────────────────────────────────── */
 .placeholder-grid {
   display: grid;
