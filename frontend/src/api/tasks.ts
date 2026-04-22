@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { Task, TaskRequest, DaySummary, AuthResponse, LoginRequest, RegisterRequest, TaskTemplate, TaskTemplateRequest, StreakData, UserProfile, UpdateProfileRequest, ChangePasswordRequest, MonthlyPerformance } from '../types'
+import type { Task, TaskRequest, DaySummary, AuthResponse, LoginRequest, RegisterRequest, TaskTemplate, TaskTemplateRequest, StreakData, UserProfile, UpdateProfileRequest, ChangePasswordRequest, MonthlyPerformance, DashboardStats } from '../types'
 
 /**
  * Em dev  → Vite proxy redireciona /api para localhost:8081 (sem CORS)
@@ -97,6 +97,9 @@ export const changePassword = (data: ChangePasswordRequest): Promise<{ message: 
   api.put<{ message: string }>('/users/me/password', data).then(r => r.data)
 
 // ── Stats ──────────────────────────────────────────────────────
+
+export const getDashboardStats = (): Promise<DashboardStats> =>
+  api.get<DashboardStats>('/stats/dashboard').then(r => r.data)
 
 export const getMonthlyPerformance = (): Promise<MonthlyPerformance[]> =>
   api.get<MonthlyPerformance[]>('/stats/monthly-performance').then(r => r.data)

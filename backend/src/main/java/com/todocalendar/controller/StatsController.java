@@ -1,5 +1,6 @@
 package com.todocalendar.controller;
 
+import com.todocalendar.dto.DashboardStatsResponse;
 import com.todocalendar.dto.MonthlyPerformanceResponse;
 import com.todocalendar.entity.User;
 import com.todocalendar.service.StatsService;
@@ -18,6 +19,16 @@ import java.util.List;
 public class StatsController {
 
     private final StatsService statsService;
+
+    /**
+     * GET /api/stats/dashboard
+     * Retorna score de hoje, streak, contagens mensais e série dos últimos 30 dias.
+     */
+    @GetMapping("/dashboard")
+    public ResponseEntity<DashboardStatsResponse> getDashboard(
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(statsService.getDashboardStats(currentUser.getId()));
+    }
 
     /**
      * GET /api/stats/monthly-performance

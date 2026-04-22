@@ -1275,6 +1275,118 @@ a.sidebar-item.active .sidebar-item-icon {
   letter-spacing: 0.1px;
 }
 
+/* ── Keyframes ───────────────────────────────────────────── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.45; }
+}
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+/* ── Dashboard ───────────────────────────────────────────── */
+.dash-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.dash-card {
+  background: var(--elevated);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 16px;
+  transition: border-color 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.dash-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--dash-accent, transparent);
+  border-radius: 99px 0 0 99px;
+  opacity: 0.7;
+}
+.dash-card:hover { border-color: var(--line-md); }
+
+.dash-card-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 10px;
+}
+.dash-card-icon  { display: flex; flex-shrink: 0; }
+.dash-card-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-3);
+}
+.dash-card-value {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.dash-card-sub {
+  font-size: 11.5px;
+  color: var(--text-2);
+  line-height: 1.4;
+}
+
+/* Skeleton states */
+.dash-card-skeleton {
+  height: 32px;
+  background: var(--raised);
+  border-radius: var(--r-md);
+  animation: pulse 1.4s ease-in-out infinite;
+  margin-bottom: 6px;
+}
+.dash-skel {
+  background: var(--raised);
+  border-radius: var(--r-md);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+.dash-skel--icon  { width: 16px; height: 16px; border-radius: 4px; }
+.dash-skel--label { width: 80px; height: 10px; }
+.dash-skel--value { width: 80px; height: 28px; margin: 10px 0 6px; }
+.dash-skel--sub   { width: 120px; height: 10px; }
+.dash-skel--title { width: 180px; height: 11px; margin-bottom: 10px; }
+
+/* Chart section header */
+.dash-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0;
+}
+.dash-trend-badge {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+.dash-chart-hint {
+  font-size: 11px;
+  color: var(--text-3);
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .dash-cards-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 520px) {
+  .dash-cards-grid { grid-template-columns: 1fr 1fr; }
+  .dash-card-value { font-size: 22px; }
+}
+
 /* ── Gráficos page ───────────────────────────────────────── */
 
 /* Summary cards row */

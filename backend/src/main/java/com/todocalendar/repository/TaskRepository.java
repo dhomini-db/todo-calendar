@@ -22,6 +22,30 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
      */
     List<Task> findBySourceTemplateIdAndUserIdOrderByDateAsc(Long sourceTemplateId, Long userId);
 
+    /** Total de tarefas visíveis (skipped=false) em um período. */
+    @Query("SELECT COUNT(t) FROM Task t WHERE t.user.id = :userId AND t.date BETWEEN :start AND :end AND t.skipped = false")
+    long countTasksInPeriod(
+            @Param("start")  LocalDate start,
+            @Param("end")    LocalDate end,
+            @Param("userId") Long userId
+    );
+
+    /** Total de tarefas POSITIVAS concluídas (boa escolha) em um período. */
+    @Query("""
+            SELECT COUNT(t) FROM Task t
+            WHERE t.user.id = :userId
+              AND t.date BETWEEN :start AND :end
+              AND t.skipped = false
+              AND t.type = 'POSITIVE'
+              AND t.completed = true
+              AND t.interacted = true
+           """)
+    long countPositiveCompletedInPeriod(
+            @Param("start")  LocalDate start,
+            @Param("end")    LocalDate end,
+            @Param("userId") Long userId
+    );
+
     /**
      * Retorna por dia: denominador efetivo, boas escolhas e qtd interagidas.
      *

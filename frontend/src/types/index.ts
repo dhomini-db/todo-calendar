@@ -74,6 +74,23 @@ export interface StreakData {
   weekDays: DayStatus[]
 }
 
+// ── Dashboard ──────────────────────────────────────────────────
+
+export interface DailyScore {
+  date: string
+  label: string          // "22/04"
+  percentage: number | null
+}
+
+export interface DashboardStats {
+  scoreHoje: number | null
+  streakAtual: number
+  tarefasTotalMes: number
+  tarefasConcluidasMes: number
+  taxaConclusaoMes: number | null
+  last30Days: DailyScore[]
+}
+
 // ── Estatísticas ───────────────────────────────────────────────
 
 export interface MonthlyPerformance {
