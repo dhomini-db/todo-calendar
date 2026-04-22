@@ -3,6 +3,8 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Cell,
 } from 'recharts'
+import type { TooltipProps } from 'recharts'
+import type { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent'
 import { getMonthlyPerformance } from '../api/tasks'
 import type { MonthlyPerformance } from '../types'
 
@@ -19,21 +21,18 @@ function barOpacity(pct: number | null): number {
   return pct === null ? 0.35 : 1
 }
 
-// ── Custom Tooltip ─────────────────────────────────────────────
-
-interface TooltipProps {
-  active?: boolean
-  payload?: { value: number; payload: ChartItem }[]
-  label?: string
-}
+// ── Chart data shape ───────────────────────────────────────────
 
 interface ChartItem extends MonthlyPerformance {
   display: number
 }
 
-function CustomTooltip({ active, payload, label }: TooltipProps) {
+// ── Custom Tooltip ─────────────────────────────────────────────
+
+function CustomTooltip({ active, payload, label }: TooltipProps<ValueType, NameType>) {
   if (!active || !payload?.length) return null
-  const { percentage } = payload[0].payload
+  const item = payload[0].payload as ChartItem
+  const { percentage } = item
   return (
     <div className="chart-tooltip">
       <p className="chart-tooltip-month">{label}</p>
@@ -42,7 +41,11 @@ function CustomTooltip({ active, payload, label }: TooltipProps) {
       </p>
       {percentage !== null && (
         <p className="chart-tooltip-label">
-          {percentage >= 70 ? 'Bom desempenho' : percentage >= 40 ? 'Desempenho médio' : 'Abaixo da meta'}
+          {percentage >= 70
+            ? 'Bom desempenho'
+            : percentage >= 40
+              ? 'Desempenho médio'
+              : 'Abaixo da meta'}
         </p>
       )}
     </div>
@@ -51,13 +54,15 @@ function CustomTooltip({ active, payload, label }: TooltipProps) {
 
 // ── Summary cards ──────────────────────────────────────────────
 
+interface WithData { month: string; percentage: number }
+
 function SummaryCards({ data }: { data: MonthlyPerformance[] }) {
-  const withData = data.filter(d => d.percentage !== null) as { month: string; percentage: number }[]
+  const withData = data.filter((d): d is WithData => d.percentage !== null)
   if (!withData.length) return null
 
-  const avg    = Math.round(withData.reduce((s, d) => s + d.percentage, 0) / withData.length)
-  const best   = withData.reduce((a, b) => a.percentage >= b.percentage ? a : b)
-  const worst  = withData.reduce((a, b) => a.percentage <= b.percentage ? a : b)
+  const avg   = Math.round(withData.reduce((s, d) => s + d.percentage, 0) / withData.length)
+  const best  = withData.reduce((a, b) => a.percentage >= b.percentage ? a : b)
+  const worst = withData.reduce((a, b) => a.percentage <= b.percentage ? a : b)
 
   return (
     <div className="chart-summary-grid">
@@ -81,6 +86,23 @@ function SummaryCards({ data }: { data: MonthlyPerformance[] }) {
   )
 }
 
+// ── Skeleton bars ──────────────────────────────────────────────
+
+const SKELETON_HEIGHTS = [55, 72, 40, 68, 30, 78, 50, 65, 42, 58, 35, 70]
+
+function SkeletonChart() {
+  return (
+    <div className="chart-placeholder">
+      <div className="chart-placeholder-bars">
+        {SKELETON_HEIGHTS.map((h, i) => (
+          <div key={i} className="chart-placeholder-bar" style={{ height: `${h}%` }} />
+        ))}
+      </div>
+      <p className="chart-placeholder-label">Carregando…</p>
+    </div>
+  )
+}
+
 // ── Main page ──────────────────────────────────────────────────
 
 export default function GraficosPage() {
@@ -96,6 +118,7 @@ export default function GraficosPage() {
   }))
 
   const year = new Date().getFullYear()
+  const allEmpty = !isLoading && !isError && data?.every(d => d.percentage === null)
 
   return (
     <div className="inner-page">
@@ -104,32 +127,21 @@ export default function GraficosPage() {
         <p className="page-sub">Seu desempenho ao longo do tempo</p>
       </div>
 
-      {/* ── Summary cards ──────────────────────────────────────── */}
+      {/* Summary cards */}
       {data && <SummaryCards data={data} />}
 
-      {/* ── Bar chart ──────────────────────────────────────────── */}
+      {/* Bar chart */}
       <div className="settings-section">
         <p className="settings-section-title">Desempenho mensal — {year}</p>
         <div className="chart-card">
 
-          {isLoading && (
-            <div className="chart-placeholder">
-              <div className="chart-placeholder-bars">
-                {Array.from({ length: 12 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="chart-placeholder-bar"
-                    style={{ height: `${20 + Math.random() * 60}%` }}
-                  />
-                ))}
-              </div>
-              <p className="chart-placeholder-label">Carregando…</p>
-            </div>
-          )}
+          {isLoading && <SkeletonChart />}
 
           {isError && (
             <div className="chart-empty">
-              <p>Não foi possível carregar os dados. Tente novamente.</p>
+              <span className="chart-empty-icon">⚠️</span>
+              <p className="chart-empty-title">Erro ao carregar</p>
+              <p className="chart-empty-desc">Não foi possível buscar os dados. Tente recarregar a página.</p>
             </div>
           )}
 
@@ -140,11 +152,7 @@ export default function GraficosPage() {
                 barCategoryGap="35%"
                 margin={{ top: 8, right: 4, left: -12, bottom: 0 }}
               >
-                <CartesianGrid
-                  vertical={false}
-                  stroke="var(--line)"
-                  strokeDasharray="4 4"
-                />
+                <CartesianGrid vertical={false} stroke="var(--line)" strokeDasharray="4 4" />
                 <XAxis
                   dataKey="month"
                   tick={{ fill: 'var(--text-3)', fontSize: 11.5, fontWeight: 500 }}
@@ -177,7 +185,6 @@ export default function GraficosPage() {
             </ResponsiveContainer>
           )}
 
-          {/* Legend */}
           {!isLoading && !isError && (
             <div className="chart-legend">
               <span className="chart-legend-item">
@@ -201,8 +208,7 @@ export default function GraficosPage() {
         </div>
       </div>
 
-      {/* ── Empty state ─────────────────────────────────────────── */}
-      {!isLoading && !isError && data?.every(d => d.percentage === null) && (
+      {allEmpty && (
         <div className="chart-empty">
           <span className="chart-empty-icon">📊</span>
           <p className="chart-empty-title">Ainda sem dados</p>
