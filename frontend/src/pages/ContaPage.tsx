@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useAuth } from '../contexts/AuthContext'
 import { updateProfile, changePassword } from '../api/tasks'
@@ -29,10 +29,6 @@ export default function ContaPage() {
     ? user.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
     : '?'
 
-  const memberSince = user
-    ? '—'   // shown from profile query below; placeholder for static display
-    : '—'
-
   // ── Edit profile state ─────────────────────────────────────
   const [editOpen, setEditOpen] = useState(false)
   const [profileName,  setProfileName]  = useState(user?.name  ?? '')
@@ -55,7 +51,7 @@ export default function ContaPage() {
     },
   })
 
-  function handleProfileSave(e: React.FormEvent) {
+  function handleProfileSave(e: FormEvent) {
     e.preventDefault()
     setProfileError('')
     setProfileOk(false)
@@ -95,7 +91,7 @@ export default function ContaPage() {
     },
   })
 
-  function handlePwdSave(e: React.FormEvent) {
+  function handlePwdSave(e: FormEvent) {
     e.preventDefault()
     setPwdError('')
     setPwdOk(false)
