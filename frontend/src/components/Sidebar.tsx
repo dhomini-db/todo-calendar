@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { useLanguage } from '../contexts/LanguageContext'
 
 const SIDEBAR_MIN     = 200
 const SIDEBAR_MAX     = 400
@@ -95,6 +96,7 @@ interface SidebarProps { mobileOpen?: boolean; onMobileClose?: () => void }
 
 export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const { user, logout } = useAuth()
+  const { t } = useLanguage()
   const navigate = useNavigate()
 
   /* ── Resize logic ─────────────────────────────────────────── */
@@ -178,15 +180,15 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
 
       {/* Nav */}
       <nav className="sidebar-nav">
-        <p className="sidebar-section-label">Workspace</p>
-        <NavItem to="/"          icon={<IconCalendar />} label="Calendário" end         onClick={onMobileClose} />
-        <NavItem to="/dashboard" icon={<IconGrid />}     label="Dashboard"              onClick={onMobileClose} />
-        <NavItem to="/graficos"  icon={<IconChart />}    label="Gráficos"               onClick={onMobileClose} />
+        <p className="sidebar-section-label">{t('nav.workspace')}</p>
+        <NavItem to="/"          icon={<IconCalendar />} label={t('nav.calendar')}   end onClick={onMobileClose} />
+        <NavItem to="/dashboard" icon={<IconGrid />}     label={t('nav.dashboard')}      onClick={onMobileClose} />
+        <NavItem to="/graficos"  icon={<IconChart />}    label={t('nav.charts')}         onClick={onMobileClose} />
 
-        <p className="sidebar-section-label" style={{ marginTop: 12 }}>Conta</p>
-        <NavItem to="/conta"         icon={<IconUser />}     label="Meu Perfil"    onClick={onMobileClose} />
-        <NavItem to="/personalizar"  icon={<IconPalette />}  label="Aparência"     onClick={onMobileClose} />
-        <NavItem to="/configuracoes" icon={<IconSettings />} label="Configurações" onClick={onMobileClose} />
+        <p className="sidebar-section-label" style={{ marginTop: 12 }}>{t('nav.account')}</p>
+        <NavItem to="/conta"         icon={<IconUser />}     label={t('nav.profile')}     onClick={onMobileClose} />
+        <NavItem to="/personalizar"  icon={<IconPalette />}  label={t('nav.appearance')}  onClick={onMobileClose} />
+        <NavItem to="/configuracoes" icon={<IconSettings />} label={t('nav.settings')}    onClick={onMobileClose} />
       </nav>
 
       {/* Footer */}

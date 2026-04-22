@@ -11,8 +11,9 @@ import GraficosPage       from './pages/GraficosPage'
 import ContaPage          from './pages/ContaPage'
 import PersonalizarPage   from './pages/PersonalizarPage'
 import ConfiguracoesPage  from './pages/ConfiguracoesPage'
-import { AuthProvider }  from './contexts/AuthContext'
-import { ThemeProvider } from './contexts/ThemeContext'
+import { AuthProvider }     from './contexts/AuthContext'
+import { ThemeProvider }    from './contexts/ThemeContext'
+import { LanguageProvider } from './contexts/LanguageContext'
 import './index.css'
 
 const queryClient = new QueryClient({
@@ -24,6 +25,7 @@ const queryClient = new QueryClient({
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ThemeProvider>
+      <LanguageProvider>
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
@@ -42,6 +44,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           </BrowserRouter>
         </QueryClientProvider>
       </AuthProvider>
+      </LanguageProvider>
     </ThemeProvider>
   </React.StrictMode>,
 )

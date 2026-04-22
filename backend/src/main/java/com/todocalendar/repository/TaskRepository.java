@@ -22,6 +22,10 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
      */
     List<Task> findBySourceTemplateIdAndUserIdOrderByDateAsc(Long sourceTemplateId, Long userId);
 
+    /** Todas as tarefas visíveis do usuário, para exportação CSV. */
+    @Query("SELECT t FROM Task t WHERE t.user.id = :userId AND t.skipped = false ORDER BY t.date DESC, t.createdAt DESC")
+    List<Task> findAllForExport(@Param("userId") Long userId);
+
     /** Total de tarefas visíveis (skipped=false) em um período. */
     @Query("SELECT COUNT(t) FROM Task t WHERE t.user.id = :userId AND t.date BETWEEN :start AND :end AND t.skipped = false")
     long countTasksInPeriod(

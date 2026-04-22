@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
 import { useAuth } from './contexts/AuthContext'
+import { useNotificationScheduler } from './hooks/useNotifications'
 
 function IconMenu() {
   return (
@@ -16,6 +17,7 @@ function IconMenu() {
 export default function App() {
   const { isAuthenticated } = useAuth()
   const [mobileOpen, setMobileOpen] = useState(false)
+  useNotificationScheduler() // fires daily reminder in background
 
   if (!isAuthenticated) return <Navigate to="/login" replace />
 
