@@ -1696,6 +1696,9 @@ a.sidebar-item.active .sidebar-item-icon {
 /* ── Configurações page ─────────────────────────────────── */
 
 /* Card container */
+/* ── Configurações page ──────────────────────────────────────── */
+
+/* Card container */
 .cfg-card {
   background: var(--elevated);
   border: 1px solid var(--line);
@@ -1705,18 +1708,17 @@ a.sidebar-item.active .sidebar-item-icon {
 .cfg-divider {
   height: 1px;
   background: var(--line);
+  margin: 0;
 }
 
 /* Row */
-.cfg-row {
-  padding: 0;
-}
+.cfg-row { padding: 0; }
+
 .cfg-row-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 15px 18px;
+  gap: 12px;
+  padding: 16px 18px;
 }
 .cfg-row-head--click {
   cursor: pointer;
@@ -1724,21 +1726,52 @@ a.sidebar-item.active .sidebar-item-icon {
   transition: background 0.12s;
 }
 .cfg-row-head--click:hover { background: var(--raised); }
-.cfg-row-title { font-size: 13px; font-weight: 500; color: var(--text); letter-spacing: -0.1px; }
-.cfg-row-desc  { font-size: 12px; color: var(--text-2); margin-top: 2px; }
-.cfg-row-control { flex-shrink: 0; display: flex; align-items: center; }
-.cfg-row-chevron { font-size: 10px; color: var(--text-3); flex-shrink: 0; }
 
-/* Toggle switch */
+/* Icon slot */
+.cfg-row-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-sm);
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Info (title + desc) */
+.cfg-row-info { flex: 1; min-width: 0; }
+.cfg-row-title { font-size: 13.5px; font-weight: 500; color: var(--text); letter-spacing: -0.1px; }
+.cfg-row-desc  { font-size: 12px; color: var(--text-2); margin-top: 2px; line-height: 1.4; }
+
+/* Controls (right side) */
+.cfg-row-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.cfg-row-chevron { color: var(--text-3); display: flex; align-items: center; }
+
+/* Hint below row head */
+.cfg-row-hint {
+  font-size: 11.5px;
+  color: var(--text-3);
+  line-height: 1.5;
+  padding: 0 18px 14px 60px;
+}
+
+/* ── Toggle switch ─────────────────────────────────────────── */
 .cfg-toggle {
   position: relative;
-  width: 38px;
-  height: 21px;
+  width: 40px;
+  height: 22px;
   border-radius: 11px;
   background: var(--raised);
   border: 1.5px solid var(--line-md);
   cursor: pointer;
-  transition: background 0.18s, border-color 0.18s;
+  transition: background 0.2s, border-color 0.2s;
   flex-shrink: 0;
   padding: 0;
   font-family: inherit;
@@ -1746,32 +1779,90 @@ a.sidebar-item.active .sidebar-item-icon {
 .cfg-toggle::after {
   content: '';
   position: absolute;
-  top: 2px;
-  left: 2px;
+  top: 2.5px;
+  left: 2.5px;
   width: 13px;
   height: 13px;
   border-radius: 50%;
   background: var(--text-3);
-  transition: transform 0.18s, background 0.18s;
+  transition: transform 0.2s cubic-bezier(.4,0,.2,1), background 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
 }
 .cfg-toggle--on {
   background: var(--accent);
   border-color: var(--accent);
 }
 .cfg-toggle--on::after {
-  transform: translateX(17px);
+  transform: translateX(18px);
   background: #fff;
 }
-.cfg-toggle--disabled { opacity: 0.45; cursor: not-allowed; }
+.cfg-toggle--disabled { opacity: 0.40; cursor: not-allowed; }
 
-/* Expanded panel */
+/* ── Language selector ─────────────────────────────────────── */
+.cfg-lang-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0 18px 16px 60px;
+}
+.cfg-lang-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  border: 1.5px solid var(--line);
+  background: var(--bg);
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.14s, color 0.14s, background 0.14s;
+  text-align: left;
+}
+.cfg-lang-btn:hover:not(.cfg-lang-btn--active) {
+  border-color: var(--line-md);
+  color: var(--text);
+  background: var(--raised);
+}
+.cfg-lang-btn--active {
+  border-color: var(--accent);
+  color: var(--text);
+  background: var(--accent-soft);
+}
+.cfg-lang-code {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: var(--raised);
+  color: var(--text-2);
+  padding: 2px 5px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  border: 1px solid var(--line);
+}
+.cfg-lang-btn--active .cfg-lang-code {
+  background: var(--accent);
+  color: #fff;
+  border-color: transparent;
+}
+.cfg-lang-label { flex: 1; }
+.cfg-lang-check {
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* ── Expanded panel ────────────────────────────────────────── */
 .cfg-expand {
-  padding: 4px 18px 15px;
+  padding: 12px 18px 16px 60px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   border-top: 1px solid var(--line);
-  background: var(--base);
+  background: var(--bg);
 }
 .cfg-expand-row {
   display: flex;
@@ -1784,9 +1875,13 @@ a.sidebar-item.active .sidebar-item-icon {
   color: var(--text-2);
   font-weight: 500;
 }
-.cfg-expand-value {
-  font-size: 12px;
+.cfg-expand-badge {
+  font-size: 11.5px;
   font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: var(--raised);
+  border: 1px solid var(--line);
 }
 .cfg-expand-hint {
   font-size: 11.5px;
@@ -1797,6 +1892,10 @@ a.sidebar-item.active .sidebar-item-icon {
   font-size: 12px;
   color: #f87171;
   line-height: 1.5;
+  background: rgba(248,113,113,0.07);
+  border: 1px solid rgba(248,113,113,0.18);
+  border-radius: var(--r-sm);
+  padding: 8px 10px;
 }
 
 /* Time picker */
@@ -1815,40 +1914,11 @@ a.sidebar-item.active .sidebar-item-icon {
 }
 .cfg-time-input:focus { border-color: var(--accent); }
 
-/* Language options */
-.cfg-lang-options {
-  display: flex;
-  gap: 8px;
-  padding: 0 18px 15px;
-}
-.cfg-lang-btn {
+/* ── Export button ─────────────────────────────────────────── */
+.cfg-btn-export {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 8px 14px;
-  border-radius: var(--r-md);
-  border: 1.5px solid var(--line);
-  background: var(--base);
-  color: var(--text-2);
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: border-color 0.12s, color 0.12s, background 0.12s;
-  flex: 1;
-  justify-content: center;
-}
-.cfg-lang-btn:hover { border-color: var(--line-md); color: var(--text); }
-.cfg-lang-btn--active {
-  border-color: var(--accent);
-  color: var(--text);
-  background: var(--elevated);
-}
-.cfg-lang-flag  { font-size: 16px; line-height: 1; }
-.cfg-lang-check { color: var(--accent); font-weight: 700; margin-left: auto; }
-
-/* Export button */
-.cfg-btn-export {
+  gap: 6px;
   background: var(--raised);
   border: 1px solid var(--line);
   color: var(--text);
@@ -1861,11 +1931,18 @@ a.sidebar-item.active .sidebar-item-icon {
   white-space: nowrap;
   transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
-.cfg-btn-export:hover:not(:disabled) { background: var(--elevated); border-color: var(--line-md); }
+.cfg-btn-export:hover:not(:disabled) {
+  background: var(--lift);
+  border-color: var(--line-md);
+}
 .cfg-btn-export:disabled { opacity: 0.55; cursor: not-allowed; }
-.cfg-btn-export--done { color: #4ade80; border-color: #4ade80; }
+.cfg-btn-export--done {
+  color: #4ade80;
+  border-color: rgba(74,222,128,0.35);
+  background: rgba(74,222,128,0.07);
+}
 
-/* Accent button (request permission) */
+/* ── Accent button (request permission) ────────────────────── */
 .cfg-btn-accent {
   background: var(--accent);
   border: none;
