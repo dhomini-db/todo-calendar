@@ -7,6 +7,7 @@ import type { TooltipProps } from 'recharts'
 import type { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent'
 import { getDashboardStats } from '../api/tasks'
 import type { DashboardStats, DailyScore } from '../types'
+import { useLanguage } from '../contexts/LanguageContext'
 
 // ── Color helpers ──────────────────────────────────────────────
 
@@ -19,7 +20,7 @@ function scoreColor(pct: number | null): string {
 
 // ── Trend calculation ──────────────────────────────────────────
 
-function calcTrend(days: DailyScore[]): { label: string; color: string; arrow: string } | null {
+function calcTrend(days: DailyScore[], t: (k: string) => string): { label: string; color: string; arrow: string } | null {
   const valid = days.filter(d => d.percentage !== null) as { percentage: number }[]
   if (valid.length < 8) return null
 
@@ -27,9 +28,9 @@ function calcTrend(days: DailyScore[]): { label: string; color: string; arrow: s
   const prev   = valid.slice(-14, -7).reduce((s, d) => s + d.percentage, 0) / valid.slice(-14, -7).length
 
   const diff = recent - prev
-  if (diff > 3)  return { label: 'Melhorando', color: '#4ade80', arrow: '↑' }
-  if (diff < -3) return { label: 'Piorando',   color: '#f87171', arrow: '↓' }
-  return             { label: 'Estável',     color: '#facc15', arrow: '→' }
+  if (diff > 3)  return { label: t('dash.trend.up'),     color: '#4ade80', arrow: '↑' }
+  if (diff < -3) return { label: t('dash.trend.down'),   color: '#f87171', arrow: '↓' }
+  return             { label: t('dash.trend.stable'),  color: '#facc15', arrow: '→' }
 }
 
 // ── Metric card icons ──────────────────────────────────────────
@@ -97,6 +98,7 @@ function MetricCard({ icon, label, value, sub, accent, loading }: MetricCardProp
 // ── Custom tooltip ─────────────────────────────────────────────
 
 function ChartTooltip({ active, payload, label }: TooltipProps<ValueType, NameType>) {
+  const { t } = useLanguage()
   if (!active || !payload?.length) return null
   const item = payload[0].payload as DailyScore & { display: number }
   const pct  = item.percentage
@@ -104,11 +106,11 @@ function ChartTooltip({ active, payload, label }: TooltipProps<ValueType, NameTy
     <div className="chart-tooltip">
       <p className="chart-tooltip-month">{label}</p>
       <p className="chart-tooltip-value" style={{ color: scoreColor(pct) }}>
-        {pct !== null ? `${pct}%` : 'Sem dados'}
+        {pct !== null ? `${pct}%` : t('dash.tooltip.none')}
       </p>
       {pct !== null && (
         <p className="chart-tooltip-label">
-          {pct >= 70 ? 'Bom dia' : pct >= 40 ? 'Dia médio' : 'Dia difícil'}
+          {pct >= 70 ? t('dash.tooltip.good') : pct >= 40 ? t('dash.tooltip.avg') : t('dash.tooltip.bad')}
         </p>
       )}
     </div>
@@ -117,8 +119,8 @@ function ChartTooltip({ active, payload, label }: TooltipProps<ValueType, NameTy
 
 // ── Chart area ─────────────────────────────────────────────────
 
-function PerformanceChart({ days }: { days: DailyScore[] }) {
-  const trend = calcTrend(days)
+function PerformanceChart({ days, t }: { days: DailyScore[]; t: (k: string) => string }) {
+  const trend = calcTrend(days, t)
 
   // Replace null with undefined so recharts draws gaps
   type ChartPoint = DailyScore & { display: number | undefined }
@@ -133,7 +135,7 @@ function PerformanceChart({ days }: { days: DailyScore[] }) {
   return (
     <div className="settings-section">
       <div className="dash-chart-header">
-        <p className="settings-section-title" style={{ margin: 0 }}>Desempenho — últimos 30 dias</p>
+        <p className="settings-section-title" style={{ margin: 0 }}>{t('dash.chart.title')}</p>
         {trend && (
           <span className="dash-trend-badge" style={{ color: trend.color }}>
             {trend.arrow} {trend.label}
@@ -180,7 +182,7 @@ function PerformanceChart({ days }: { days: DailyScore[] }) {
             />
           </AreaChart>
         </ResponsiveContainer>
-        <p className="dash-chart-hint">Linha tracejada = meta de 50%</p>
+        <p className="dash-chart-hint">{t('dash.chart.hint')}</p>
       </div>
     </div>
   )
@@ -221,6 +223,7 @@ function DashboardSkeleton() {
 // ── Main page ──────────────────────────────────────────────────
 
 export default function DashboardPage() {
+  const { t } = useLanguage()
   const { data, isLoading, isError } = useQuery<DashboardStats>({
     queryKey: ['stats', 'dashboard'],
     queryFn:  getDashboardStats,
@@ -233,8 +236,8 @@ export default function DashboardPage() {
   return (
     <div className="inner-page">
       <div className="inner-page-header">
-        <h1 className="page-title">Dashboard</h1>
-        <p className="page-sub">Visão geral do seu desempenho</p>
+        <h1 className="page-title">{t('dash.title')}</h1>
+        <p className="page-sub">{t('dash.sub')}</p>
       </div>
 
       {isLoading && <DashboardSkeleton />}
@@ -242,8 +245,8 @@ export default function DashboardPage() {
       {isError && (
         <div className="chart-empty">
           <span className="chart-empty-icon">⚠️</span>
-          <p className="chart-empty-title">Não foi possível carregar</p>
-          <p className="chart-empty-desc">Verifique sua conexão e recarregue a página.</p>
+          <p className="chart-empty-title">{t('common.error.load')}</p>
+          <p className="chart-empty-desc">{t('common.error.conn')}</p>
         </div>
       )}
 
@@ -253,40 +256,40 @@ export default function DashboardPage() {
           <div className="dash-cards-grid">
             <MetricCard
               icon={<IconScore />}
-              label="Score hoje"
+              label={t('dash.metric.score')}
               value={data.scoreHoje !== null ? `${data.scoreHoje}%` : '—'}
               sub={data.scoreHoje !== null
-                ? data.scoreHoje >= 70 ? 'Ótimo desempenho!'
-                : data.scoreHoje >= 40 ? 'Continue assim'
-                : 'Você consegue mais'
-                : 'Sem tarefas hoje'}
+                ? data.scoreHoje >= 70 ? t('dash.score.great')
+                : data.scoreHoje >= 40 ? t('dash.score.ok')
+                : t('dash.score.low')
+                : t('dash.score.none')}
               accent={scoreColor_}
             />
             <MetricCard
               icon={<IconFlame />}
-              label="Streak atual"
-              value={`${data.streakAtual} ${data.streakAtual === 1 ? 'dia' : 'dias'}`}
-              sub={data.streakAtual > 0 ? 'Dias consecutivos ≥ 50%' : 'Complete hoje para começar'}
+              label={t('dash.metric.streak')}
+              value={`${data.streakAtual} ${data.streakAtual === 1 ? t('dash.streak.day') : t('dash.streak.days')}`}
+              sub={data.streakAtual > 0 ? t('dash.streak.sub') : t('dash.streak.none')}
               accent={data.streakAtual > 0 ? '#fb923c' : undefined}
             />
             <MetricCard
               icon={<IconCheck />}
-              label="Tarefas este mês"
+              label={t('dash.metric.tasks')}
               value={data.tarefasTotalMes}
-              sub={`${data.tarefasConcluidasMes} positivas concluídas`}
+              sub={`${data.tarefasConcluidasMes} ${t('dash.tasks.sub')}`}
               accent="var(--accent)"
             />
             <MetricCard
               icon={<IconChart />}
-              label="Taxa de conclusão"
+              label={t('dash.metric.rate')}
               value={data.taxaConclusaoMes !== null ? `${data.taxaConclusaoMes}%` : '—'}
-              sub="Média mensal do desempenho"
+              sub={t('dash.metric.rate.sub')}
               accent={taxaColor}
             />
           </div>
 
           {/* 30-day chart */}
-          <PerformanceChart days={data.last30Days} />
+          <PerformanceChart days={data.last30Days} t={t} />
         </>
       )}
     </div>

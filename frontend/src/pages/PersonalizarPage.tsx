@@ -1,34 +1,36 @@
 import { useTheme, THEMES } from '../contexts/ThemeContext'
+import { useLanguage } from '../contexts/LanguageContext'
 
 export default function PersonalizarPage() {
   const { theme, setTheme } = useTheme()
+  const { t } = useLanguage()
 
-  const dark  = THEMES.filter(t => t.dark)
-  const light = THEMES.filter(t => !t.dark)
+  const dark  = THEMES.filter(th => th.dark)
+  const light = THEMES.filter(th => !th.dark)
 
   return (
     <div className="inner-page">
       <div className="inner-page-header">
-        <h1 className="page-title">Personalizar</h1>
-        <p className="page-sub">Escolha a aparência do aplicativo</p>
+        <h1 className="page-title">{t('appear.title')}</h1>
+        <p className="page-sub">{t('appear.sub')}</p>
       </div>
 
       {/* ── Temas Escuros ──────────────────────────────────── */}
       <div className="settings-section">
-        <p className="settings-section-title">Temas Escuros</p>
+        <p className="settings-section-title">{t('appear.dark')}</p>
         <div className="theme-grid">
-          {dark.map(t => (
-            <ThemeCard key={t.id} t={t} active={theme === t.id} onSelect={() => setTheme(t.id)} />
+          {dark.map(th => (
+            <ThemeCard key={th.id} t={th} active={theme === th.id} onSelect={() => setTheme(th.id)} />
           ))}
         </div>
       </div>
 
       {/* ── Temas Claros ───────────────────────────────────── */}
       <div className="settings-section">
-        <p className="settings-section-title">Temas Claros</p>
+        <p className="settings-section-title">{t('appear.light')}</p>
         <div className="theme-grid">
-          {light.map(t => (
-            <ThemeCard key={t.id} t={t} active={theme === t.id} onSelect={() => setTheme(t.id)} />
+          {light.map(th => (
+            <ThemeCard key={th.id} t={th} active={theme === th.id} onSelect={() => setTheme(th.id)} />
           ))}
         </div>
       </div>
@@ -40,6 +42,7 @@ export default function PersonalizarPage() {
 import type { ThemeOption } from '../contexts/ThemeContext'
 
 function ThemeCard({ t, active, onSelect }: { t: ThemeOption; active: boolean; onSelect: () => void }) {
+  const { t: translate } = useLanguage()
   return (
     <button
       className={`theme-card${active ? ' active' : ''}`}
@@ -69,7 +72,7 @@ function ThemeCard({ t, active, onSelect }: { t: ThemeOption; active: boolean; o
       <div className="theme-card-body">
         <div className="theme-card-top">
           <span className="theme-card-label">{t.label}</span>
-          {active && <span className="theme-card-badge">Ativo</span>}
+          {active && <span className="theme-card-badge">{translate('appear.active')}</span>}
         </div>
         <span className="theme-card-desc">{t.description}</span>
       </div>

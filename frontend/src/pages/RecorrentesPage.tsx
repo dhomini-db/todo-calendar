@@ -7,24 +7,20 @@ import {
   useToggleTemplate,
   useDeleteTemplate,
 } from '../hooks/useTasks'
+import { useLanguage } from '../contexts/LanguageContext'
 
 // ── Helpers ────────────────────────────────────────────────────
 
-const DAYS = [
-  { value: '1', label: 'Seg' },
-  { value: '2', label: 'Ter' },
-  { value: '3', label: 'Qua' },
-  { value: '4', label: 'Qui' },
-  { value: '5', label: 'Sex' },
-  { value: '6', label: 'Sáb' },
-  { value: '7', label: 'Dom' },
-]
+const DAY_KEYS = ['1', '2', '3', '4', '5', '6', '7']
 
-function recurrenceLabel(t: TaskTemplate): string {
-  if (t.recurrenceType === 'DAILY') return 'Todo dia'
-  if (!t.daysOfWeek) return 'Semanal'
-  const ids = t.daysOfWeek.split(',')
-  return DAYS.filter(d => ids.includes(d.value)).map(d => d.label).join(', ')
+function recurrenceLabel(tmpl: TaskTemplate, t: (k: string) => string): string {
+  if (tmpl.recurrenceType === 'DAILY') return t('rec.daily')
+  if (!tmpl.daysOfWeek) return t('rec.weekly')
+  const ids = tmpl.daysOfWeek.split(',')
+  return DAY_KEYS
+    .filter(v => ids.includes(v))
+    .map(v => t(`rec.day.${v}`))
+    .join(', ')
 }
 
 // ── Form state ─────────────────────────────────────────────────
@@ -80,6 +76,7 @@ interface TemplateFormProps {
 }
 
 function TemplateForm({ initial = EMPTY_FORM, onSubmit, onCancel, loading }: TemplateFormProps) {
+  const { t } = useLanguage()
   const [form, setForm] = useState<TaskTemplateRequest>(initial)
 
   function set<K extends keyof TaskTemplateRequest>(key: K, value: TaskTemplateRequest[K]) {
@@ -113,18 +110,18 @@ function TemplateForm({ initial = EMPTY_FORM, onSubmit, onCancel, loading }: Tem
           type="button"
           className={`type-btn positive ${form.type === 'POSITIVE' ? 'active' : ''}`}
           onClick={() => set('type', 'POSITIVE' as TaskType)}
-        >↑ Positiva</button>
+        >{t('rec.type.positive')}</button>
         <button
           type="button"
           className={`type-btn negative ${form.type === 'NEGATIVE' ? 'active' : ''}`}
           onClick={() => set('type', 'NEGATIVE' as TaskType)}
-        >↓ Negativa</button>
+        >{t('rec.type.negative')}</button>
       </div>
 
       {/* Título */}
       <input
         className="add-input"
-        placeholder="Nome da tarefa recorrente"
+        placeholder={t('rec.ph.title')}
         value={form.title}
         onChange={e => set('title', e.target.value)}
         autoFocus
@@ -134,7 +131,7 @@ function TemplateForm({ initial = EMPTY_FORM, onSubmit, onCancel, loading }: Tem
       {/* Descrição */}
       <textarea
         className="add-input"
-        placeholder="Descrição (opcional)"
+        placeholder={t('rec.ph.desc')}
         rows={2}
         value={form.description ?? ''}
         onChange={e => set('description', e.target.value)}
@@ -146,25 +143,25 @@ function TemplateForm({ initial = EMPTY_FORM, onSubmit, onCancel, loading }: Tem
           type="button"
           className={`type-btn positive ${form.recurrenceType === 'DAILY' ? 'active' : ''}`}
           onClick={() => set('recurrenceType', 'DAILY' as RecurrenceType)}
-        >Todo dia</button>
+        >{t('rec.freq.daily')}</button>
         <button
           type="button"
           className={`type-btn positive ${form.recurrenceType === 'WEEKLY' ? 'active' : ''}`}
           onClick={() => set('recurrenceType', 'WEEKLY' as RecurrenceType)}
-        >Dias específicos</button>
+        >{t('rec.freq.weekly')}</button>
       </div>
 
       {/* Dias da semana */}
       {form.recurrenceType === 'WEEKLY' && (
         <div className="weekday-picker">
-          {DAYS.map(d => (
+          {DAY_KEYS.map(d => (
             <button
-              key={d.value}
+              key={d}
               type="button"
-              className={`weekday-btn ${selectedDays.includes(d.value) ? 'active' : ''}`}
-              onClick={() => toggleDay(d.value)}
+              className={`weekday-btn ${selectedDays.includes(d) ? 'active' : ''}`}
+              onClick={() => toggleDay(d)}
             >
-              {d.label}
+              {t(`rec.day.${d}`)}
             </button>
           ))}
         </div>
@@ -176,9 +173,9 @@ function TemplateForm({ initial = EMPTY_FORM, onSubmit, onCancel, loading }: Tem
           className="btn-primary"
           disabled={!form.title.trim() || (form.recurrenceType === 'WEEKLY' && selectedDays.length === 0) || loading}
         >
-          {loading ? 'Salvando...' : 'Salvar'}
+          {loading ? t('rec.saving') : t('rec.save')}
         </button>
-        <button type="button" className="btn-ghost" onClick={onCancel}>Cancelar</button>
+        <button type="button" className="btn-ghost" onClick={onCancel}>{t('common.cancel')}</button>
       </div>
     </form>
   )
@@ -194,6 +191,7 @@ interface TemplateCardProps {
 }
 
 function TemplateCard({ template, onEdit, onDelete, onToggle }: TemplateCardProps) {
+  const { t } = useLanguage()
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   return (
@@ -207,7 +205,7 @@ function TemplateCard({ template, onEdit, onDelete, onToggle }: TemplateCardProp
           <div className="template-card-meta">
             <span className="template-recurrence-badge">
               <IconRepeat />
-              {recurrenceLabel(template)}
+              {recurrenceLabel(template, t)}
             </span>
             {template.description && (
               <span className="template-card-desc">{template.description}</span>
@@ -221,22 +219,22 @@ function TemplateCard({ template, onEdit, onDelete, onToggle }: TemplateCardProp
         <button
           className={`template-toggle-btn ${template.active ? 'on' : 'off'}`}
           onClick={onToggle}
-          title={template.active ? 'Pausar' : 'Ativar'}
+          title={template.active ? t('rec.pause') : t('rec.activate')}
         >
           <div className="template-toggle-knob" />
         </button>
 
-        <button className="task-action-btn" onClick={onEdit} title="Editar">
+        <button className="task-action-btn" onClick={onEdit} title={t('common.edit')}>
           <IconEdit />
         </button>
 
         {confirmDelete ? (
           <div className="delete-confirm">
-            <button className="confirm-yes" onClick={onDelete}>Excluir</button>
-            <button className="confirm-no" onClick={() => setConfirmDelete(false)}>Cancelar</button>
+            <button className="confirm-yes" onClick={onDelete}>{t('rec.confirm.delete')}</button>
+            <button className="confirm-no" onClick={() => setConfirmDelete(false)}>{t('common.cancel')}</button>
           </div>
         ) : (
-          <button className="task-action-btn danger" onClick={() => setConfirmDelete(true)} title="Excluir">
+          <button className="task-action-btn danger" onClick={() => setConfirmDelete(true)} title={t('common.delete')}>
             <IconTrash />
           </button>
         )}
@@ -248,6 +246,7 @@ function TemplateCard({ template, onEdit, onDelete, onToggle }: TemplateCardProp
 // ── Page ───────────────────────────────────────────────────────
 
 export default function RecorrentesPage() {
+  const { t } = useLanguage()
   const { data: templates = [], isLoading } = useTemplates()
   const createMut  = useCreateTemplate()
   const updateMut  = useUpdateTemplate()
@@ -266,20 +265,20 @@ export default function RecorrentesPage() {
     updateMut.mutate({ id: editTarget.id, data }, { onSuccess: () => setEditTarget(null) })
   }
 
-  const active   = templates.filter(t => t.active)
-  const inactive = templates.filter(t => !t.active)
+  const active   = templates.filter(tmpl => tmpl.active)
+  const inactive = templates.filter(tmpl => !tmpl.active)
 
   return (
     <div className="inner-page">
       <div className="inner-page-header">
-        <h1 className="page-title">Tarefas Recorrentes</h1>
-        <p className="page-sub">Defina tarefas que aparecem automaticamente todos os dias</p>
+        <h1 className="page-title">{t('rec.title')}</h1>
+        <p className="page-sub">{t('rec.sub')}</p>
       </div>
 
       {/* Form criar */}
       {showForm && !editTarget && (
         <div className="settings-section">
-          <p className="settings-section-title">Nova tarefa recorrente</p>
+          <p className="settings-section-title">{t('rec.new.section')}</p>
           <div className="template-form-wrapper">
             <TemplateForm
               onSubmit={handleCreate}
@@ -296,33 +295,31 @@ export default function RecorrentesPage() {
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
             <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
-          Nova tarefa recorrente
+          {t('rec.new.btn')}
         </button>
       )}
 
       {/* Lista ativa */}
-      {isLoading && <p className="panel-empty">Carregando...</p>}
+      {isLoading && <p className="panel-empty">{t('rec.loading')}</p>}
 
       {!isLoading && active.length === 0 && !showForm && (
         <div className="placeholder-banner" style={{ marginBottom: 24 }}>
           <div className="placeholder-banner-icon">🔁</div>
-          <p className="placeholder-banner-title">Nenhuma tarefa recorrente ativa</p>
-          <p className="placeholder-banner-desc">
-            Crie uma tarefa recorrente e ela aparecerá automaticamente no calendário todos os dias.
-          </p>
+          <p className="placeholder-banner-title">{t('rec.empty.title')}</p>
+          <p className="placeholder-banner-desc">{t('rec.empty.desc')}</p>
         </div>
       )}
 
       {active.length > 0 && (
         <div className="settings-section">
-          <p className="settings-section-title">Ativas ({active.length})</p>
+          <p className="settings-section-title">{`${t('rec.active')} (${active.length})`}</p>
           <div className="template-list">
-            {active.map(t => (
-              editTarget?.id === t.id ? (
-                <div key={t.id} className="template-form-wrapper">
-                  <p className="settings-section-title" style={{ marginBottom: 10 }}>Editando: {t.title}</p>
+            {active.map(tmpl => (
+              editTarget?.id === tmpl.id ? (
+                <div key={tmpl.id} className="template-form-wrapper">
+                  <p className="settings-section-title" style={{ marginBottom: 10 }}>{`${t('rec.editing')}: ${tmpl.title}`}</p>
                   <TemplateForm
-                    initial={{ title: t.title, description: t.description ?? '', type: t.type, recurrenceType: t.recurrenceType, daysOfWeek: t.daysOfWeek ?? '' }}
+                    initial={{ title: tmpl.title, description: tmpl.description ?? '', type: tmpl.type, recurrenceType: tmpl.recurrenceType, daysOfWeek: tmpl.daysOfWeek ?? '' }}
                     onSubmit={handleUpdate}
                     onCancel={() => setEditTarget(null)}
                     loading={updateMut.isPending}
@@ -330,11 +327,11 @@ export default function RecorrentesPage() {
                 </div>
               ) : (
                 <TemplateCard
-                  key={t.id}
-                  template={t}
-                  onEdit={() => setEditTarget(t)}
-                  onDelete={() => deleteMut.mutate(t.id)}
-                  onToggle={() => toggleMut.mutate(t.id)}
+                  key={tmpl.id}
+                  template={tmpl}
+                  onEdit={() => setEditTarget(tmpl)}
+                  onDelete={() => deleteMut.mutate(tmpl.id)}
+                  onToggle={() => toggleMut.mutate(tmpl.id)}
                 />
               )
             ))}
@@ -347,13 +344,13 @@ export default function RecorrentesPage() {
         <div className="settings-section">
           <p className="settings-section-title">Pausadas ({inactive.length})</p>
           <div className="template-list">
-            {inactive.map(t => (
+            {inactive.map(tmpl => (
               <TemplateCard
-                key={t.id}
-                template={t}
-                onEdit={() => setEditTarget(t)}
-                onDelete={() => deleteMut.mutate(t.id)}
-                onToggle={() => toggleMut.mutate(t.id)}
+                key={tmpl.id}
+                template={tmpl}
+                onEdit={() => setEditTarget(tmpl)}
+                onDelete={() => deleteMut.mutate(tmpl.id)}
+                onToggle={() => toggleMut.mutate(tmpl.id)}
               />
             ))}
           </div>

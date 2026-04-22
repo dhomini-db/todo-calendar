@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, type FormEvent } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useAuth } from '../contexts/AuthContext'
+import { useLanguage } from '../contexts/LanguageContext'
 import { updateProfile, changePassword, uploadAvatar, removeAvatar } from '../api/tasks'
 import type { UpdateProfileRequest, ChangePasswordRequest } from '../types'
 
@@ -18,7 +19,7 @@ function IconCamera() {
 
 // ── Password strength ──────────────────────────────────────────
 
-function passwordStrength(pwd: string): { score: number; label: string; color: string } {
+function passwordStrength(pwd: string, t: (k: string) => string): { score: number; label: string; color: string } {
   if (!pwd) return { score: 0, label: '', color: '' }
   let score = 0
   if (pwd.length >= 8)           score++
@@ -26,10 +27,10 @@ function passwordStrength(pwd: string): { score: number; label: string; color: s
   if (/[A-Z]/.test(pwd))         score++
   if (/[0-9]/.test(pwd))         score++
   if (/[^A-Za-z0-9]/.test(pwd)) score++
-  if (score <= 1) return { score, label: 'Fraca',  color: '#f87171' }
-  if (score <= 2) return { score, label: 'Média',  color: '#fb923c' }
-  if (score <= 3) return { score, label: 'Boa',    color: '#facc15' }
-  return               { score, label: 'Forte',   color: '#4ade80' }
+  if (score <= 1) return { score, label: t('conta.pwd.weak'),   color: '#f87171' }
+  if (score <= 2) return { score, label: t('conta.pwd.medium'), color: '#fb923c' }
+  if (score <= 3) return { score, label: t('conta.pwd.good'),   color: '#facc15' }
+  return               { score, label: t('conta.pwd.strong'),  color: '#4ade80' }
 }
 
 // ── Avatar component ───────────────────────────────────────────
@@ -55,6 +56,7 @@ function Avatar({ src, initials, size = 'lg' }: AvatarProps) {
 
 export default function ContaPage() {
   const { user, updateUser, logout } = useAuth()
+  const { t } = useLanguage()
 
   const initials = user?.name
     ? user.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
@@ -105,7 +107,7 @@ export default function ContaPage() {
     },
     onError: (err: unknown) => {
       const msg = (err as { response?: { data?: { error?: string } } })
-        ?.response?.data?.error ?? 'Erro ao enviar foto'
+        ?.response?.data?.error ?? t('conta.avatar.err.upload')
       setAvatarError(msg)
     },
   })
@@ -116,7 +118,7 @@ export default function ContaPage() {
       updateUser({ profileImageUrl: null })
       setAvatarError('')
     },
-    onError: () => setAvatarError('Erro ao remover foto'),
+    onError: () => setAvatarError(t('conta.avatar.err.remove')),
   })
 
   function handleSavePhoto() {
@@ -144,7 +146,7 @@ export default function ContaPage() {
     },
     onError: (err: unknown) => {
       const msg = (err as { response?: { data?: { error?: string } } })
-        ?.response?.data?.error ?? 'Erro ao salvar perfil'
+        ?.response?.data?.error ?? t('conta.err.profile')
       setProfileError(msg)
     },
   })
@@ -172,7 +174,7 @@ export default function ContaPage() {
   const [pwdError,   setPwdError]   = useState('')
   const [pwdOk,      setPwdOk]      = useState(false)
 
-  const strength = passwordStrength(newPwd)
+  const strength = passwordStrength(newPwd, t)
 
   const pwdMutation = useMutation({
     mutationFn: (data: ChangePasswordRequest) => changePassword(data),
@@ -184,7 +186,7 @@ export default function ContaPage() {
     },
     onError: (err: unknown) => {
       const msg = (err as { response?: { data?: { error?: string } } })
-        ?.response?.data?.error ?? 'Erro ao alterar senha'
+        ?.response?.data?.error ?? t('conta.err.pwd')
       setPwdError(msg)
     },
   })
@@ -203,20 +205,20 @@ export default function ContaPage() {
   return (
     <div className="inner-page">
       <div className="inner-page-header">
-        <h1 className="page-title">Minha Conta</h1>
-        <p className="page-sub">Gerencie seu perfil e segurança</p>
+        <h1 className="page-title">{t('conta.title')}</h1>
+        <p className="page-sub">{t('conta.sub')}</p>
       </div>
 
       {/* ── Profile card ──────────────────────────────────────── */}
       <div className="settings-section">
-        <p className="settings-section-title">Perfil</p>
+        <p className="settings-section-title">{t('conta.section.profile')}</p>
         <div className="conta-card">
 
           {/* Avatar — clicável para abrir seletor */}
           <div
             className="conta-avatar-wrap"
             onClick={() => !pendingFile && fileInputRef.current?.click()}
-            title="Alterar foto"
+            title={t('conta.avatar.change')}
           >
             <Avatar src={currentAvatarSrc} initials={initials} size="lg" />
             {!pendingFile && (
@@ -246,19 +248,19 @@ export default function ContaPage() {
                 onClick={() => removeMutation.mutate()}
                 disabled={removeMutation.isPending}
               >
-                {removeMutation.isPending ? 'Removendo…' : 'Remover foto'}
+                {removeMutation.isPending ? t('conta.avatar.removing') : t('conta.avatar.remove')}
               </button>
             )}
           </div>
 
-          <button className="conta-edit-btn" onClick={openEdit}>Editar</button>
+          <button className="conta-edit-btn" onClick={openEdit}>{t('common.edit')}</button>
         </div>
 
         {/* Photo preview + save/cancel — aparece só quando há arquivo pendente */}
         {pendingFile && (
           <div className="conta-photo-bar">
             <span className="conta-photo-bar-label">
-              {uploadMutation.isPending ? 'Enviando…' : `Foto selecionada: ${pendingFile.name}`}
+              {uploadMutation.isPending ? t('conta.avatar.saving') : `${t('conta.avatar.selected')} ${pendingFile.name}`}
             </span>
             <div className="conta-photo-bar-actions">
               <button
@@ -266,14 +268,14 @@ export default function ContaPage() {
                 onClick={cancelPhotoUpload}
                 disabled={uploadMutation.isPending}
               >
-                Cancelar
+                {t('common.cancel')}
               </button>
               <button
                 className="conta-btn-save"
                 onClick={handleSavePhoto}
                 disabled={uploadMutation.isPending}
               >
-                {uploadMutation.isPending ? 'Salvando…' : 'Salvar foto'}
+                {uploadMutation.isPending ? t('common.saving') : t('conta.avatar.save')}
               </button>
             </div>
           </div>
@@ -286,17 +288,17 @@ export default function ContaPage() {
         {editOpen && (
           <form className="conta-form" onSubmit={handleProfileSave}>
             <div className="conta-form-row">
-              <label className="conta-label">Nome</label>
+              <label className="conta-label">{t('conta.label.name')}</label>
               <input
                 className="conta-input"
                 value={profileName}
                 onChange={e => setProfileName(e.target.value)}
-                placeholder="Seu nome"
+                placeholder={t('conta.ph.name')}
                 required
               />
             </div>
             <div className="conta-form-row">
-              <label className="conta-label">E-mail</label>
+              <label className="conta-label">{t('conta.label.email')}</label>
               <input
                 className="conta-input"
                 type="email"
@@ -307,13 +309,13 @@ export default function ContaPage() {
               />
             </div>
             {profileError && <p className="conta-error">{profileError}</p>}
-            {profileOk    && <p className="conta-success">Perfil atualizado ✓</p>}
+            {profileOk    && <p className="conta-success">{t('conta.profile.ok')}</p>}
             <div className="conta-form-actions">
               <button type="button" className="conta-btn-cancel" onClick={() => setEditOpen(false)}>
-                Cancelar
+                {t('common.cancel')}
               </button>
               <button type="submit" className="conta-btn-save" disabled={profileMutation.isPending}>
-                {profileMutation.isPending ? 'Salvando…' : 'Salvar'}
+                {profileMutation.isPending ? t('common.saving') : t('common.save')}
               </button>
             </div>
           </form>
@@ -322,11 +324,11 @@ export default function ContaPage() {
 
       {/* ── Change password ────────────────────────────────────── */}
       <div className="settings-section">
-        <p className="settings-section-title">Segurança</p>
+        <p className="settings-section-title">{t('conta.section.security')}</p>
         <div className="conta-action-row" onClick={() => { setPwdOpen(o => !o); setPwdError(''); setPwdOk(false) }}>
           <div>
-            <p className="conta-action-title">Alterar senha</p>
-            <p className="conta-action-desc">Defina uma nova senha de acesso</p>
+            <p className="conta-action-title">{t('conta.pwd.title')}</p>
+            <p className="conta-action-desc">{t('conta.pwd.desc')}</p>
           </div>
           <span className="conta-chevron">{pwdOpen ? '▲' : '▼'}</span>
         </div>
@@ -334,7 +336,7 @@ export default function ContaPage() {
         {pwdOpen && (
           <form className="conta-form conta-form--indent" onSubmit={handlePwdSave}>
             <div className="conta-form-row">
-              <label className="conta-label">Senha atual</label>
+              <label className="conta-label">{t('conta.label.pwd.current')}</label>
               <input
                 className="conta-input"
                 type="password"
@@ -345,13 +347,13 @@ export default function ContaPage() {
               />
             </div>
             <div className="conta-form-row">
-              <label className="conta-label">Nova senha</label>
+              <label className="conta-label">{t('conta.label.pwd.new')}</label>
               <input
                 className="conta-input"
                 type="password"
                 value={newPwd}
                 onChange={e => setNewPwd(e.target.value)}
-                placeholder="mín. 8 caracteres"
+                placeholder={t('conta.ph.pwd.new')}
                 required
                 minLength={8}
               />
@@ -373,7 +375,7 @@ export default function ContaPage() {
               )}
             </div>
             <div className="conta-form-row">
-              <label className="conta-label">Confirmar nova senha</label>
+              <label className="conta-label">{t('conta.label.pwd.confirm')}</label>
               <input
                 className="conta-input"
                 type="password"
@@ -384,13 +386,13 @@ export default function ContaPage() {
               />
             </div>
             {pwdError && <p className="conta-error">{pwdError}</p>}
-            {pwdOk    && <p className="conta-success">Senha alterada com sucesso ✓</p>}
+            {pwdOk    && <p className="conta-success">{t('conta.pwd.ok')}</p>}
             <div className="conta-form-actions">
               <button type="button" className="conta-btn-cancel" onClick={() => setPwdOpen(false)}>
-                Cancelar
+                {t('common.cancel')}
               </button>
               <button type="submit" className="conta-btn-save" disabled={pwdMutation.isPending}>
-                {pwdMutation.isPending ? 'Salvando…' : 'Alterar senha'}
+                {pwdMutation.isPending ? t('common.saving') : t('conta.pwd.btn')}
               </button>
             </div>
           </form>
@@ -399,13 +401,13 @@ export default function ContaPage() {
 
       {/* ── Danger zone ────────────────────────────────────────── */}
       <div className="settings-section">
-        <p className="settings-section-title">Sessão</p>
+        <p className="settings-section-title">{t('conta.section.session')}</p>
         <div className="conta-logout-row">
           <div>
-            <p className="conta-action-title">Sair da conta</p>
-            <p className="conta-action-desc">Encerra sua sessão neste dispositivo</p>
+            <p className="conta-action-title">{t('conta.logout.title')}</p>
+            <p className="conta-action-desc">{t('conta.logout.desc')}</p>
           </div>
-          <button className="conta-btn-logout" onClick={logout}>Sair</button>
+          <button className="conta-btn-logout" onClick={logout}>{t('conta.logout.btn')}</button>
         </div>
       </div>
     </div>

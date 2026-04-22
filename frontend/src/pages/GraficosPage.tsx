@@ -7,6 +7,7 @@ import type { TooltipProps } from 'recharts'
 import type { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent'
 import { getMonthlyPerformance } from '../api/tasks'
 import type { MonthlyPerformance } from '../types'
+import { useLanguage } from '../contexts/LanguageContext'
 
 // ── Helpers ────────────────────────────────────────────────────
 
@@ -30,6 +31,7 @@ interface ChartItem extends MonthlyPerformance {
 // ── Custom Tooltip ─────────────────────────────────────────────
 
 function CustomTooltip({ active, payload, label }: TooltipProps<ValueType, NameType>) {
+  const { t } = useLanguage()
   if (!active || !payload?.length) return null
   const item = payload[0].payload as ChartItem
   const { percentage } = item
@@ -37,15 +39,15 @@ function CustomTooltip({ active, payload, label }: TooltipProps<ValueType, NameT
     <div className="chart-tooltip">
       <p className="chart-tooltip-month">{label}</p>
       <p className="chart-tooltip-value" style={{ color: barColor(percentage) }}>
-        {percentage !== null ? `${percentage}%` : 'Sem dados'}
+        {percentage !== null ? `${percentage}%` : t('common.no_data')}
       </p>
       {percentage !== null && (
         <p className="chart-tooltip-label">
           {percentage >= 70
-            ? 'Bom desempenho'
+            ? t('graficos.tooltip.good')
             : percentage >= 40
-              ? 'Desempenho médio'
-              : 'Abaixo da meta'}
+              ? t('graficos.tooltip.avg')
+              : t('graficos.tooltip.low')}
         </p>
       )}
     </div>
@@ -57,6 +59,7 @@ function CustomTooltip({ active, payload, label }: TooltipProps<ValueType, NameT
 interface WithData { month: string; percentage: number }
 
 function SummaryCards({ data }: { data: MonthlyPerformance[] }) {
+  const { t } = useLanguage()
   const withData = data.filter((d): d is WithData => d.percentage !== null)
   if (!withData.length) return null
 
@@ -67,17 +70,17 @@ function SummaryCards({ data }: { data: MonthlyPerformance[] }) {
   return (
     <div className="chart-summary-grid">
       <div className="chart-summary-card">
-        <p className="chart-summary-label">Média do ano</p>
+        <p className="chart-summary-label">{t('graficos.avg')}</p>
         <p className="chart-summary-value" style={{ color: barColor(avg) }}>{avg}%</p>
       </div>
       <div className="chart-summary-card">
-        <p className="chart-summary-label">Melhor mês</p>
+        <p className="chart-summary-label">{t('graficos.best')}</p>
         <p className="chart-summary-value" style={{ color: '#4ade80' }}>
           {best.month} · {best.percentage}%
         </p>
       </div>
       <div className="chart-summary-card">
-        <p className="chart-summary-label">Pior mês</p>
+        <p className="chart-summary-label">{t('graficos.worst')}</p>
         <p className="chart-summary-value" style={{ color: barColor(worst.percentage) }}>
           {worst.month} · {worst.percentage}%
         </p>
@@ -91,6 +94,7 @@ function SummaryCards({ data }: { data: MonthlyPerformance[] }) {
 const SKELETON_HEIGHTS = [55, 72, 40, 68, 30, 78, 50, 65, 42, 58, 35, 70]
 
 function SkeletonChart() {
+  const { t } = useLanguage()
   return (
     <div className="chart-placeholder">
       <div className="chart-placeholder-bars">
@@ -98,7 +102,7 @@ function SkeletonChart() {
           <div key={i} className="chart-placeholder-bar" style={{ height: `${h}%` }} />
         ))}
       </div>
-      <p className="chart-placeholder-label">Carregando…</p>
+      <p className="chart-placeholder-label">{t('common.loading')}</p>
     </div>
   )
 }
@@ -106,6 +110,7 @@ function SkeletonChart() {
 // ── Main page ──────────────────────────────────────────────────
 
 export default function GraficosPage() {
+  const { t } = useLanguage()
   const { data, isLoading, isError } = useQuery({
     queryKey: ['stats', 'monthly-performance'],
     queryFn: getMonthlyPerformance,
@@ -123,8 +128,8 @@ export default function GraficosPage() {
   return (
     <div className="inner-page">
       <div className="inner-page-header">
-        <h1 className="page-title">Gráficos</h1>
-        <p className="page-sub">Seu desempenho ao longo do tempo</p>
+        <h1 className="page-title">{t('graficos.title')}</h1>
+        <p className="page-sub">{t('graficos.sub')}</p>
       </div>
 
       {/* Summary cards */}
@@ -132,7 +137,7 @@ export default function GraficosPage() {
 
       {/* Bar chart */}
       <div className="settings-section">
-        <p className="settings-section-title">Desempenho mensal — {year}</p>
+        <p className="settings-section-title">{`${t('graficos.section')} — ${year}`}</p>
         <div className="chart-card">
 
           {isLoading && <SkeletonChart />}
@@ -140,8 +145,8 @@ export default function GraficosPage() {
           {isError && (
             <div className="chart-empty">
               <span className="chart-empty-icon">⚠️</span>
-              <p className="chart-empty-title">Erro ao carregar</p>
-              <p className="chart-empty-desc">Não foi possível buscar os dados. Tente recarregar a página.</p>
+              <p className="chart-empty-title">{t('graficos.error.title')}</p>
+              <p className="chart-empty-desc">{t('graficos.error.desc')}</p>
             </div>
           )}
 
@@ -189,19 +194,19 @@ export default function GraficosPage() {
             <div className="chart-legend">
               <span className="chart-legend-item">
                 <span className="chart-legend-dot" style={{ background: '#4ade80' }} />
-                Bom (≥70%)
+                {t('graficos.legend.good')}
               </span>
               <span className="chart-legend-item">
                 <span className="chart-legend-dot" style={{ background: '#facc15' }} />
-                Médio (40–69%)
+                {t('graficos.legend.avg')}
               </span>
               <span className="chart-legend-item">
                 <span className="chart-legend-dot" style={{ background: '#f87171' }} />
-                Baixo (&lt;40%)
+                {t('graficos.legend.low')}
               </span>
               <span className="chart-legend-item">
                 <span className="chart-legend-dot" style={{ background: 'var(--line)', opacity: 1 }} />
-                Sem dados
+                {t('graficos.legend.none')}
               </span>
             </div>
           )}
@@ -211,10 +216,8 @@ export default function GraficosPage() {
       {allEmpty && (
         <div className="chart-empty">
           <span className="chart-empty-icon">📊</span>
-          <p className="chart-empty-title">Ainda sem dados</p>
-          <p className="chart-empty-desc">
-            Complete tarefas ao longo do mês para ver seu desempenho aqui.
-          </p>
+          <p className="chart-empty-title">{t('graficos.empty.title')}</p>
+          <p className="chart-empty-desc">{t('graficos.empty.desc')}</p>
         </div>
       )}
     </div>
