@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 import { useLanguage, type Lang } from '../contexts/LanguageContext'
 import { useNotifications } from '../hooks/useNotifications'
 import { exportTasksCsv } from '../api/tasks'
@@ -14,36 +14,6 @@ function Toggle({ on, onToggle, disabled }: { on: boolean; onToggle: () => void;
       disabled={disabled}
       className={`cfg-toggle${on ? ' cfg-toggle--on' : ''}${disabled ? ' cfg-toggle--disabled' : ''}`}
     />
-  )
-}
-
-// ── Config row (standard layout) ──────────────────────────────
-
-function CfgRow({
-  title, desc, children, open, onClick,
-}: {
-  title: string
-  desc: string
-  children?: React.ReactNode
-  open?: boolean
-  onClick?: () => void
-}) {
-  return (
-    <div className="cfg-row">
-      <div
-        className={`cfg-row-head${onClick ? ' cfg-row-head--click' : ''}`}
-        onClick={onClick}
-      >
-        <div>
-          <p className="cfg-row-title">{title}</p>
-          <p className="cfg-row-desc">{desc}</p>
-        </div>
-        {children && !onClick && <div className="cfg-row-control">{children}</div>}
-        {onClick && (
-          <span className="cfg-row-chevron">{open ? '▲' : '▼'}</span>
-        )}
-      </div>
-    </div>
   )
 }
 
