@@ -74,6 +74,13 @@ export interface StreakData {
   weekDays: DayStatus[]
 }
 
+// ── Estatísticas ───────────────────────────────────────────────
+
+export interface MonthlyPerformance {
+  month: string              // "Jan", "Fev", ...
+  percentage: number | null  // null = sem dados naquele mês
+}
+
 // ── Perfil do usuário ──────────────────────────────────────────
 
 export interface UserProfile {
