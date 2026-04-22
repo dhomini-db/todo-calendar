@@ -53,6 +53,13 @@ public class User implements UserDetails {
     @Column
     private LocalDate lastCompletedDate;
 
+    // ── Foto de perfil ─────────────────────────────────────────
+    // Armazenada como data URI base64 (ex: "data:image/png;base64,...")
+    // TEXT suporta até ~1GB no PostgreSQL — suficiente para imagens até 2MB.
+
+    @Column(name = "profile_image_url", columnDefinition = "TEXT")
+    private String profileImageUrl;
+
     // ── UserDetails ────────────────────────────────────────────
     // Sem roles por ora: todos os usuários têm o mesmo nível de acesso.
 

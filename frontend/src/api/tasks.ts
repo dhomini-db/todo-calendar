@@ -96,6 +96,17 @@ export const updateProfile = (data: UpdateProfileRequest): Promise<UserProfile> 
 export const changePassword = (data: ChangePasswordRequest): Promise<{ message: string }> =>
   api.put<{ message: string }>('/users/me/password', data).then(r => r.data)
 
+export const uploadAvatar = (file: File): Promise<UserProfile> => {
+  const form = new FormData()
+  form.append('file', file)
+  return api.post<UserProfile>('/users/me/avatar', form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }).then(r => r.data)
+}
+
+export const removeAvatar = (): Promise<UserProfile> =>
+  api.delete<UserProfile>('/users/me/avatar').then(r => r.data)
+
 // ── Export ─────────────────────────────────────────────────────
 
 export const exportTasksCsv = async (): Promise<void> => {

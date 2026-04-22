@@ -1569,6 +1569,90 @@ a.sidebar-item.active .sidebar-item-icon {
 .conta-name  { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.2px; }
 .conta-email { font-size: 12.5px; color: var(--text-2); margin-top: 2px; }
 
+/* Avatar wrap — clicável para upload */
+.conta-avatar-wrap {
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+/* Overlay de câmera (aparece no hover) */
+.conta-avatar-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.52);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  pointer-events: none;
+}
+.conta-avatar-wrap:hover .conta-avatar-overlay { opacity: 1; }
+/* Foto dentro do avatar */
+.conta-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+/* Avatar tamanho grande (perfil) */
+.conta-avatar--lg {
+  width: 56px;
+  height: 56px;
+  font-size: 20px;
+}
+/* Info section dentro do card */
+.conta-info { flex: 1; min-width: 0; }
+/* Botão remover foto */
+.conta-remove-photo {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-top: 5px;
+  font-size: 11.5px;
+  color: var(--red);
+  cursor: pointer;
+  opacity: 0.72;
+  transition: opacity 0.15s;
+  letter-spacing: -0.1px;
+}
+.conta-remove-photo:hover:not(:disabled) { opacity: 1; }
+.conta-remove-photo:disabled { opacity: 0.4; cursor: default; }
+/* Barra de confirmação de foto pendente */
+.conta-photo-bar {
+  margin-top: 10px;
+  background: var(--elevated);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--r);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.conta-photo-bar-label {
+  font-size: 12.5px;
+  color: var(--text-2);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.conta-photo-bar-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* Sidebar avatar image */
+.sidebar-user-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
 /* ── Placeholder action list ─────────────────────────────── */
 .placeholder-actions {
   background: var(--elevated);
@@ -2037,17 +2121,7 @@ a.sidebar-item.active .sidebar-item-icon {
   .chart-summary-value { font-size: 15px; }
 }
 
-/* ── Conta page — new profile UI ────────────────────────── */
-.conta-avatar--lg {
-  width: 52px;
-  height: 52px;
-  font-size: 20px;
-}
-
-.conta-card {
-  align-items: center;
-}
-
+/* ── Conta page — extended styles ───────────────────────── */
 .conta-edit-btn {
   margin-left: auto;
   background: var(--raised);

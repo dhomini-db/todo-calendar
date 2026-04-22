@@ -105,6 +105,7 @@ export interface UserProfile {
   name: string
   email: string
   createdAt: string
+  profileImageUrl?: string | null
 }
 
 export interface UpdateProfileRequest {
@@ -124,6 +125,7 @@ export interface AuthUser {
   userId: number
   name: string
   email: string
+  profileImageUrl?: string | null
 }
 
 export interface AuthResponse {
@@ -131,6 +133,7 @@ export interface AuthResponse {
   userId: number
   name: string
   email: string
+  profileImageUrl?: string | null
 }
 
 export interface LoginRequest {

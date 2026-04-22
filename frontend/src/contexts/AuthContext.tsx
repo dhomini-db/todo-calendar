@@ -26,7 +26,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'))
 
   const saveAuth = useCallback((res: AuthResponse) => {
-    const authUser: AuthUser = { userId: res.userId, name: res.name, email: res.email }
+    const authUser: AuthUser = {
+      userId: res.userId,
+      name: res.name,
+      email: res.email,
+      profileImageUrl: res.profileImageUrl ?? null,
+    }
     localStorage.setItem('token', res.token)
     localStorage.setItem('user',  JSON.stringify(authUser))
     setToken(res.token)

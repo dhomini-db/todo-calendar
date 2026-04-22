@@ -17,6 +17,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.Base64;
 
 @Service
 @RequiredArgsConstructor
@@ -115,6 +119,50 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
+    // ── Foto de perfil ─────────────────────────────────────────
+
+    private static final long MAX_AVATAR_BYTES = 2L * 1024 * 1024; // 2 MB
+
+    @Transactional
+    public UserProfileResponse uploadAvatar(User currentUser, MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("Arquivo vazio");
+        }
+
+        String contentType = file.getContentType();
+        if (contentType == null ||
+                (!contentType.equals("image/jpeg") &&
+                 !contentType.equals("image/png")  &&
+                 !contentType.equals("image/webp"))) {
+            throw new IllegalArgumentException("Formato inválido. Use JPG, PNG ou WebP");
+        }
+
+        if (file.getSize() > MAX_AVATAR_BYTES) {
+            throw new IllegalArgumentException("Arquivo muito grande. Máximo 2 MB");
+        }
+
+        try {
+            byte[] bytes  = file.getBytes();
+            String base64 = Base64.getEncoder().encodeToString(bytes);
+            String dataUri = "data:" + contentType + ";base64," + base64;
+
+            User managed = findOrThrow(currentUser.getId());
+            managed.setProfileImageUrl(dataUri);
+            userRepository.save(managed);
+            return toProfileResponse(managed);
+        } catch (IOException e) {
+            throw new RuntimeException("Erro ao processar imagem");
+        }
+    }
+
+    @Transactional
+    public UserProfileResponse removeAvatar(User currentUser) {
+        User managed = findOrThrow(currentUser.getId());
+        managed.setProfileImageUrl(null);
+        userRepository.save(managed);
+        return toProfileResponse(managed);
+    }
+
     // ── Utilitários privados ───────────────────────────────────
 
     private User findOrThrow(Long userId) {
@@ -128,6 +176,7 @@ public class UserService implements UserDetailsService {
                 .name(user.getName())
                 .email(user.getEmail())
                 .createdAt(user.getCreatedAt())
+                .profileImageUrl(user.getProfileImageUrl())
                 .build();
     }
 
@@ -137,6 +186,7 @@ public class UserService implements UserDetailsService {
                 .userId(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
+                .profileImageUrl(user.getProfileImageUrl())
                 .build();
     }
 }

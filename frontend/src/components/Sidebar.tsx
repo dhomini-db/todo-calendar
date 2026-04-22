@@ -195,7 +195,12 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       <div className="sidebar-footer">
         {user && (
           <div className="sidebar-user-info">
-            <div className="sidebar-user-avatar">{initials}</div>
+            <div className="sidebar-user-avatar">
+              {user?.profileImageUrl
+                ? <img src={user.profileImageUrl} alt={user.name} className="sidebar-user-avatar-img" />
+                : initials
+              }
+            </div>
             <div className="sidebar-user-text">
               <p className="sidebar-user-name">{user.name}</p>
               <p className="sidebar-user-email">{user.email}</p>
