@@ -174,6 +174,58 @@ const translations: Record<Lang, Record<string, string>> = {
     'rec.day.5':               'Sex',
     'rec.day.6':               'Sáb',
     'rec.day.7':               'Dom',
+
+    // ── Calendar page ──────────────────────────────────────────
+    'cal.title':               'Calendário',
+    'cal.sub':                 'Clique em um dia para gerenciar suas tarefas',
+    'cal.nav.prev':            'Mês anterior',
+    'cal.nav.next':            'Próximo mês',
+
+    // weekday headers (Sun-first order, matching date-fns getDay())
+    'cal.wd.sun':              'Dom',
+    'cal.wd.mon':              'Seg',
+    'cal.wd.tue':              'Ter',
+    'cal.wd.wed':              'Qua',
+    'cal.wd.thu':              'Qui',
+    'cal.wd.fri':              'Sex',
+    'cal.wd.sat':              'Sáb',
+
+    // streak badge
+    'cal.streak.day':          'dia',
+    'cal.streak.days':         'dias',
+    'cal.streak.record':       'recorde',
+
+    // task panel — header & list
+    'cal.panel.task':          'tarefa',
+    'cal.panel.tasks':         'tarefas',
+    'cal.panel.score':         'de boas escolhas hoje',
+    'cal.panel.loading':       'Carregando tarefas',
+    'cal.panel.empty':         'Nenhuma tarefa para este dia.',
+    'cal.panel.neg_divider':   'Hábitos a evitar',
+
+    // task panel — form
+    'cal.panel.new_task':      'Nova tarefa',
+    'cal.panel.positive':      '↑ Positiva',
+    'cal.panel.negative':      '↓ Negativa',
+    'cal.panel.neg_hint':      'Evitar esse hábito conta como boa escolha',
+    'cal.panel.name_ph':       'Nome da tarefa',
+    'cal.panel.desc_ph':       'Descrição (opcional)',
+    'cal.panel.recurring':     'Tornar tarefa recorrente',
+    'cal.panel.daily':         'Diário',
+    'cal.panel.weekly':        'Semanal',
+    'cal.panel.hint.daily':    'Aparecerá automaticamente todos os dias',
+    'cal.panel.hint.wk_empty': 'Selecione ao menos um dia da semana',
+    'cal.panel.hint.weekly':   'Aparecerá toda',
+    'cal.panel.saving':        'Salvando...',
+    'cal.panel.create':        'Criar recorrente',
+    'cal.panel.add':           'Adicionar',
+
+    // task item
+    'cal.task.pending':        'Pendente',
+    'cal.task.done':           'Concluída',
+    'cal.task.habit_done':     'Hábito realizado',
+    'cal.task.check':          'Marcar',
+    'cal.task.uncheck':        'Desmarcar',
   },
 
   en: {
@@ -345,6 +397,58 @@ const translations: Record<Lang, Record<string, string>> = {
     'rec.day.5':               'Fri',
     'rec.day.6':               'Sat',
     'rec.day.7':               'Sun',
+
+    // ── Calendar page ──────────────────────────────────────────
+    'cal.title':               'Calendar',
+    'cal.sub':                 'Click on a day to manage your tasks',
+    'cal.nav.prev':            'Previous month',
+    'cal.nav.next':            'Next month',
+
+    // weekday headers (Sun-first)
+    'cal.wd.sun':              'Sun',
+    'cal.wd.mon':              'Mon',
+    'cal.wd.tue':              'Tue',
+    'cal.wd.wed':              'Wed',
+    'cal.wd.thu':              'Thu',
+    'cal.wd.fri':              'Fri',
+    'cal.wd.sat':              'Sat',
+
+    // streak badge
+    'cal.streak.day':          'day',
+    'cal.streak.days':         'days',
+    'cal.streak.record':       'record',
+
+    // task panel — header & list
+    'cal.panel.task':          'task',
+    'cal.panel.tasks':         'tasks',
+    'cal.panel.score':         'good choices today',
+    'cal.panel.loading':       'Loading tasks',
+    'cal.panel.empty':         'No tasks for this day.',
+    'cal.panel.neg_divider':   'Habits to avoid',
+
+    // task panel — form
+    'cal.panel.new_task':      'New task',
+    'cal.panel.positive':      '↑ Positive',
+    'cal.panel.negative':      '↓ Negative',
+    'cal.panel.neg_hint':      'Avoiding this habit counts as a good choice',
+    'cal.panel.name_ph':       'Task name',
+    'cal.panel.desc_ph':       'Description (optional)',
+    'cal.panel.recurring':     'Make task recurring',
+    'cal.panel.daily':         'Daily',
+    'cal.panel.weekly':        'Weekly',
+    'cal.panel.hint.daily':    'Will appear automatically every day',
+    'cal.panel.hint.wk_empty': 'Select at least one day of the week',
+    'cal.panel.hint.weekly':   'Will appear every',
+    'cal.panel.saving':        'Saving...',
+    'cal.panel.create':        'Create recurring',
+    'cal.panel.add':           'Add',
+
+    // task item
+    'cal.task.pending':        'Pending',
+    'cal.task.done':           'Done',
+    'cal.task.habit_done':     'Habit completed',
+    'cal.task.check':          'Check',
+    'cal.task.uncheck':        'Uncheck',
   },
 }
 

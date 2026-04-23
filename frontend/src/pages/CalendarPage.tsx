@@ -1,18 +1,20 @@
 import { useState } from 'react'
-import Calendar     from '../components/Calendar'
-import TaskPanel    from '../components/TaskPanel'
-import StreakBadge  from '../components/StreakBadge'
+import Calendar    from '../components/Calendar'
+import TaskPanel   from '../components/TaskPanel'
+import StreakBadge from '../components/StreakBadge'
+import { useLanguage } from '../contexts/LanguageContext'
 
 export default function CalendarPage() {
   const today = new Date()
   const [selectedDate, setSelectedDate] = useState(today)
   const [currentMonth, setCurrentMonth] = useState(today)
+  const { t } = useLanguage()
 
   return (
     <>
       <div className="calendar-area">
-        <h1 className="page-title">Calendário</h1>
-        <p className="page-sub">Clique em um dia para gerenciar suas tarefas</p>
+        <h1 className="page-title">{t('cal.title')}</h1>
+        <p className="page-sub">{t('cal.sub')}</p>
         <StreakBadge />
         <Calendar
           selectedDate={selectedDate}

@@ -1,7 +1,8 @@
 import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import { ptBR, enUS } from 'date-fns/locale'
 import { useState } from 'react'
 import { useTasksByDate, useCreateTask, useCreateRecurringTask } from '../hooks/useTasks'
+import { useLanguage } from '../contexts/LanguageContext'
 import type { TaskType, RecurrenceType } from '../types'
 import TaskItem from './TaskItem'
 
@@ -21,8 +22,6 @@ function progressColor(pct: number): string {
 
 function calcScore(tasks: { completed: boolean; interacted: boolean; type: TaskType }[]) {
   if (tasks.length === 0) return 0
-  // Denominador efetivo = positivas (todas) + negativas CHECADAS (falhou no hábito).
-  // Negativas não-checadas são neutras — não penalizam o score.
   const positives        = tasks.filter(t => t.type === 'POSITIVE')
   const checkedNegatives = tasks.filter(t => t.type === 'NEGATIVE' && t.interacted && t.completed)
   const denominator      = positives.length + checkedNegatives.length
@@ -31,15 +30,8 @@ function calcScore(tasks: { completed: boolean; interacted: boolean; type: TaskT
   return Math.round((good / denominator) * 100)
 }
 
-const WEEK_DAYS = [
-  { value: '1', label: 'Seg' },
-  { value: '2', label: 'Ter' },
-  { value: '3', label: 'Qua' },
-  { value: '4', label: 'Qui' },
-  { value: '5', label: 'Sex' },
-  { value: '6', label: 'Sáb' },
-  { value: '7', label: 'Dom' },
-]
+// Mon–Sun ordered weekday values (matches rec.day.* keys)
+const WEEK_DAY_VALUES = ['1', '2', '3', '4', '5', '6', '7']
 
 // ── Icons ──────────────────────────────────────────────────────
 
@@ -66,6 +58,9 @@ function RepeatIcon() {
 // ── Component ──────────────────────────────────────────────────
 
 export default function TaskPanel({ selectedDate }: TaskPanelProps) {
+  const { lang, t } = useLanguage()
+  const locale = lang === 'en' ? enUS : ptBR
+
   const dateStr = format(selectedDate, 'yyyy-MM-dd')
   const { data: tasks = [], isLoading } = useTasksByDate(dateStr)
   const createTask      = useCreateTask(dateStr)
@@ -83,13 +78,15 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
   const positiveTasks   = tasks.filter(t => t.type === 'POSITIVE')
   const negativeTasks   = tasks.filter(t => t.type === 'NEGATIVE')
 
-  // Score — baseado apenas em tarefas com interação do usuário
   const interactedTasks = tasks.filter(t => t.interacted)
   const pct             = calcScore(tasks)
   const goodCount       = positiveTasks.filter(t => t.interacted && t.completed).length
 
-  const dayName   = format(selectedDate, "EEEE", { locale: ptBR })
-  const dateLabel = format(selectedDate, "d 'de' MMMM", { locale: ptBR })
+  // Date header — locale-aware
+  const dayName   = format(selectedDate, 'EEEE', { locale })
+  const dateLabel = lang === 'en'
+    ? format(selectedDate, 'MMMM d', { locale: enUS })
+    : format(selectedDate, "d 'de' MMMM", { locale: ptBR })
 
   function toggleDay(val: string) {
     setDaysOfWeek(prev =>
@@ -101,7 +98,6 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
     if (!title.trim()) return
 
     if (isRecurring) {
-      // Cria template → backend auto-gera a instância do dia
       createRecurring.mutate(
         {
           title:         title.trim(),
@@ -113,7 +109,6 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
         { onSuccess: resetForm },
       )
     } else {
-      // Tarefa avulsa
       createTask.mutate(
         { title: title.trim(), description: description.trim() || undefined, date: dateStr, type: taskType },
         { onSuccess: resetForm },
@@ -135,6 +130,9 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
   const canSubmit = title.trim() &&
     (!isRecurring || recurrenceType === 'DAILY' || daysOfWeek.length > 0)
 
+  // Weekly hint: "Aparecerá toda Seg, Ter" / "Will appear every Mon, Tue"
+  const selectedDayLabels = daysOfWeek.map(v => t(`rec.day.${v}`)).join(', ')
+
   return (
     <div className="task-panel">
       {/* Header */}
@@ -143,7 +141,8 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
           {dayName} · {dateLabel}
         </p>
         <p className="panel-count">
-          {goodCount} <span>/ {positiveTasks.length} {positiveTasks.length === 1 ? 'tarefa' : 'tarefas'}</span>
+          {goodCount}{' '}
+          <span>/ {positiveTasks.length} {positiveTasks.length === 1 ? t('cal.panel.task') : t('cal.panel.tasks')}</span>
         </p>
         <div className="progress-track">
           <div
@@ -152,20 +151,20 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
           />
         </div>
         {interactedTasks.length > 0 && (
-          <p className="panel-score-label">{pct}% de boas escolhas hoje</p>
+          <p className="panel-score-label">{pct}% {t('cal.panel.score')}</p>
         )}
       </div>
 
       {/* Task list */}
       <div className="panel-body">
         {isLoading && (
-          <div className="panel-loading" aria-label="Carregando tarefas" role="status">
+          <div className="panel-loading" aria-label={t('cal.panel.loading')} role="status">
             <div className="panel-spinner" />
           </div>
         )}
 
         {!isLoading && tasks.length === 0 && (
-          <p className="panel-empty">Nenhuma tarefa para este dia.</p>
+          <p className="panel-empty">{t('cal.panel.empty')}</p>
         )}
 
         {positiveTasks.map(task => (
@@ -174,7 +173,7 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
 
         {positiveTasks.length > 0 && negativeTasks.length > 0 && (
           <div className="task-type-divider">
-            <span>Hábitos a evitar</span>
+            <span>{t('cal.panel.neg_divider')}</span>
           </div>
         )}
 
@@ -187,50 +186,50 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
       <div className="panel-footer">
         {showForm ? (
           <div className="add-form">
-            {/* Tipo positiva/negativa */}
+            {/* Positive / Negative type */}
             <div className="type-toggle">
               <button
                 className={`type-btn positive ${taskType === 'POSITIVE' ? 'active' : ''}`}
                 onClick={() => setTaskType('POSITIVE')}
                 type="button"
               >
-                ↑ Positiva
+                {t('cal.panel.positive')}
               </button>
               <button
                 className={`type-btn negative ${taskType === 'NEGATIVE' ? 'active' : ''}`}
                 onClick={() => setTaskType('NEGATIVE')}
                 type="button"
               >
-                ↓ Negativa
+                {t('cal.panel.negative')}
               </button>
             </div>
 
             {taskType === 'NEGATIVE' && (
-              <p className="type-hint">Evitar esse hábito conta como boa escolha</p>
+              <p className="type-hint">{t('cal.panel.neg_hint')}</p>
             )}
 
-            {/* Título */}
+            {/* Title */}
             <input
               className="add-input"
-              placeholder="Nome da tarefa"
+              placeholder={t('cal.panel.name_ph')}
               value={title}
               onChange={e => setTitle(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && !isRecurring && handleSubmit()}
               autoFocus
-              aria-label="Nome da tarefa"
+              aria-label={t('cal.panel.name_ph')}
             />
 
-            {/* Descrição */}
+            {/* Description */}
             <textarea
               className="add-input"
-              placeholder="Descrição (opcional)"
+              placeholder={t('cal.panel.desc_ph')}
               rows={2}
               value={description}
               onChange={e => setDescription(e.target.value)}
-              aria-label="Descrição da tarefa"
+              aria-label={t('cal.panel.desc_ph')}
             />
 
-            {/* Toggle recorrência */}
+            {/* Recurrence toggle */}
             <label className="recurrence-toggle-row">
               <input
                 type="checkbox"
@@ -239,10 +238,10 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
                 onChange={e => setIsRecurring(e.target.checked)}
               />
               <span className="recurrence-toggle-icon"><RepeatIcon /></span>
-              <span className="recurrence-toggle-label">Tornar tarefa recorrente</span>
+              <span className="recurrence-toggle-label">{t('cal.panel.recurring')}</span>
             </label>
 
-            {/* Opções de recorrência */}
+            {/* Recurrence options */}
             {isRecurring && (
               <div className="recurrence-options">
                 <div className="type-toggle">
@@ -251,27 +250,27 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
                     className={`type-btn positive ${recurrenceType === 'DAILY' ? 'active' : ''}`}
                     onClick={() => setRecurrenceType('DAILY')}
                   >
-                    Diário
+                    {t('cal.panel.daily')}
                   </button>
                   <button
                     type="button"
                     className={`type-btn positive ${recurrenceType === 'WEEKLY' ? 'active' : ''}`}
                     onClick={() => setRecurrenceType('WEEKLY')}
                   >
-                    Semanal
+                    {t('cal.panel.weekly')}
                   </button>
                 </div>
 
                 {recurrenceType === 'WEEKLY' && (
                   <div className="weekday-picker">
-                    {WEEK_DAYS.map(d => (
+                    {WEEK_DAY_VALUES.map(v => (
                       <button
-                        key={d.value}
+                        key={v}
                         type="button"
-                        className={`weekday-btn ${daysOfWeek.includes(d.value) ? 'active' : ''}`}
-                        onClick={() => toggleDay(d.value)}
+                        className={`weekday-btn ${daysOfWeek.includes(v) ? 'active' : ''}`}
+                        onClick={() => toggleDay(v)}
                       >
-                        {d.label}
+                        {t(`rec.day.${v}`)}
                       </button>
                     ))}
                   </div>
@@ -279,16 +278,16 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
 
                 <p className="type-hint">
                   {recurrenceType === 'DAILY'
-                    ? 'Aparecerá automaticamente todos os dias'
+                    ? t('cal.panel.hint.daily')
                     : daysOfWeek.length === 0
-                      ? 'Selecione ao menos um dia da semana'
-                      : `Aparecerá toda ${WEEK_DAYS.filter(d => daysOfWeek.includes(d.value)).map(d => d.label).join(', ')}`
+                      ? t('cal.panel.hint.wk_empty')
+                      : `${t('cal.panel.hint.weekly')} ${selectedDayLabels}`
                   }
                 </p>
               </div>
             )}
 
-            {/* Ações */}
+            {/* Actions */}
             <div className="add-form-actions">
               <button
                 className="btn-primary"
@@ -296,19 +295,19 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
                 disabled={!canSubmit || isPending}
               >
                 {isPending
-                  ? 'Salvando...'
+                  ? t('cal.panel.saving')
                   : isRecurring
-                    ? 'Criar recorrente'
-                    : 'Adicionar'
+                    ? t('cal.panel.create')
+                    : t('cal.panel.add')
                 }
               </button>
-              <button className="btn-ghost" onClick={resetForm}>Cancelar</button>
+              <button className="btn-ghost" onClick={resetForm}>{t('common.cancel')}</button>
             </div>
           </div>
         ) : (
           <button className="add-btn" onClick={() => setShowForm(true)}>
             <PlusIcon />
-            Nova tarefa
+            {t('cal.panel.new_task')}
           </button>
         )}
       </div>

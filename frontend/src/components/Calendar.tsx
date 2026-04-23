@@ -9,8 +9,9 @@ import {
   startOfMonth,
   subMonths,
 } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import { ptBR, enUS } from 'date-fns/locale'
 import { useMonthSummary } from '../hooks/useTasks'
+import { useLanguage } from '../contexts/LanguageContext'
 import type { DaySummary } from '../types'
 
 interface CalendarProps {
@@ -20,7 +21,7 @@ interface CalendarProps {
   onChangeMonth: (date: Date) => void
 }
 
-/** Retorna a classe CSS e a cor do bar para o dia */
+/** Returns CSS class + bar colour for a day */
 function dayStyle(summary: DaySummary | undefined): { cls: string; bar: string } {
   if (!summary || summary.color === 'NONE') return { cls: '', bar: '' }
   switch (summary.color) {
@@ -32,9 +33,21 @@ function dayStyle(summary: DaySummary | undefined): { cls: string; bar: string }
   }
 }
 
-const WEEK_DAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
+// Sun-first order matching date-fns getDay() (0 = Sunday)
+const WD_KEYS = [
+  'cal.wd.sun',
+  'cal.wd.mon',
+  'cal.wd.tue',
+  'cal.wd.wed',
+  'cal.wd.thu',
+  'cal.wd.fri',
+  'cal.wd.sat',
+]
 
 export default function Calendar({ selectedDate, onSelectDate, currentMonth, onChangeMonth }: CalendarProps) {
+  const { lang, t } = useLanguage()
+  const locale = lang === 'en' ? enUS : ptBR
+
   const year  = currentMonth.getFullYear()
   const month = currentMonth.getMonth() + 1
 
@@ -44,21 +57,29 @@ export default function Calendar({ selectedDate, onSelectDate, currentMonth, onC
   const lastDay     = endOfMonth(currentMonth)
   const days        = eachDayOfInterval({ start: firstDay, end: lastDay })
   const startOffset = getDay(firstDay)
-  const monthLabel  = format(currentMonth, 'MMMM yyyy', { locale: ptBR })
+  const monthLabel  = format(currentMonth, 'MMMM yyyy', { locale })
 
   return (
     <div className="calendar-wrap">
       {/* Header */}
       <div className="calendar-header">
-        <button className="cal-nav" onClick={() => onChangeMonth(subMonths(currentMonth, 1))} aria-label="Mês anterior">‹</button>
-        <h2 className="calendar-month">{monthLabel}</h2>
-        <button className="cal-nav" onClick={() => onChangeMonth(addMonths(currentMonth, 1))} aria-label="Próximo mês">›</button>
+        <button
+          className="cal-nav"
+          onClick={() => onChangeMonth(subMonths(currentMonth, 1))}
+          aria-label={t('cal.nav.prev')}
+        >‹</button>
+        <h2 className="calendar-month" style={{ textTransform: 'capitalize' }}>{monthLabel}</h2>
+        <button
+          className="cal-nav"
+          onClick={() => onChangeMonth(addMonths(currentMonth, 1))}
+          aria-label={t('cal.nav.next')}
+        >›</button>
       </div>
 
       {/* Weekday labels */}
       <div className="cal-weekdays">
-        {WEEK_DAYS.map(d => (
-          <div key={d} className="cal-weekday">{d}</div>
+        {WD_KEYS.map(key => (
+          <div key={key} className="cal-weekday">{t(key)}</div>
         ))}
       </div>
 
@@ -85,14 +106,13 @@ export default function Calendar({ selectedDate, onSelectDate, currentMonth, onC
                 isSelected ? 'selected' : '',
                 isTodayDay && !cls ? 'today' : '',
               ].filter(Boolean).join(' ')}
-              title={hasTasks ? `${daySumm!.completed}/${daySumm!.total} tarefas · ${pct}%` : undefined}
+              title={hasTasks ? `${daySumm!.completed}/${daySumm!.total} · ${pct}%` : undefined}
             >
               <span className="cal-day-num">{format(day, 'd')}</span>
 
               {hasTasks && (
                 <>
                   <span className="cal-day-pct">{pct}%</span>
-                  {/* barra de progresso na base do célula */}
                   <div className="cal-day-bar-track">
                     <div
                       className="cal-day-bar-fill"
@@ -108,22 +128,10 @@ export default function Calendar({ selectedDate, onSelectDate, currentMonth, onC
 
       {/* Legend */}
       <div className="cal-legend">
-        <div className="legend-item">
-          <div className="legend-dot" style={{ background: '#4ade80' }} />
-          100%
-        </div>
-        <div className="legend-item">
-          <div className="legend-dot" style={{ background: '#34d399' }} />
-          70–99%
-        </div>
-        <div className="legend-item">
-          <div className="legend-dot" style={{ background: '#fbbf24' }} />
-          50–69%
-        </div>
-        <div className="legend-item">
-          <div className="legend-dot" style={{ background: '#f87171' }} />
-          {'< 50%'}
-        </div>
+        <div className="legend-item"><div className="legend-dot" style={{ background: '#4ade80' }} />100%</div>
+        <div className="legend-item"><div className="legend-dot" style={{ background: '#34d399' }} />70–99%</div>
+        <div className="legend-item"><div className="legend-dot" style={{ background: '#fbbf24' }} />50–69%</div>
+        <div className="legend-item"><div className="legend-dot" style={{ background: '#f87171' }} />{'< 50%'}</div>
       </div>
     </div>
   )
