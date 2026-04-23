@@ -3094,3 +3094,613 @@ a.sidebar-item.active::before {
     z-index: 5;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   GLASS DESIGN SYSTEM v2
+   Glassmorphism · Depth · Fluid Motion · Refined Space
+   Applied as progressive enhancement over the existing tokens.
+═══════════════════════════════════════════════════════════════ */
+
+/* ── 1. Rounder radius + glass tokens for ALL themes ─────────── */
+:root,
+[data-theme="amber-night"],
+[data-theme="arctic"],
+[data-theme="rose-dawn"],
+[data-theme="tyrian-purple"],
+[data-theme="moss-velvet"],
+[data-theme="midnight-espresso"],
+[data-theme="banana-cream"],
+[data-theme="blue-mirage"],
+[data-theme="pistachio"] {
+  --r-xs:  4px;
+  --r-sm:  8px;
+  --r:     12px;
+  --r-md:  14px;
+  --r-lg:  20px;
+  --r-xl:  26px;
+  --r-2xl: 36px;
+
+  --blur-sm: blur(10px);
+  --blur:    blur(22px);
+  --blur-lg: blur(40px);
+}
+
+/* ── 2. Richer shadows — dark themes ─────────────────────────── */
+:root,
+[data-theme="amber-night"],
+[data-theme="arctic"],
+[data-theme="tyrian-purple"],
+[data-theme="moss-velvet"],
+[data-theme="midnight-espresso"] {
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.28), 0 1px 2px rgba(0,0,0,0.18);
+  --shadow:    0 4px 20px rgba(0,0,0,0.38), 0 2px 6px rgba(0,0,0,0.22);
+  --shadow-md: 0 8px 40px rgba(0,0,0,0.48), 0 4px 12px rgba(0,0,0,0.26);
+  --shadow-lg: 0 20px 80px rgba(0,0,0,0.58), 0 8px 24px rgba(0,0,0,0.32);
+}
+
+/* ── 3. Softer shadows — light themes ───────────────────────── */
+[data-theme="rose-dawn"],
+[data-theme="banana-cream"],
+[data-theme="blue-mirage"],
+[data-theme="pistachio"] {
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow:    0 4px 20px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06);
+  --shadow-md: 0 8px 40px rgba(0,0,0,0.14), 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 20px 80px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.10);
+}
+
+/* ── 4. Body — ambient gradient orbs (theme-aware) ───────────── */
+body {
+  background-image:
+    radial-gradient(ellipse 65% 55% at 5% 0%,   var(--accent-glow) 0%, transparent 100%),
+    radial-gradient(ellipse 55% 45% at 95% 100%, var(--accent-glow) 0%, transparent 100%);
+  background-attachment: fixed;
+}
+
+/* ── 5. Auth page ─────────────────────────────────────────────── */
+.auth-page {
+  background-image:
+    radial-gradient(ellipse 90% 70% at 20% 10%, var(--accent-soft)  0%, transparent 65%),
+    radial-gradient(ellipse 70% 55% at 80% 90%, var(--accent-glow)  0%, transparent 65%);
+  background-attachment: fixed;
+}
+
+.auth-card {
+  border-radius: var(--r-2xl);
+  box-shadow:
+    var(--shadow-lg),
+    inset 0 1px 0 rgba(255,255,255,0.07),
+    inset 0 -1px 0 rgba(0,0,0,0.08);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+}
+
+.auth-btn {
+  border-radius: var(--r-md);
+  min-height: 44px;
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  box-shadow: 0 4px 14px var(--accent-soft);
+  transition: opacity 0.12s, transform 0.15s cubic-bezier(0.34,1.4,0.64,1), box-shadow 0.15s;
+}
+.auth-btn:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px var(--accent-soft);
+}
+.auth-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.97) !important;
+}
+
+.field-input {
+  border-radius: var(--r-md);
+}
+.field-input:focus {
+  box-shadow: 0 0 0 4px var(--accent-glow), 0 0 0 1px var(--accent-border);
+}
+
+/* ── 6. Sidebar ───────────────────────────────────────────────── */
+.sidebar {
+  border-right: 1px solid var(--line-md);
+  box-shadow: 1px 0 0 0 var(--line);
+}
+
+.sidebar-logo {
+  padding: 22px 16px 18px;
+}
+
+/* Active item — pill with inner ring */
+.sidebar-item.active,
+a.sidebar-item.active {
+  box-shadow: inset 0 0 0 1px var(--accent-border);
+  font-weight: 600;
+}
+
+/* Hover refinement */
+.sidebar-item:hover:not(.active),
+a.sidebar-item:hover:not(.active) {
+  background: var(--raised);
+  color: var(--text);
+}
+
+.sidebar-footer {
+  padding: 12px 10px 18px;
+  border-top: 1px solid var(--line-md);
+}
+
+/* ── 7. Calendar wrap ─────────────────────────────────────────── */
+.calendar-wrap {
+  border-radius: var(--r-2xl);
+  box-shadow: var(--shadow);
+  padding: 20px 18px 16px;
+  border: 1px solid var(--line-md);
+  backdrop-filter: var(--blur-sm);
+  -webkit-backdrop-filter: var(--blur-sm);
+}
+
+/* Month header */
+.calendar-month {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+
+/* Nav pills */
+.cal-nav {
+  width: 32px;
+  height: 32px;
+  border-radius: 99px;
+  font-size: 17px;
+  border: 1px solid var(--line-md);
+  transition: all 0.16s cubic-bezier(0.4,0,0.2,1);
+}
+.cal-nav:hover {
+  border-color: var(--line-hi);
+  background: var(--raised);
+  transform: scale(1.08);
+}
+.cal-nav:active { transform: scale(0.92); }
+
+/* Day cells — rounder, spring hover */
+.cal-day {
+  border-radius: var(--r-md);
+  border: 1px solid var(--line-md);
+  transition:
+    background 0.12s,
+    border-color 0.12s,
+    transform 0.18s cubic-bezier(0.34,1.56,0.64,1),
+    box-shadow 0.15s;
+}
+.cal-day:hover {
+  background: var(--raised);
+  border-color: var(--line-hi);
+  transform: scale(1.08);
+  box-shadow: var(--shadow-sm);
+  z-index: 2;
+  position: relative;
+}
+.cal-day:active { transform: scale(0.96); transition-duration: 0.08s; }
+
+/* Selected — glow ring */
+.cal-day.selected {
+  box-shadow:
+    0 0 0 1px var(--accent-border),
+    0 4px 14px var(--accent-glow) !important;
+}
+
+/* Today dot — accent ring */
+.cal-day.today:not(.selected) {
+  border-color: var(--accent-border);
+}
+
+/* Legend dots — rounder */
+.legend-dot {
+  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+}
+.cal-legend {
+  gap: 14px;
+  margin-top: 14px;
+  padding-top: 12px;
+}
+
+/* ── 8. Panel area ───────────────────────────────────────────── */
+.panel-area {
+  border-left: 1px solid var(--line-md);
+}
+
+.panel-header {
+  padding: 22px 18px 16px;
+}
+
+.panel-date {
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  margin-bottom: 7px;
+}
+.panel-count {
+  font-size: 22px;
+  letter-spacing: -0.9px;
+  margin-bottom: 12px;
+}
+.panel-count span {
+  font-size: 14.5px;
+}
+.progress-track {
+  height: 4px;
+  border-radius: 99px;
+}
+.panel-score-label {
+  font-size: 11.5px;
+  margin-top: 7px;
+}
+
+/* ── 9. Task items — slide-in + card hover ───────────────────── */
+.task-item {
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  transition: background 0.14s, border-color 0.14s, transform 0.20s cubic-bezier(0.4,0,0.2,1);
+}
+.task-item:hover {
+  background: var(--raised);
+  border-color: var(--line);
+  transform: translateX(3px);
+}
+
+.task-item.task-positive { border-left: 2.5px solid rgba(59,130,246,0.40); }
+.task-item.task-negative { border-left: 2.5px solid rgba(248,113,113,0.40); }
+
+/* Checkbox — spring scale */
+.task-checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  transition: background 0.14s, border-color 0.14s, transform 0.16s cubic-bezier(0.34,1.56,0.64,1);
+}
+.task-checkbox:hover { transform: scale(1.12); }
+.task-checkbox.checked { transform: scale(1); }
+
+.task-outcome {
+  border-radius: 99px;
+  padding: 2px 9px;
+  font-size: 10px;
+  letter-spacing: 0.1px;
+}
+
+/* Task edit input — rounder */
+.task-edit-input {
+  border-radius: var(--r-sm);
+}
+
+/* Delete confirm */
+.delete-confirm {
+  border-radius: var(--r-sm);
+}
+.confirm-yes, .confirm-no {
+  border-radius: var(--r-xs);
+}
+
+/* ── 10. Add button ──────────────────────────────────────────── */
+.add-btn {
+  border-radius: var(--r-lg);
+  padding: 10px 14px;
+  font-size: 13.5px;
+  gap: 8px;
+  border-style: dashed;
+  transition: all 0.18s cubic-bezier(0.4,0,0.2,1);
+}
+.add-btn:hover {
+  background: var(--accent-glow);
+  border-color: var(--accent-border);
+  border-style: solid;
+  color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+.add-btn:active { transform: scale(0.98); }
+
+/* ── 11. Primary + ghost buttons ─────────────────────────────── */
+.btn-primary {
+  border-radius: var(--r-md);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  transition: opacity 0.12s, transform 0.15s cubic-bezier(0.34,1.3,0.64,1), box-shadow 0.15s;
+  box-shadow: 0 2px 8px var(--accent-soft);
+}
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.90;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px var(--accent-soft);
+}
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.97) !important;
+  box-shadow: none;
+}
+
+.btn-ghost {
+  border-radius: var(--r-md);
+  font-size: 13.5px;
+  transition: all 0.14s;
+}
+.btn-ghost:hover {
+  background: var(--raised);
+  color: var(--text);
+  border-color: var(--line-md);
+}
+.btn-ghost:active { transform: scale(0.97); }
+
+/* ── 12. Add form inputs ─────────────────────────────────────── */
+.add-input {
+  border-radius: var(--r-md);
+  padding: 9px 12px;
+}
+.add-input:focus {
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+/* Recurrence toggle */
+.recurrence-toggle-row {
+  border-radius: var(--r-md);
+  padding: 8px 12px;
+}
+
+/* Type toggle */
+.type-toggle { border-radius: var(--r-md); padding: 3px; }
+.type-btn { border-radius: var(--r); }
+
+/* ── 13. Streak bar ───────────────────────────────────────────── */
+.streak-bar {
+  border-radius: var(--r-xl);
+  padding: 9px 16px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--line-md);
+  backdrop-filter: var(--blur-sm);
+  -webkit-backdrop-filter: var(--blur-sm);
+}
+
+.streak-bar-count { font-size: 19px; }
+.streak-bar-label { font-size: 12.5px; }
+
+.streak-dot {
+  width: 8px;
+  height: 8px;
+  transition: background 0.2s, transform 0.2s;
+}
+.streak-dot.done {
+  transform: scale(1.18);
+  box-shadow: 0 0 4px rgba(74,222,128,0.50);
+}
+.streak-dot.today {
+  box-shadow: 0 0 0 2px var(--accent);
+  background: var(--line-md);
+  width: 9px;
+  height: 9px;
+}
+.streak-dots { gap: 6px; }
+
+/* ── 14. Dashboard cards ──────────────────────────────────────── */
+.dash-card {
+  border-radius: var(--r-xl);
+  transition:
+    transform 0.22s cubic-bezier(0.34,1.3,0.64,1),
+    box-shadow 0.22s,
+    border-color 0.15s;
+}
+.dash-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--line-md);
+}
+.dash-card-value {
+  font-size: 30px;
+  letter-spacing: -1.2px;
+}
+.dash-card-label { font-size: 10.5px; letter-spacing: 0.6px; }
+
+/* ── 15. Gráficos ────────────────────────────────────────────── */
+.chart-card {
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-sm);
+}
+.chart-summary-card {
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s cubic-bezier(0.34,1.3,0.64,1), box-shadow 0.2s;
+}
+.chart-summary-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+.chart-tooltip {
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-md);
+  background: var(--elevated);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+}
+
+/* ── 16. Settings cards ──────────────────────────────────────── */
+.cfg-card {
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.cfg-row-icon {
+  border-radius: var(--r-md);
+  width: 32px;
+  height: 32px;
+}
+.cfg-lang-btn {
+  border-radius: var(--r-lg);
+  padding: 11px 14px;
+}
+.cfg-lang-code {
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+.cfg-time-input { border-radius: var(--r-md); }
+.cfg-btn-export { border-radius: var(--r-lg); }
+.cfg-btn-accent { border-radius: var(--r-lg); }
+.cfg-toggle { border-radius: 99px; }
+
+/* ── 17. Conta page ──────────────────────────────────────────── */
+.conta-card {
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-sm);
+  padding: 20px 20px;
+}
+.conta-avatar--lg {
+  width: 64px;
+  height: 64px;
+  font-size: 22px;
+}
+.conta-action-row {
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-sm);
+}
+.conta-logout-row {
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-sm);
+}
+.conta-form {
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-sm);
+}
+.conta-input {
+  border-radius: var(--r-md);
+  background: var(--raised);
+}
+.conta-btn-cancel { border-radius: var(--r-md); }
+.conta-btn-save   { border-radius: var(--r-md); }
+.conta-edit-btn   { border-radius: var(--r-md); }
+.conta-btn-logout { border-radius: var(--r-md); }
+.conta-photo-bar  { border-radius: var(--r-lg); }
+
+/* ── 18. Recurring tasks ─────────────────────────────────────── */
+.template-form-wrapper {
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-sm);
+}
+.template-card {
+  border-radius: var(--r-lg);
+  transition: background 0.14s, border-color 0.14s, transform 0.20s cubic-bezier(0.4,0,0.2,1), box-shadow 0.20s;
+}
+.template-card:hover {
+  background: var(--raised);
+  border-color: var(--line-md);
+  transform: translateX(4px);
+  box-shadow: var(--shadow-sm);
+}
+.weekday-btn {
+  border-radius: var(--r-sm);
+  min-height: 34px;
+  padding: 6px 12px;
+}
+.weekday-btn.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+
+/* ── 19. Theme cards ─────────────────────────────────────────── */
+.theme-card {
+  border-radius: var(--r-xl);
+  transition: transform 0.22s cubic-bezier(0.34,1.3,0.64,1), box-shadow 0.22s, border-color 0.15s;
+}
+.theme-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+.theme-card.active {
+  box-shadow: 0 0 0 1px var(--accent), 0 4px 16px var(--accent-soft);
+}
+
+/* ── 20. Typography — refined hierarchy ─────────────────────── */
+.page-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.7px;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.page-sub {
+  font-size: 13.5px;
+  line-height: 1.45;
+  margin-bottom: 18px;
+}
+.settings-section-title {
+  font-size: 10.5px;
+  letter-spacing: 0.9px;
+  margin-bottom: 10px;
+}
+.inner-page { padding: 32px 36px; }
+.inner-page-header { margin-bottom: 28px; }
+
+/* ── 21. Mobile overrides ────────────────────────────────────── */
+@media (max-width: 768px) {
+  .inner-page { padding: 20px 16px; }
+
+  /* Sidebar overlay — glass */
+  .sidebar {
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+  }
+  .sidebar--open {
+    box-shadow: var(--shadow-lg) !important;
+  }
+  .sidebar-backdrop {
+    background: rgba(0,0,0,0.52) !important;
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+  }
+
+  /* Sticky panel footer — glass */
+  .panel-footer {
+    backdrop-filter: var(--blur-sm);
+    -webkit-backdrop-filter: var(--blur-sm);
+    border-top: 1px solid var(--line-md);
+  }
+
+  /* Calendar on mobile */
+  .calendar-wrap { padding: 14px 12px 10px; }
+  .cal-day { border-radius: var(--r); min-height: 40px; }
+
+  /* Disable hover transforms on touch (avoids stuck states) */
+  .dash-card:hover       { transform: none; }
+  .chart-summary-card:hover { transform: none; }
+  .theme-card:hover      { transform: none; }
+  .template-card:hover   { transform: none; box-shadow: none; }
+  .task-item:hover       { transform: none; }
+  .cal-day:hover         { transform: scale(1.04); }
+  .add-btn:hover         { transform: none; }
+  .btn-primary:hover:not(:disabled) { transform: none; }
+
+  /* Mobile topbar */
+  .mobile-topbar {
+    border-bottom: 1px solid var(--line-md);
+    padding: 11px 16px;
+  }
+
+  /* Page title compact */
+  .page-title { font-size: 16px; }
+  .page-sub   { font-size: 12px; margin-bottom: 10px; }
+  .inner-page-header { margin-bottom: 18px; }
+
+  /* Streak bar compact */
+  .streak-bar { padding: 8px 12px; border-radius: var(--r-lg); }
+
+  /* Dashboard */
+  .dash-card-value { font-size: 24px; }
+}
+
+@media (max-width: 480px) {
+  .dash-cards-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .dash-card { padding: 14px; }
+  .dash-card-value { font-size: 22px; }
+  .chart-summary-grid { grid-template-columns: 1fr 1fr; }
+  .chart-summary-grid > :last-child { grid-column: 1 / -1; }
+}
