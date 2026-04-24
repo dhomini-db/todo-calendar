@@ -1,7 +1,9 @@
-import { useQuery } from '@tanstack/react-query'
-import { getSocialRankings } from '../api/tasks'
+import { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { getSocialRankings, followUser, unfollowUser } from '../api/tasks'
 import { useLanguage } from '../contexts/LanguageContext'
 import { useAuth } from '../contexts/AuthContext'
+import UserProfileModal from '../components/UserProfileModal'
 import type { UserRanking } from '../types'
 
 function Medal({ rank }: { rank: number }) {
@@ -19,23 +21,75 @@ function IconFlame() {
   )
 }
 
-function RankCard({ user, isMe }: { user: UserRanking; isMe: boolean }) {
+// ── Follow button (inline, in the rank card) ───────────────────
+
+interface FollowBtnProps { userId: number; isFollowing: boolean; disabled?: boolean }
+
+function FollowBtn({ userId, isFollowing, disabled }: FollowBtnProps) {
+  const { t } = useLanguage()
+  const queryClient = useQueryClient()
+  const [optimistic, setOptimistic] = useState<boolean | null>(null)
+
+  const following = optimistic !== null ? optimistic : isFollowing
+
+  const followMut = useMutation({
+    mutationFn: () => followUser(userId),
+    onMutate: () => setOptimistic(true),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['social', 'rankings'] }); setOptimistic(null) },
+    onError: () => setOptimistic(null),
+  })
+  const unfollowMut = useMutation({
+    mutationFn: () => unfollowUser(userId),
+    onMutate: () => setOptimistic(false),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['social', 'rankings'] }); setOptimistic(null) },
+    onError: () => setOptimistic(null),
+  })
+
+  const pending = followMut.isPending || unfollowMut.isPending
+
+  return (
+    <button
+      className={`rank-follow-btn${following ? ' rank-follow-btn--following' : ''}`}
+      onClick={e => { e.stopPropagation(); if (following) unfollowMut.mutate(); else followMut.mutate() }}
+      disabled={disabled || pending}
+      title={following ? t('social.unfollow') : t('social.follow')}
+    >
+      {pending ? '…' : following ? t('social.following') : t('social.follow')}
+    </button>
+  )
+}
+
+// ── Rank card ──────────────────────────────────────────────────
+
+interface RankCardProps {
+  user: UserRanking
+  isMe: boolean
+  onClick: () => void
+}
+
+function RankCard({ user, isMe, onClick }: RankCardProps) {
   const { t } = useLanguage()
   const top3 = user.rank <= 3
 
   return (
-    <div className={`rank-card${top3 ? ' rank-card--top' : ''}${isMe ? ' rank-card--me' : ''}`}>
+    <div
+      className={`rank-card rank-card--clickable${top3 ? ' rank-card--top' : ''}${isMe ? ' rank-card--me' : ''}`}
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => e.key === 'Enter' && onClick()}
+    >
       <div className="rank-card-left">
         <div className="rank-position">
           <Medal rank={user.rank} />
         </div>
         <div
           className="rank-avatar"
-          style={{
-            background: `hsl(${(user.id * 47) % 360}, 55%, 45%)`,
-          }}
+          style={{ background: `hsl(${(user.id * 47) % 360}, 55%, 45%)` }}
         >
-          {user.initial}
+          {user.profileImageUrl
+            ? <img src={user.profileImageUrl} alt={user.name} className="rank-avatar-img" />
+            : user.initial}
         </div>
         <div className="rank-info">
           <p className="rank-name">
@@ -44,16 +98,24 @@ function RankCard({ user, isMe }: { user: UserRanking; isMe: boolean }) {
           </p>
           <p className="rank-best">
             {t('social.best')}: {user.bestStreak} {t('social.days')}
+            {user.followersCount > 0 && (
+              <span className="rank-followers-count"> · {user.followersCount} {t('social.followers')}</span>
+            )}
           </p>
         </div>
       </div>
 
-      <div className="rank-streak-wrap">
-        <span className="rank-streak-icon"><IconFlame /></span>
-        <div>
-          <p className="rank-streak-value">{user.currentStreak}</p>
-          <p className="rank-streak-label">{t('social.days')}</p>
+      <div className="rank-right">
+        <div className="rank-streak-wrap">
+          <span className="rank-streak-icon"><IconFlame /></span>
+          <div>
+            <p className="rank-streak-value">{user.currentStreak}</p>
+            <p className="rank-streak-label">{t('social.days')}</p>
+          </div>
         </div>
+        {!isMe && (
+          <FollowBtn userId={user.id} isFollowing={user.isFollowing} />
+        )}
       </div>
     </div>
   )
@@ -86,6 +148,7 @@ function RankSkeleton() {
 export default function SocialPage() {
   const { t } = useLanguage()
   const { user } = useAuth()
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
 
   const { data, isLoading, isError } = useQuery<UserRanking[]>({
     queryKey: ['social', 'rankings'],
@@ -100,13 +163,15 @@ export default function SocialPage() {
         <p className="page-sub">{t('social.sub')}</p>
       </div>
 
-      {/* Podium - top 3 highlight */}
+      {/* Podium - top 3 */}
       {data && data.length >= 3 && (
         <div className="social-podium">
           {/* 2nd */}
-          <div className="podium-item podium-item--2">
+          <div className="podium-item podium-item--2" onClick={() => setSelectedUserId(data[1].id)} style={{ cursor: 'pointer' }}>
             <div className="podium-avatar" style={{ background: `hsl(${(data[1].id * 47) % 360}, 55%, 45%)` }}>
-              {data[1].initial}
+              {data[1].profileImageUrl
+                ? <img src={data[1].profileImageUrl} alt={data[1].name} className="podium-avatar-img" />
+                : data[1].initial}
             </div>
             <p className="podium-name">{data[1].name}</p>
             <div className="podium-block podium-block--2">
@@ -115,10 +180,12 @@ export default function SocialPage() {
             </div>
           </div>
           {/* 1st */}
-          <div className="podium-item podium-item--1">
+          <div className="podium-item podium-item--1" onClick={() => setSelectedUserId(data[0].id)} style={{ cursor: 'pointer' }}>
             <div className="podium-crown">👑</div>
             <div className="podium-avatar podium-avatar--1" style={{ background: `hsl(${(data[0].id * 47) % 360}, 55%, 45%)` }}>
-              {data[0].initial}
+              {data[0].profileImageUrl
+                ? <img src={data[0].profileImageUrl} alt={data[0].name} className="podium-avatar-img" />
+                : data[0].initial}
             </div>
             <p className="podium-name">{data[0].name}</p>
             <div className="podium-block podium-block--1">
@@ -127,9 +194,11 @@ export default function SocialPage() {
             </div>
           </div>
           {/* 3rd */}
-          <div className="podium-item podium-item--3">
+          <div className="podium-item podium-item--3" onClick={() => setSelectedUserId(data[2].id)} style={{ cursor: 'pointer' }}>
             <div className="podium-avatar" style={{ background: `hsl(${(data[2].id * 47) % 360}, 55%, 45%)` }}>
-              {data[2].initial}
+              {data[2].profileImageUrl
+                ? <img src={data[2].profileImageUrl} alt={data[2].name} className="podium-avatar-img" />
+                : data[2].initial}
             </div>
             <p className="podium-name">{data[2].name}</p>
             <div className="podium-block podium-block--3">
@@ -167,6 +236,7 @@ export default function SocialPage() {
                 key={u.id}
                 user={u}
                 isMe={u.id === user?.userId}
+                onClick={() => setSelectedUserId(u.id)}
               />
             ))}
           </div>
@@ -180,6 +250,14 @@ export default function SocialPage() {
           <p className="social-info-text">{t('social.info')}</p>
         </div>
       </div>
+
+      {/* User profile modal */}
+      {selectedUserId !== null && (
+        <UserProfileModal
+          userId={selectedUserId}
+          onClose={() => setSelectedUserId(null)}
+        />
+      )}
     </div>
   )
 }

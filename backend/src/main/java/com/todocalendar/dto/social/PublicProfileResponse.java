@@ -1,13 +1,14 @@
 package com.todocalendar.dto.social;
 
-public record UserRankingResponse(
+public record PublicProfileResponse(
         Long    id,
         String  name,
         String  initial,
         int     currentStreak,
         int     bestStreak,
-        int     rank,
+        long    totalTasksCompleted,
         boolean isFollowing,
         long    followersCount,
+        long    followingCount,
         String  profileImageUrl
 ) {}

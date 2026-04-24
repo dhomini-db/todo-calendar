@@ -4925,3 +4925,273 @@ a.sidebar-item:hover:not(.active) {
   .podium-block--1 { min-width: 60px; padding: 10px 12px 12px; }
   .podium-block--2, .podium-block--3 { min-width: 52px; padding: 8px 10px 10px; }
 }
+
+/* ════════════════════════════════════════════════════════════════
+   RANK CARD UPDATES — follow button & avatar image
+   ════════════════════════════════════════════════════════════════ */
+
+.rank-card--clickable {
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.12s;
+}
+.rank-card--clickable:hover {
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  transform: translateY(-1px);
+}
+.rank-card--clickable:active { transform: translateY(0); }
+
+.rank-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.rank-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.rank-followers-count {
+  opacity: 0.75;
+}
+
+/* Inline follow button in rank card */
+.rank-follow-btn {
+  padding: 4px 12px;
+  border-radius: 99px;
+  border: 1.5px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, opacity 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.rank-follow-btn:hover:not(:disabled) {
+  background: var(--accent);
+  color: #fff;
+}
+.rank-follow-btn--following {
+  background: color-mix(in srgb, var(--accent) 14%, var(--raised));
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  color: var(--text-2);
+}
+.rank-follow-btn--following:hover:not(:disabled) {
+  background: color-mix(in srgb, #ef4444 12%, var(--raised));
+  border-color: #ef4444;
+  color: #ef4444;
+}
+.rank-follow-btn:disabled { opacity: 0.5; cursor: default; }
+
+/* Podium avatar images */
+.podium-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   USER PROFILE MODAL
+   ════════════════════════════════════════════════════════════════ */
+
+.upm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(3px);
+  z-index: 1300;
+  animation: upm-fade-in 0.18s ease;
+}
+@keyframes upm-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.upm-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1301;
+  width: min(420px, calc(100vw - 32px));
+  border-radius: 20px;
+  padding: 28px 24px 24px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid var(--line-md);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 0.5px var(--line-sm);
+  animation: upm-slide-in 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+@keyframes upm-slide-in {
+  from { opacity: 0; transform: translate(-50%, -46%) scale(0.94); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.upm-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: var(--raised);
+  border: 1px solid var(--line-md);
+  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-3);
+  transition: color 0.15s, background 0.15s;
+}
+.upm-close:hover { color: var(--text-1); background: var(--line-md); }
+
+/* Header */
+.upm-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.upm-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+.upm-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.upm-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-1);
+  margin: 0;
+}
+
+.upm-follow-counts {
+  font-size: 12.5px;
+  color: var(--text-3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.upm-dot { opacity: 0.5; }
+.upm-follow-counts strong { color: var(--text-2); font-weight: 600; }
+
+/* Stats */
+.upm-stats {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+.upm-stat {
+  flex: 1;
+  background: var(--raised);
+  border: 1px solid var(--line-sm);
+  border-radius: 12px;
+  padding: 12px 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.upm-stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-1);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1;
+}
+.upm-stat-label {
+  font-size: 10.5px;
+  color: var(--text-3);
+  margin: 0;
+  text-align: center;
+}
+
+/* Follow button (modal) */
+.upm-follow-btn {
+  width: 100%;
+  padding: 11px;
+  border-radius: 12px;
+  border: 1.5px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, background 0.15s, border-color 0.15s, color 0.15s;
+}
+.upm-follow-btn:hover:not(:disabled) { opacity: 0.85; }
+.upm-follow-btn--following {
+  background: color-mix(in srgb, var(--accent) 12%, var(--raised));
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  color: var(--text-2);
+}
+.upm-follow-btn--following:hover:not(:disabled) {
+  background: color-mix(in srgb, #ef4444 10%, var(--raised));
+  border-color: #ef4444;
+  color: #ef4444;
+}
+.upm-follow-btn:disabled { opacity: 0.5; cursor: default; }
+
+.upm-self-badge {
+  font-size: 12.5px;
+  color: var(--text-3);
+  background: var(--raised);
+  border: 1px solid var(--line-md);
+  border-radius: 99px;
+  padding: 6px 18px;
+}
+
+/* Loading / error states */
+.upm-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+  width: 100%;
+}
+.upm-avatar-skel {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+}
+.upm-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 0;
+  color: var(--text-3);
+  font-size: 13px;
+}

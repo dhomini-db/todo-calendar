@@ -35,6 +35,16 @@ const translations: Record<Lang, Record<string, string>> = {
     'social.best':           'Melhor',
     'social.empty':          'Nenhum usuário no ranking ainda',
     'social.info':           'O ranking é atualizado com base no streak atual de cada usuário. Complete suas tarefas diariamente para subir no ranking! 🚀',
+    'social.follow':         'Seguir',
+    'social.following':      'Seguindo',
+    'social.unfollow':       'Deixar de seguir',
+    'social.followers':      'seguidores',
+    'social.following_count':'seguindo',
+    'social.tasks_done':     'tarefas concluídas',
+    'social.streak_current': 'Streak atual',
+    'social.streak_best':    'Melhor streak',
+    'social.profile_title':  'Perfil',
+    'social.cant_follow_self': 'Esse é você!',
 
     // ── Common ─────────────────────────────────────────────────
     'common.save':       'Salvar',
@@ -327,6 +337,16 @@ const translations: Record<Lang, Record<string, string>> = {
     'social.best':           'Best',
     'social.empty':          'No users in the ranking yet',
     'social.info':           'Rankings update based on each user\'s current streak. Complete your daily tasks to climb the leaderboard! 🚀',
+    'social.follow':         'Follow',
+    'social.following':      'Following',
+    'social.unfollow':       'Unfollow',
+    'social.followers':      'followers',
+    'social.following_count':'following',
+    'social.tasks_done':     'tasks completed',
+    'social.streak_current': 'Current streak',
+    'social.streak_best':    'Best streak',
+    'social.profile_title':  'Profile',
+    'social.cant_follow_self': 'That\'s you!',
 
     // ── Common ─────────────────────────────────────────────────
     'common.save':       'Save',

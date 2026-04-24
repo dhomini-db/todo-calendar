@@ -1,12 +1,19 @@
 package com.todocalendar.service;
 
+import com.todocalendar.dto.social.PublicProfileResponse;
 import com.todocalendar.dto.social.UserRankingResponse;
+import com.todocalendar.entity.Follow;
 import com.todocalendar.entity.User;
+import com.todocalendar.repository.FollowRepository;
+import com.todocalendar.repository.TaskRepository;
 import com.todocalendar.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -14,35 +21,86 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SocialService {
 
-    private final UserRepository userRepository;
+    private final UserRepository   userRepository;
+    private final FollowRepository followRepository;
+    private final TaskRepository   taskRepository;
+
+    // ── Rankings ───────────────────────────────────────────────────────────────
 
     /**
-     * Returns the top 20 users ordered by currentStreak desc, bestStreak desc.
-     * Users with currentStreak = 0 are included at the bottom (natural sort order).
-     * Rank is 1-based.
+     * Top-20 global leaderboard with follow status for the requesting user.
      */
-    public List<UserRankingResponse> getGlobalRankings() {
+    public List<UserRankingResponse> getGlobalRankings(Long currentUserId) {
         List<User> topUsers = userRepository.findTop20ByOrderByCurrentStreakDescBestStreakDesc();
 
-        AtomicInteger rankCounter = new AtomicInteger(1);
+        // Fetch all IDs that currentUser follows in one query
+        Set<Long> followingIds = Set.copyOf(followRepository.findFollowingIdsByFollowerId(currentUserId));
+
+        AtomicInteger rank = new AtomicInteger(1);
         return topUsers.stream()
-                .map(user -> new UserRankingResponse(
-                        user.getId(),
-                        user.getName(),
-                        extractInitial(user.getName()),
-                        user.getCurrentStreak(),
-                        user.getBestStreak(),
-                        rankCounter.getAndIncrement()
+                .map(u -> new UserRankingResponse(
+                        u.getId(),
+                        u.getName(),
+                        extractInitial(u.getName()),
+                        u.getCurrentStreak(),
+                        u.getBestStreak(),
+                        rank.getAndIncrement(),
+                        followingIds.contains(u.getId()),
+                        followRepository.countByFollowingId(u.getId()),
+                        u.getProfileImageUrl()
                 ))
                 .collect(Collectors.toList());
     }
 
-    // ── Private helpers ────────────────────────────────────────────────────────
+    // ── Public Profile ─────────────────────────────────────────────────────────
+
+    public PublicProfileResponse getPublicProfile(Long profileUserId, Long currentUserId) {
+        User u = userRepository.findById(profileUserId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + profileUserId));
+
+        long completed  = taskRepository.countAllTimeCompletedByUser(profileUserId);
+        long followers  = followRepository.countByFollowingId(profileUserId);
+        long following  = followRepository.countByFollowerId(profileUserId);
+        boolean isFollowing = followRepository.existsByFollowerIdAndFollowingId(currentUserId, profileUserId);
+
+        return new PublicProfileResponse(
+                u.getId(),
+                u.getName(),
+                extractInitial(u.getName()),
+                u.getCurrentStreak(),
+                u.getBestStreak(),
+                completed,
+                isFollowing,
+                followers,
+                following,
+                u.getProfileImageUrl()
+        );
+    }
+
+    // ── Follow / Unfollow ──────────────────────────────────────────────────────
+
+    @Transactional
+    public void follow(Long followerId, Long followingId) {
+        if (followerId.equals(followingId)) return; // can't follow yourself
+
+        // Upsert — ignore if already following
+        if (!followRepository.existsByFollowerIdAndFollowingId(followerId, followingId)) {
+            User follower  = userRepository.getReferenceById(followerId);
+            User following = userRepository.getReferenceById(followingId);
+            Follow.FollowId id = new Follow.FollowId(followerId, followingId);
+            followRepository.save(Follow.builder().id(id).follower(follower).following(following).build());
+        }
+    }
+
+    @Transactional
+    public void unfollow(Long followerId, Long followingId) {
+        followRepository.deleteByFollowerIdAndFollowingId(followerId, followingId);
+    }
+
+    // ── Helpers ────────────────────────────────────────────────────────────────
 
     private String extractInitial(String name) {
-        if (name == null || name.isBlank()) {
-            return "?";
-        }
+        if (name == null || name.isBlank()) return "?";
         return String.valueOf(name.strip().charAt(0)).toUpperCase();
     }
 }

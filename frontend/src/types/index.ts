@@ -146,6 +146,22 @@ export interface UserRanking {
   currentStreak: number
   bestStreak: number
   rank: number
+  isFollowing: boolean
+  followersCount: number
+  profileImageUrl?: string | null
+}
+
+export interface PublicProfile {
+  id: number
+  name: string
+  initial: string
+  currentStreak: number
+  bestStreak: number
+  totalTasksCompleted: number
+  isFollowing: boolean
+  followersCount: number
+  followingCount: number
+  profileImageUrl?: string | null
 }
 
 // ── Autenticação ───────────────────────────────────────────────
