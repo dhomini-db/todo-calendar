@@ -89,7 +89,7 @@ export default function TaskItem({ task, date }: TaskItemProps) {
           <>
             <p className={`task-title ${task.completed ? 'done' : ''}`}>{task.title}</p>
             {task.description && <p className="task-desc">{task.description}</p>}
-            {isPending && isRecurring && (
+            {isPending && isRecurring && isPositive && (
               <span className="task-outcome pending">{t('cal.task.pending')}</span>
             )}
             {!isPending && (
