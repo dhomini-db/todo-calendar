@@ -163,9 +163,6 @@ const translations: Record<Lang, Record<string, string>> = {
     'graf.dist.none':          'Sem dados',
     'graf.dist.month':         'mês',
     'graf.dist.months':        'meses',
-    'graficos.tooltip.good':   'Bom desempenho',
-    'graficos.tooltip.avg':    'Desempenho médio',
-    'graficos.tooltip.low':    'Abaixo da meta',
 
     // ── Personalizar page ──────────────────────────────────────
     'appear.title':            'Personalizar',
