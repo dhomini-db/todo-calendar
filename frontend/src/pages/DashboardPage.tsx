@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, ReferenceLine,
+  BarChart, Bar, Cell,
 } from 'recharts'
 import type { TooltipProps } from 'recharts'
 import type { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent'
@@ -188,6 +189,162 @@ function PerformanceChart({ days, t }: { days: DailyScore[]; t: (k: string) => s
   )
 }
 
+// ── Activity heatmap ───────────────────────────────────────────
+
+function heatColor(pct: number | null): string {
+  if (pct === null) return 'var(--line-md)'
+  if (pct >= 70)   return '#4ade80'
+  if (pct >= 40)   return '#facc15'
+  return '#f87171'
+}
+
+function HeatmapSection({ days, t }: { days: DailyScore[]; t: (k: string) => string }) {
+  const hasAny = days.some(d => d.percentage !== null)
+  return (
+    <div className="settings-section">
+      <p className="settings-section-title">{t('dash.heatmap.title')}</p>
+      <div className="chart-card">
+        <div className="dash-heatmap">
+          {days.map((day, i) => (
+            <div
+              key={i}
+              className="dash-heatmap-cell"
+              style={{ background: heatColor(day.percentage) }}
+              title={
+                day.percentage !== null
+                  ? `${day.label} · ${day.percentage}%`
+                  : `${day.label} · ${t('common.no_data')}`
+              }
+            />
+          ))}
+        </div>
+        {hasAny && (
+          <div className="dash-heatmap-legend">
+            <span className="chart-legend-item">
+              <span className="chart-legend-dot" style={{ background: 'var(--line-md)' }} />
+              {t('graficos.legend.none')}
+            </span>
+            <span className="chart-legend-item">
+              <span className="chart-legend-dot" style={{ background: '#f87171' }} />
+              {t('graficos.legend.low')}
+            </span>
+            <span className="chart-legend-item">
+              <span className="chart-legend-dot" style={{ background: '#facc15' }} />
+              {t('graficos.legend.avg')}
+            </span>
+            <span className="chart-legend-item">
+              <span className="chart-legend-dot" style={{ background: '#4ade80' }} />
+              {t('graficos.legend.good')}
+            </span>
+          </div>
+        )}
+        {!hasAny && (
+          <p className="dash-chart-hint" style={{ textAlign: 'center', padding: '16px 0 4px' }}>
+            {t('dash.heatmap.empty')}
+          </p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── Weekday rhythm ─────────────────────────────────────────────
+
+function WeekdaySection({ days, t }: { days: DailyScore[]; t: (k: string) => string }) {
+  // Group by day of week (0 = Sun … 6 = Sat)
+  const sums: Record<number, { total: number; count: number }> =
+    Object.fromEntries([0,1,2,3,4,5,6].map(i => [i, { total: 0, count: 0 }]))
+
+  days.forEach(day => {
+    if (day.percentage === null || !day.date) return
+    // Use T12:00:00 to avoid UTC-offset off-by-one on the weekday
+    const wd = new Date(day.date + 'T12:00:00').getDay()
+    sums[wd].total  += day.percentage
+    sums[wd].count  += 1
+  })
+
+  const names = t('dash.weekdays').split(',')
+  const chartData = names.map((name, i) => ({
+    name: name.trim(),
+    avg:  sums[i].count > 0 ? Math.round(sums[i].total / sums[i].count) : null,
+    display: sums[i].count > 0 ? Math.round(sums[i].total / sums[i].count) : 0,
+    count: sums[i].count,
+  }))
+
+  if (chartData.every(d => d.avg === null)) return null
+
+  const best = chartData.reduce((a, b) =>
+    (a.avg ?? -1) >= (b.avg ?? -1) ? a : b
+  )
+
+  return (
+    <div className="settings-section">
+      <div className="dash-chart-header">
+        <p className="settings-section-title" style={{ margin: 0 }}>{t('dash.weekday.title')}</p>
+        {best.avg !== null && (
+          <span className="dash-trend-badge" style={{ color: scoreColor(best.avg) }}>
+            ★ {best.name}
+          </span>
+        )}
+      </div>
+      <div className="chart-card" style={{ marginTop: 10 }}>
+        <ResponsiveContainer width="100%" height={180}>
+          <BarChart
+            data={chartData}
+            barCategoryGap="30%"
+            margin={{ top: 8, right: 4, left: -12, bottom: 0 }}
+          >
+            <CartesianGrid vertical={false} stroke="var(--line)" strokeDasharray="4 4" />
+            <XAxis
+              dataKey="name"
+              tick={{ fill: 'var(--text-3)', fontSize: 12 }}
+              axisLine={false}
+              tickLine={false}
+            />
+            <YAxis
+              domain={[0, 100]}
+              tickFormatter={v => `${v}%`}
+              ticks={[0, 50, 100]}
+              tick={{ fill: 'var(--text-3)', fontSize: 11 }}
+              axisLine={false}
+              tickLine={false}
+              width={38}
+            />
+            <Tooltip
+              content={({ active, payload, label }) => {
+                if (!active || !payload?.length) return null
+                const d = payload[0].payload as typeof chartData[0]
+                return (
+                  <div className="chart-tooltip">
+                    <p className="chart-tooltip-month">{label}</p>
+                    <p className="chart-tooltip-value" style={{ color: scoreColor(d.avg) }}>
+                      {d.avg !== null ? `${d.avg}%` : t('common.no_data')}
+                    </p>
+                    {d.count > 0 && (
+                      <p className="chart-tooltip-label">{d.count} {t('dash.weekday.days')}</p>
+                    )}
+                  </div>
+                )
+              }}
+              cursor={{ fill: 'var(--raised)', radius: 4 }}
+            />
+            <Bar dataKey="display" radius={[5, 5, 0, 0]} maxBarSize={40}>
+              {chartData.map((entry, i) => (
+                <Cell
+                  key={i}
+                  fill={scoreColor(entry.avg)}
+                  fillOpacity={entry.avg === null ? 0.25 : 0.85}
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+        <p className="dash-chart-hint">{t('dash.weekday.hint')}</p>
+      </div>
+    </div>
+  )
+}
+
 // ── Loading skeleton ───────────────────────────────────────────
 
 function DashboardSkeleton() {
@@ -290,6 +447,12 @@ export default function DashboardPage() {
 
           {/* 30-day chart */}
           <PerformanceChart days={data.last30Days} t={t} />
+
+          {/* 30-day heatmap */}
+          <HeatmapSection days={data.last30Days} t={t} />
+
+          {/* Weekday rhythm */}
+          <WeekdaySection days={data.last30Days} t={t} />
         </>
       )}
     </div>

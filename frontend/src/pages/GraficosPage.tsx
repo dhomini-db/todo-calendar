@@ -54,9 +54,122 @@ function CustomTooltip({ active, payload, label }: TooltipProps<ValueType, NameT
   )
 }
 
-// ── Summary cards ──────────────────────────────────────────────
+// ── Annual insights cards ──────────────────────────────────────
 
 interface WithData { month: string; percentage: number }
+
+function annualTrend(data: MonthlyPerformance[], t: (k: string) => string): { label: string; color: string } {
+  const withData = data.filter((d): d is WithData => d.percentage !== null)
+  if (withData.length < 4) return { label: t('graf.trend.na'), color: 'var(--text-3)' }
+  const half = Math.floor(withData.length / 2)
+  const first = withData.slice(0, half).reduce((s, d) => s + d.percentage, 0) / half
+  const last  = withData.slice(-half).reduce((s, d) => s + d.percentage, 0) / half
+  const diff  = last - first
+  if (diff > 4)  return { label: t('graf.trend.up'),     color: '#4ade80' }
+  if (diff < -4) return { label: t('graf.trend.down'),   color: '#f87171' }
+  return              { label: t('graf.trend.stable'),  color: '#facc15' }
+}
+
+function InsightsSection({ data, t }: { data: MonthlyPerformance[]; t: (k: string) => string }) {
+  const withData = data.filter((d): d is WithData => d.percentage !== null)
+  if (!withData.length) return null
+
+  const recorded    = withData.length
+  const great       = withData.filter(d => d.percentage >= 70).length
+  const consistency = Math.round(withData.reduce((s, d) => s + d.percentage, 0) / withData.length)
+  const trend       = annualTrend(data, t)
+
+  const insights = [
+    {
+      label: t('graf.insights.recorded'),
+      value: `${recorded}/12`,
+      color: 'var(--accent)',
+      sub:   t('graf.insights.recorded.sub'),
+    },
+    {
+      label: t('graf.insights.great'),
+      value: String(great),
+      color: great > 0 ? '#4ade80' : 'var(--text-3)',
+      sub:   t('graficos.legend.good'),
+    },
+    {
+      label: t('graf.insights.consistency'),
+      value: `${consistency}%`,
+      color: barColor(consistency),
+      sub:   t('graf.insights.consistency.sub'),
+    },
+    {
+      label: t('graf.insights.trend'),
+      value: trend.label,
+      color: trend.color,
+      sub:   t('graf.insights.trend.sub'),
+    },
+  ]
+
+  return (
+    <div className="settings-section">
+      <p className="settings-section-title">{t('graf.insights.title')}</p>
+      <div className="graf-insights-grid">
+        {insights.map((ins, i) => (
+          <div key={i} className="graf-insight-card">
+            <p className="graf-insight-label">{ins.label}</p>
+            <p className="graf-insight-value" style={{ color: ins.color }}>{ins.value}</p>
+            <p className="graf-insight-sub">{ins.sub}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ── Distribution bars ──────────────────────────────────────────
+
+function DistributionSection({ data, t }: { data: MonthlyPerformance[]; t: (k: string) => string }) {
+  const withData = data.filter((d): d is WithData => d.percentage !== null)
+  if (!withData.length) return null
+
+  const total = data.length
+  const great = data.filter(d => d.percentage !== null && d.percentage >= 70).length
+  const avg   = data.filter(d => d.percentage !== null && d.percentage >= 40 && d.percentage < 70).length
+  const low   = data.filter(d => d.percentage !== null && d.percentage <  40).length
+  const none  = data.filter(d => d.percentage === null).length
+
+  const rows = [
+    { label: t('graf.dist.great'), count: great, color: '#4ade80' },
+    { label: t('graf.dist.avg'),   count: avg,   color: '#facc15' },
+    { label: t('graf.dist.low'),   count: low,   color: '#f87171' },
+    { label: t('graf.dist.none'),  count: none,  color: 'var(--line-md)' },
+  ]
+
+  return (
+    <div className="settings-section">
+      <p className="settings-section-title">{t('graf.dist.title')}</p>
+      <div className="chart-card">
+        <div className="graf-dist-list">
+          {rows.map((row, i) => (
+            <div key={i} className="graf-dist-row">
+              <span className="graf-dist-label">{row.label}</span>
+              <div className="graf-dist-track">
+                <div
+                  className="graf-dist-fill"
+                  style={{
+                    width:      `${(row.count / total) * 100}%`,
+                    background: row.color,
+                  }}
+                />
+              </div>
+              <span className="graf-dist-count">
+                {row.count} {row.count === 1 ? t('graf.dist.month') : t('graf.dist.months')}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Summary cards ──────────────────────────────────────────────
 
 function SummaryCards({ data }: { data: MonthlyPerformance[] }) {
   const { t } = useLanguage()
@@ -220,6 +333,12 @@ export default function GraficosPage() {
           <p className="chart-empty-desc">{t('graficos.empty.desc')}</p>
         </div>
       )}
+
+      {/* Annual insights */}
+      {data && !allEmpty && <InsightsSection data={data} t={t} />}
+
+      {/* Performance distribution */}
+      {data && !allEmpty && <DistributionSection data={data} t={t} />}
     </div>
   )
 }
