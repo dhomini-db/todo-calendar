@@ -119,6 +119,35 @@ export interface ChangePasswordRequest {
   confirmNewPassword: string
 }
 
+// ── IA / Chat ──────────────────────────────────────────────────
+
+export interface AiChatMessage {
+  role: 'user' | 'assistant'
+  content: string
+}
+
+export interface AiChatRequest {
+  message: string
+  history: AiChatMessage[]
+}
+
+export interface AiChatResponse {
+  response: string | null
+  success: boolean
+  error: string | null
+}
+
+// ── Social / Rankings ──────────────────────────────────────────
+
+export interface UserRanking {
+  id: number
+  name: string
+  initial: string
+  currentStreak: number
+  bestStreak: number
+  rank: number
+}
+
 // ── Autenticação ───────────────────────────────────────────────
 
 export interface AuthUser {

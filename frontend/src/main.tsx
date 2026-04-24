@@ -11,6 +11,8 @@ import GraficosPage       from './pages/GraficosPage'
 import ContaPage          from './pages/ContaPage'
 import PersonalizarPage   from './pages/PersonalizarPage'
 import ConfiguracoesPage  from './pages/ConfiguracoesPage'
+import SocialPage         from './pages/SocialPage'
+import RecorrentesPage    from './pages/RecorrentesPage'
 import { AuthProvider }     from './contexts/AuthContext'
 import { ThemeProvider }    from './contexts/ThemeContext'
 import { LanguageProvider } from './contexts/LanguageContext'
@@ -39,6 +41,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 <Route path="conta"             element={<ContaPage />} />
                 <Route path="personalizar"      element={<PersonalizarPage />} />
                 <Route path="configuracoes"     element={<ConfiguracoesPage />} />
+                <Route path="social"            element={<SocialPage />} />
+                <Route path="recorrentes"       element={<RecorrentesPage />} />
               </Route>
             </Routes>
           </BrowserRouter>

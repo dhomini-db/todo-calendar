@@ -56,6 +56,16 @@ function IconPalette() {
     </svg>
   )
 }
+function IconPeople() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+  )
+}
 function IconSettings() {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -184,6 +194,7 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         <NavItem to="/"          icon={<IconCalendar />} label={t('nav.calendar')}   end onClick={onMobileClose} />
         <NavItem to="/dashboard" icon={<IconGrid />}     label={t('nav.dashboard')}      onClick={onMobileClose} />
         <NavItem to="/graficos"  icon={<IconChart />}    label={t('nav.charts')}         onClick={onMobileClose} />
+        <NavItem to="/social"    icon={<IconPeople />}   label={t('nav.social')}         onClick={onMobileClose} />
 
         <p className="sidebar-section-label" style={{ marginTop: 12 }}>{t('nav.account')}</p>
         <NavItem to="/conta"         icon={<IconUser />}     label={t('nav.profile')}     onClick={onMobileClose} />

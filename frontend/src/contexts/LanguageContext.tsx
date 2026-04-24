@@ -12,9 +12,29 @@ const translations: Record<Lang, Record<string, string>> = {
     'nav.calendar':    'Calendário',
     'nav.dashboard':   'Dashboard',
     'nav.charts':      'Gráficos',
+    'nav.social':      'Social',
     'nav.profile':     'Meu Perfil',
     'nav.appearance':  'Aparência',
     'nav.settings':    'Configurações',
+
+    // ── IA ─────────────────────────────────────────────────────
+    'ai.panel_title':  'TaskFlow AI',
+    'ai.sub':          'Assistente de produtividade',
+    'ai.greeting':     '👋 Olá! Como posso ajudar sua produtividade hoje?',
+    'ai.placeholder':  'Pergunte algo...',
+    'ai.send':         'Enviar',
+    'ai.error':        'Erro ao processar sua mensagem',
+    'ai.conn_error':   'Erro de conexão com o assistente',
+
+    // ── Social ─────────────────────────────────────────────────
+    'social.title':          'Social',
+    'social.sub':            'Ranking global de streaks',
+    'social.rankings_title': 'Ranking de Streaks',
+    'social.you':            'Você',
+    'social.days':           'dias',
+    'social.best':           'Melhor',
+    'social.empty':          'Nenhum usuário no ranking ainda',
+    'social.info':           'O ranking é atualizado com base no streak atual de cada usuário. Complete suas tarefas diariamente para subir no ranking! 🚀',
 
     // ── Common ─────────────────────────────────────────────────
     'common.save':       'Salvar',
@@ -284,9 +304,29 @@ const translations: Record<Lang, Record<string, string>> = {
     'nav.calendar':    'Calendar',
     'nav.dashboard':   'Dashboard',
     'nav.charts':      'Charts',
+    'nav.social':      'Social',
     'nav.profile':     'My Profile',
     'nav.appearance':  'Appearance',
     'nav.settings':    'Settings',
+
+    // ── AI ─────────────────────────────────────────────────────
+    'ai.panel_title':  'TaskFlow AI',
+    'ai.sub':          'Productivity assistant',
+    'ai.greeting':     '👋 Hi! How can I help your productivity today?',
+    'ai.placeholder':  'Ask something...',
+    'ai.send':         'Send',
+    'ai.error':        'Error processing your message',
+    'ai.conn_error':   'Connection error with the assistant',
+
+    // ── Social ─────────────────────────────────────────────────
+    'social.title':          'Social',
+    'social.sub':            'Global streak rankings',
+    'social.rankings_title': 'Streak Rankings',
+    'social.you':            'You',
+    'social.days':           'days',
+    'social.best':           'Best',
+    'social.empty':          'No users in the ranking yet',
+    'social.info':           'Rankings update based on each user\'s current streak. Complete your daily tasks to climb the leaderboard! 🚀',
 
     // ── Common ─────────────────────────────────────────────────
     'common.save':       'Save',

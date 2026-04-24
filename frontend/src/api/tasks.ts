@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { Task, TaskRequest, DaySummary, AuthResponse, LoginRequest, RegisterRequest, TaskTemplate, TaskTemplateRequest, StreakData, UserProfile, UpdateProfileRequest, ChangePasswordRequest, MonthlyPerformance, DashboardStats } from '../types'
+import type { Task, TaskRequest, DaySummary, AuthResponse, LoginRequest, RegisterRequest, TaskTemplate, TaskTemplateRequest, StreakData, UserProfile, UpdateProfileRequest, ChangePasswordRequest, MonthlyPerformance, DashboardStats, AiChatRequest, AiChatResponse, UserRanking } from '../types'
 
 /**
  * Em dev  → Vite proxy redireciona /api para localhost:8081 (sem CORS)
@@ -134,3 +134,13 @@ export const getMonthlyPerformance = (): Promise<MonthlyPerformance[]> =>
 
 export const getStreak = (): Promise<StreakData> =>
   api.get<StreakData>('/streak').then(r => r.data)
+
+// ── IA / Chat ──────────────────────────────────────────────────
+
+export const sendAiMessage = (data: AiChatRequest): Promise<AiChatResponse> =>
+  api.post<AiChatResponse>('/ai/chat', data).then(r => r.data)
+
+// ── Social ─────────────────────────────────────────────────────
+
+export const getSocialRankings = (): Promise<UserRanking[]> =>
+  api.get<UserRanking[]>('/social/rankings').then(r => r.data)
