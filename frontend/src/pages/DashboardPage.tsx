@@ -1,3 +1,4 @@
+import { useRef, useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
@@ -206,22 +207,42 @@ function heatColor(pct: number | null): string {
 }
 
 function HeatmapSection({ days, t }: { days: DailyScore[]; t: (k: string) => string }) {
-  const hasAny = days.some(d => d.percentage !== null)
+  const wrapRef = useRef<HTMLDivElement>(null)
+  // totalCols = how many week-columns fill the card width
+  const [totalCols, setTotalCols] = useState(20)
+
+  const hasAny   = days.some(d => d.percentage !== null)
+  const firstDow = days.length ? new Date(days[0].date + 'T12:00:00').getDay() : 0
+  // minimum columns needed to hold the real data
+  const minDataCols = days.length ? Math.ceil((firstDow + days.length) / 7) : 5
+
+  useEffect(() => {
+    if (!wrapRef.current) return
+    const measure = () => {
+      const w = wrapRef.current!.clientWidth
+      // label col ≈ 27px + 5px gap = 32px; each week col = 13px cell + 3px gap = 16px
+      const cols = Math.max(Math.floor((w - 32) / 16), minDataCols + 2)
+      setTotalCols(cols)
+    }
+    measure()
+    const obs = new ResizeObserver(measure)
+    obs.observe(wrapRef.current)
+    return () => obs.disconnect()
+  }, [minDataCols])
+
   if (!days.length) return null
 
-  // ── Build week-column grid (GitHub contribution style) ────
-  // Pad so index 0 of the flat array = Sunday of the first week
-  const firstDow = new Date(days[0].date + 'T12:00:00').getDay() // 0=Sun … 6=Sat
+  // ── Build week-column grid filling the full card width ────
+  // Extra future neutral columns = whatever is left after data columns
+  const futureNulls = Math.max(0, totalCols - minDataCols) * 7
 
-  // After the real data, add 4 extra weeks of neutral future cells
-  const FUTURE_WEEKS = 4
   const padded: (DailyScore | null)[] = [
     ...Array<null>(firstDow).fill(null),
     ...days,
-    ...Array<null>(FUTURE_WEEKS * 7).fill(null),
+    ...Array<null>(futureNulls).fill(null),
   ]
   const numWeeks = Math.ceil(padded.length / 7)
-  while (padded.length < numWeeks * 7) padded.push(null) // fill trailing row
+  while (padded.length < numWeeks * 7) padded.push(null)
 
   // grid[dow][weekIdx]  (dow 0=Sun … 6=Sat)
   const grid: (DailyScore | null)[][] = Array.from({ length: 7 }, (_, dow) =>
@@ -235,7 +256,7 @@ function HeatmapSection({ days, t }: { days: DailyScore[]; t: (k: string) => str
     <div className="settings-section">
       <p className="settings-section-title">{t('dash.heatmap.title')}</p>
       <div className="chart-card">
-        <div className="dash-heatmap-wrap">
+        <div className="dash-heatmap-wrap" ref={wrapRef}>
           {/* Day-of-week labels */}
           <div className="dash-heatmap-ylabels">
             {Array.from({ length: 7 }, (_, i) => (

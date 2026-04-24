@@ -2244,7 +2244,8 @@ a.sidebar-item.active .sidebar-item-icon {
   display: flex;
   align-items: flex-start;
   gap: 5px;
-  overflow-x: auto;
+  overflow: hidden;
+  width: 100%;
   margin-bottom: 14px;
 }
 .dash-heatmap-ylabels {
