@@ -212,9 +212,13 @@ function HeatmapSection({ days, t }: { days: DailyScore[]; t: (k: string) => str
   // ── Build week-column grid (GitHub contribution style) ────
   // Pad so index 0 of the flat array = Sunday of the first week
   const firstDow = new Date(days[0].date + 'T12:00:00').getDay() // 0=Sun … 6=Sat
+
+  // After the real data, add 4 extra weeks of neutral future cells
+  const FUTURE_WEEKS = 4
   const padded: (DailyScore | null)[] = [
     ...Array<null>(firstDow).fill(null),
     ...days,
+    ...Array<null>(FUTURE_WEEKS * 7).fill(null),
   ]
   const numWeeks = Math.ceil(padded.length / 7)
   while (padded.length < numWeeks * 7) padded.push(null) // fill trailing row
