@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useLanguage } from '../contexts/LanguageContext'
 import { updateProfile, changePassword, uploadAvatar, removeAvatar } from '../api/tasks'
 import type { UpdateProfileRequest, ChangePasswordRequest } from '../types'
+import ImageCropper from '../components/ImageCropper'
 
 // ── Camera icon ────────────────────────────────────────────────
 
@@ -64,18 +65,19 @@ export default function ContaPage() {
 
   // ── Avatar upload state ────────────────────────────────────
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [pendingFile,  setPendingFile]  = useState<File | null>(null)
-  const [previewUrl,   setPreviewUrl]   = useState<string | null>(null)
-  const [avatarError,  setAvatarError]  = useState('')
+  const [pendingFile,   setPendingFile]   = useState<File | null>(null)
+  const [cropSrc,       setCropSrc]       = useState<string | null>(null)   // raw blob URL → cropper
+  const [previewUrl,    setPreviewUrl]    = useState<string | null>(null)   // cropped blob URL → preview
+  const [avatarError,   setAvatarError]   = useState('')
 
+  // 1. User picks a file → open cropper
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    // Reset input so the same file can be re-selected after cancel
-    e.target.value = ''
+    e.target.value = ''  // allow re-selecting same file
 
-    if (file.size > 2 * 1024 * 1024) {
-      setAvatarError('Arquivo muito grande. Máximo 2 MB.')
+    if (file.size > 10 * 1024 * 1024) {
+      setAvatarError('Arquivo muito grande. Máximo 10 MB.')
       return
     }
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
@@ -84,10 +86,24 @@ export default function ContaPage() {
     }
 
     setAvatarError('')
-    setPendingFile(file)
-    const url = URL.createObjectURL(file)
-    setPreviewUrl(url)
+    setCropSrc(URL.createObjectURL(file))   // open cropper
   }, [])
+
+  // 2. Cropper confirms → get cropped blob
+  function handleCropDone(blob: Blob) {
+    if (cropSrc) URL.revokeObjectURL(cropSrc)
+    setCropSrc(null)
+
+    const croppedFile = new File([blob], 'avatar.jpg', { type: 'image/jpeg' })
+    setPendingFile(croppedFile)
+    setPreviewUrl(URL.createObjectURL(blob))
+  }
+
+  // 2b. Cropper cancelled
+  function handleCropCancel() {
+    if (cropSrc) URL.revokeObjectURL(cropSrc)
+    setCropSrc(null)
+  }
 
   function cancelPhotoUpload() {
     if (previewUrl) URL.revokeObjectURL(previewUrl)
@@ -204,6 +220,14 @@ export default function ContaPage() {
 
   return (
     <div className="inner-page">
+      {/* Cropper modal — shown right after file selection */}
+      {cropSrc && (
+        <ImageCropper
+          src={cropSrc}
+          onCrop={handleCropDone}
+          onCancel={handleCropCancel}
+        />
+      )}
       <div className="inner-page-header">
         <h1 className="page-title">{t('conta.title')}</h1>
         <p className="page-sub">{t('conta.sub')}</p>

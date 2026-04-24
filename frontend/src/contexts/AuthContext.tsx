@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react'
 import type { AuthUser, AuthResponse } from '../types'
+import { getProfile } from '../api/tasks'
 
 interface AuthContextValue {
   user: AuthUser | null
@@ -53,6 +54,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(null)
     setUser(null)
   }, [])
+
+  // ── Sync: refresh profile from server on every app load ──────
+  // Ensures that a photo updated on another device/browser is picked up
+  // immediately without needing to re-login.
+  useEffect(() => {
+    const storedToken = localStorage.getItem('token')
+    if (!storedToken) return
+    getProfile()
+      .then(profile => {
+        setUser(prev => {
+          if (!prev) return prev
+          const updated: AuthUser = {
+            ...prev,
+            name:            profile.name,
+            email:           profile.email,
+            profileImageUrl: profile.profileImageUrl ?? null,
+          }
+          localStorage.setItem('user', JSON.stringify(updated))
+          return updated
+        })
+      })
+      .catch(() => { /* silently ignore — offline or token expired */ })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])   // run once on mount
 
   return (
     <AuthContext.Provider value={{ user, token, saveAuth, updateUser, logout, isAuthenticated: !!token }}>

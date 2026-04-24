@@ -1653,6 +1653,63 @@ a.sidebar-item.active .sidebar-item-icon {
   display: block;
 }
 
+/* ── Image Cropper modal ─────────────────────────────────────── */
+.cropper-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 900;
+  padding: 20px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.cropper-modal {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl, 16px);
+  padding: 24px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+}
+.cropper-title {
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--text);
+  letter-spacing: -0.2px;
+  margin: 0;
+}
+.cropper-hint {
+  font-size: 12px;
+  color: var(--text-2);
+  margin: -6px 0 0;
+  text-align: center;
+}
+.cropper-canvas {
+  border-radius: 50%;
+  display: block;
+  /* Scale down on very small screens while keeping aspect ratio */
+  width: min(300px, calc(100vw - 80px));
+  height: min(300px, calc(100vw - 80px));
+  user-select: none;
+  -webkit-user-select: none;
+  transition: opacity 0.2s ease;
+}
+.cropper-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
 /* ── Placeholder action list ─────────────────────────────── */
 .placeholder-actions {
   background: var(--elevated);
