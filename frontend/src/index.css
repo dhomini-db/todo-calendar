@@ -2284,10 +2284,9 @@ a.sidebar-item.active .sidebar-item-icon {
   opacity: 0.65;
 }
 .dash-heatmap-cell--pad {
-  background: var(--raised) !important;
+  background: var(--line-md) !important;
   cursor: default;
   pointer-events: none;
-  opacity: 0.5;
 }
 .dash-heatmap-legend {
   display: flex;
