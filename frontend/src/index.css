@@ -2962,9 +2962,13 @@ a.sidebar-item.active::before {
     flex-direction: column;
     height: 100dvh;
     overflow: hidden;
-    /* safe area lateral e inferior para iPhones com notch/Dynamic Island */
-    padding-left:  env(safe-area-inset-left,  0px);
-    padding-right: env(safe-area-inset-right, 0px);
+    /* Safe areas para iPhones com notch / Dynamic Island.
+       padding-top empurra TODO o conteúdo abaixo da barra de status —
+       isso é a solução mais robusta em vez de depender só do topbar. */
+    padding-top:    env(safe-area-inset-top,    0px);
+    padding-left:   env(safe-area-inset-left,   0px);
+    padding-right:  env(safe-area-inset-right,  0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   /* ── Sidebar becomes a fixed overlay drawer ── */
@@ -3014,18 +3018,13 @@ a.sidebar-item.active::before {
     display: flex;
     align-items: center;
     gap: 10px;
-    /* safe-area-inset-top empurra o conteúdo abaixo da barra de status
-       do sistema (onde fica o horário / Dynamic Island / notch).
-       viewport-fit=cover faz o app ir até a borda, por isso é obrigatório. */
-    padding-top: max(10px, env(safe-area-inset-top));
-    padding-bottom: 10px;
-    padding-left: 14px;
-    padding-right: 14px;
+    /* Safe area é tratada no .app-shell — aqui é só padding normal */
+    padding: 10px 14px;
     border-bottom: 1px solid var(--line);
     background: var(--surface);
     flex-shrink: 0;
     z-index: 50;
-    /* garante que o backdrop cobre também a área do safe-area */
+    /* backdrop glass */
     backdrop-filter: var(--blur-sm);
     -webkit-backdrop-filter: var(--blur-sm);
   }
