@@ -47,7 +47,7 @@ function ThemeCard({ t, active, onSelect }: { t: ThemeOption; active: boolean; o
     <button
       className={`theme-card${active ? ' active' : ''}`}
       onClick={onSelect}
-      title={t.description}
+      title={translate(t.description)}
     >
       {/* Preview swatch */}
       <div className="theme-preview" style={{ background: t.bg }}>
@@ -74,7 +74,7 @@ function ThemeCard({ t, active, onSelect }: { t: ThemeOption; active: boolean; o
           <span className="theme-card-label">{t.label}</span>
           {active && <span className="theme-card-badge">{translate('appear.active')}</span>}
         </div>
-        <span className="theme-card-desc">{t.description}</span>
+        <span className="theme-card-desc">{translate(t.description)}</span>
       </div>
 
       {/* Color dot */}

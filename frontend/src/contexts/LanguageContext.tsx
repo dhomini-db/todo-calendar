@@ -170,6 +170,15 @@ const translations: Record<Lang, Record<string, string>> = {
     'appear.dark':             'Temas Escuros',
     'appear.light':            'Temas Claros',
     'appear.active':           'Ativo',
+    'theme.desc.amber-night':       'Escuro com acento azul',
+    'theme.desc.arctic':            'Escuro com acento ciano',
+    'theme.desc.tyrian-purple':     'Escuro com acento vinho',
+    'theme.desc.moss-velvet':       'Escuro com acento verde-musgo',
+    'theme.desc.midnight-espresso': 'Escuro com acento dourado',
+    'theme.desc.rose-dawn':         'Claro com acento rosado',
+    'theme.desc.banana-cream':      'Claro com acento vinho',
+    'theme.desc.blue-mirage':       'Claro com acento azul-aço',
+    'theme.desc.pistachio':         'Claro com acento verde-musgo',
 
     // ── Recorrentes page ───────────────────────────────────────
     'rec.title':               'Tarefas Recorrentes',
@@ -433,6 +442,15 @@ const translations: Record<Lang, Record<string, string>> = {
     'appear.dark':             'Dark Themes',
     'appear.light':            'Light Themes',
     'appear.active':           'Active',
+    'theme.desc.amber-night':       'Dark with blue accent',
+    'theme.desc.arctic':            'Dark with cyan accent',
+    'theme.desc.tyrian-purple':     'Dark with wine accent',
+    'theme.desc.moss-velvet':       'Dark with moss green accent',
+    'theme.desc.midnight-espresso': 'Dark with golden accent',
+    'theme.desc.rose-dawn':         'Light with rose accent',
+    'theme.desc.banana-cream':      'Light with wine accent',
+    'theme.desc.blue-mirage':       'Light with steel blue accent',
+    'theme.desc.pistachio':         'Light with moss green accent',
 
     // ── Recorrentes page ───────────────────────────────────────
     'rec.title':               'Recurring Tasks',
