@@ -2239,27 +2239,54 @@ a.sidebar-item.active .sidebar-item-icon {
   .dash-card-value { font-size: 22px; }
 }
 
-/* ── Dashboard heatmap ───────────────────────────────────── */
-.dash-heatmap {
-  display: grid;
-  grid-template-columns: repeat(10, 26px);
-  grid-auto-rows: 26px;
-  gap: 4px;
+/* ── Dashboard heatmap (GitHub-style) ───────────────────── */
+.dash-heatmap-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  overflow-x: auto;
   margin-bottom: 14px;
-  justify-content: start;
+}
+.dash-heatmap-ylabels {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+.dash-heatmap-ylabel {
+  height: 13px;
+  line-height: 13px;
+  font-size: 9px;
+  color: var(--text-3);
+  white-space: nowrap;
+  text-align: right;
+  min-width: 22px;
+}
+.dash-heatmap-weeks {
+  display: flex;
+  gap: 3px;
+}
+.dash-heatmap-week {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 .dash-heatmap-cell {
-  width: 26px;
-  height: 26px;
-  border-radius: 5px;
+  width: 13px;
+  height: 13px;
+  border-radius: 2px;
   cursor: help;
-  transition: transform 0.12s var(--ease-out), opacity 0.12s;
-  position: relative;
+  flex-shrink: 0;
+  transition: opacity 0.1s;
 }
 .dash-heatmap-cell:hover {
-  transform: scale(1.2);
-  opacity: 0.85;
-  z-index: 2;
+  opacity: 0.65;
+}
+.dash-heatmap-cell--pad {
+  background: transparent !important;
+  cursor: default;
+  pointer-events: none;
 }
 .dash-heatmap-legend {
   display: flex;

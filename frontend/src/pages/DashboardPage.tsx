@@ -207,24 +207,67 @@ function heatColor(pct: number | null): string {
 
 function HeatmapSection({ days, t }: { days: DailyScore[]; t: (k: string) => string }) {
   const hasAny = days.some(d => d.percentage !== null)
+  if (!days.length) return null
+
+  // ── Build week-column grid (GitHub contribution style) ────
+  // Pad so index 0 of the flat array = Sunday of the first week
+  const firstDow = new Date(days[0].date + 'T12:00:00').getDay() // 0=Sun … 6=Sat
+  const padded: (DailyScore | null)[] = [
+    ...Array<null>(firstDow).fill(null),
+    ...days,
+  ]
+  const numWeeks = Math.ceil(padded.length / 7)
+  while (padded.length < numWeeks * 7) padded.push(null) // fill trailing row
+
+  // grid[dow][weekIdx]  (dow 0=Sun … 6=Sat)
+  const grid: (DailyScore | null)[][] = Array.from({ length: 7 }, (_, dow) =>
+    Array.from({ length: numWeeks }, (_, w) => padded[w * 7 + dow])
+  )
+
+  // Row labels — show only Mon(1), Wed(3), Fri(5) like GitHub
+  const DOW_ALL = t('dash.weekdays').split(',').map(s => s.trim())
+
   return (
     <div className="settings-section">
       <p className="settings-section-title">{t('dash.heatmap.title')}</p>
       <div className="chart-card">
-        <div className="dash-heatmap">
-          {days.map((day, i) => (
-            <div
-              key={i}
-              className="dash-heatmap-cell"
-              style={{ background: heatColor(day.percentage) }}
-              title={
-                day.percentage !== null
-                  ? `${day.label} · ${day.percentage}%`
-                  : `${day.label} · ${t('common.no_data')}`
-              }
-            />
-          ))}
+        <div className="dash-heatmap-wrap">
+          {/* Day-of-week labels */}
+          <div className="dash-heatmap-ylabels">
+            {Array.from({ length: 7 }, (_, i) => (
+              <span key={i} className="dash-heatmap-ylabel">
+                {[1, 3, 5].includes(i) ? DOW_ALL[i] : ''}
+              </span>
+            ))}
+          </div>
+
+          {/* Week columns */}
+          <div className="dash-heatmap-weeks">
+            {Array.from({ length: numWeeks }, (_, w) => (
+              <div key={w} className="dash-heatmap-week">
+                {Array.from({ length: 7 }, (_, dow) => {
+                  const day = grid[dow][w]
+                  if (!day) return (
+                    <div key={dow} className="dash-heatmap-cell dash-heatmap-cell--pad" />
+                  )
+                  return (
+                    <div
+                      key={dow}
+                      className="dash-heatmap-cell"
+                      style={{ background: heatColor(day.percentage) }}
+                      title={
+                        day.percentage !== null
+                          ? `${day.label} · ${day.percentage}%`
+                          : `${day.label} · ${t('common.no_data')}`
+                      }
+                    />
+                  )
+                })}
+              </div>
+            ))}
+          </div>
         </div>
+
         {hasAny && (
           <div className="dash-heatmap-legend">
             <span className="chart-legend-item">
