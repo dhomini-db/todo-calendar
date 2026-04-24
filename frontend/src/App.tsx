@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
-import Sidebar from './components/Sidebar'
-import { useAuth } from './contexts/AuthContext'
+import Sidebar        from './components/Sidebar'
+import InstallPrompt  from './components/InstallPrompt'
+import OfflineBanner  from './components/OfflineBanner'
+import { useAuth }    from './contexts/AuthContext'
 import { useNotificationScheduler } from './hooks/useNotifications'
 
 function IconMenu() {
@@ -17,13 +19,17 @@ function IconMenu() {
 export default function App() {
   const { isAuthenticated } = useAuth()
   const [mobileOpen, setMobileOpen] = useState(false)
-  useNotificationScheduler() // fires daily reminder in background
+  useNotificationScheduler()
 
   if (!isAuthenticated) return <Navigate to="/login" replace />
 
   return (
     <div className="app-shell">
+      {/* ── PWA: offline indicator (top of viewport) */}
+      <OfflineBanner />
+
       <Sidebar mobileOpen={mobileOpen} onMobileClose={() => setMobileOpen(false)} />
+
       <div className="main-content">
         {/* Mobile top bar */}
         <div className="mobile-topbar">
@@ -34,6 +40,9 @@ export default function App() {
         </div>
         <Outlet />
       </div>
+
+      {/* ── PWA: install banner (bottom of viewport) */}
+      <InstallPrompt />
     </div>
   )
 }

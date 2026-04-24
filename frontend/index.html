@@ -2,9 +2,33 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
     <title>TaskFlow</title>
+    <meta name="description" content="Gerencie seus hábitos diários com inteligência. Acompanhe tarefas, streaks e desempenho." />
+
+    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- PWA — theme & status bar -->
+    <meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f2ede8" media="(prefers-color-scheme: light)" />
+
+    <!-- iOS PWA -->
+    <meta name="apple-mobile-web-app-capable"          content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title"            content="TaskFlow" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
+
+    <!-- Microsoft / Edge -->
+    <meta name="msapplication-TileColor" content="#111111" />
+    <meta name="msapplication-TileImage" content="/pwa-192x192.png" />
+
+    <!-- Open Graph (share preview) -->
+    <meta property="og:type"        content="website" />
+    <meta property="og:title"       content="TaskFlow" />
+    <meta property="og:description" content="Gerencie seus hábitos diários com inteligência." />
+    <meta property="og:image"       content="/pwa-512x512.png" />
   </head>
   <body>
     <div id="root"></div>

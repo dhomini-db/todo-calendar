@@ -226,6 +226,18 @@ const translations: Record<Lang, Record<string, string>> = {
     'cal.task.habit_done':     'Hábito realizado',
     'cal.task.check':          'Marcar',
     'cal.task.uncheck':        'Desmarcar',
+
+    // ── PWA ────────────────────────────────────────────────────
+    'pwa.install.title':  'Instalar TaskFlow',
+    'pwa.install.desc':   'Adicione à tela inicial para acesso rápido',
+    'pwa.install.btn':    'Instalar',
+    'pwa.install.later':  'Agora não',
+    'pwa.ios.title':      'Adicionar à tela inicial:',
+    'pwa.ios.step1':      'Toque em "Compartilhar"',
+    'pwa.ios.step2':      'Selecione "Adicionar à Tela Inicial"',
+    'pwa.ios.step3':      'Toque em "Adicionar" para confirmar',
+    'pwa.offline':        'Sem conexão — usando dados em cache',
+    'pwa.online':         'Conexão restaurada',
   },
 
   en: {
@@ -449,6 +461,18 @@ const translations: Record<Lang, Record<string, string>> = {
     'cal.task.habit_done':     'Habit completed',
     'cal.task.check':          'Check',
     'cal.task.uncheck':        'Uncheck',
+
+    // ── PWA ────────────────────────────────────────────────────
+    'pwa.install.title':  'Install TaskFlow',
+    'pwa.install.desc':   'Add to home screen for quick access',
+    'pwa.install.btn':    'Install',
+    'pwa.install.later':  'Not now',
+    'pwa.ios.title':      'Add to home screen:',
+    'pwa.ios.step1':      'Tap "Share"',
+    'pwa.ios.step2':      'Select "Add to Home Screen"',
+    'pwa.ios.step3':      'Tap "Add" to confirm',
+    'pwa.offline':        'No connection — using cached data',
+    'pwa.online':         'Connection restored',
   },
 }
 
