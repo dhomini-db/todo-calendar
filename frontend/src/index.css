@@ -2994,16 +2994,20 @@ a.sidebar-item.active::before {
     backdrop-filter: blur(1px);
   }
 
-  /* ── Main content fills full width ── */
+  /* ── Main content: scroll container (calendar + tasks scroll together) ── */
   .main-content {
     flex: 1;
-    overflow: hidden;
+    min-height: 0;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;   /* ← page-level scroll */
+    overflow-x: hidden;
   }
 
-  /* ── Mobile top bar ── */
+  /* ── Mobile top bar — sticky no topo do scroll container ── */
   .mobile-topbar {
+    position: sticky;
+    top: 0;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -3011,7 +3015,7 @@ a.sidebar-item.active::before {
     border-bottom: 1px solid var(--line);
     background: var(--surface);
     flex-shrink: 0;
-    z-index: 10;
+    z-index: 50;
   }
   .mobile-menu-btn {
     background: none;
@@ -3033,22 +3037,24 @@ a.sidebar-item.active::before {
     letter-spacing: -0.2px;
   }
 
-  /* ── CalendarPage: calendar area fixed, only task panel scrolls ── */
+  /* ── CalendarPage layout ── */
   .calendar-area {
-    flex: none;            /* cancela flex:1 do desktop — altura é conteúdo natural */
-    overflow: visible;     /* não clipa nada */
-    padding: 10px 12px 8px;
+    flex: none;          /* altura natural — calendário não cresce */
+    overflow: visible;
+    padding: 14px 14px 0;
   }
   .panel-area {
-    flex: 1;               /* ocupa todo espaço restante */
-    overflow-y: auto;      /* a área toda rola — sem limite de altura interno */
+    /* no scroll aqui: a página (.main-content) já rola */
+    flex: none;
+    overflow: visible;
     width: 100% !important;
     border-left: none;
     border-top: 1px solid var(--line);
-    min-height: 0;
+    min-height: 60vh;   /* garante espaço suficiente p/ a lista de tarefas */
+    padding-bottom: env(safe-area-inset-bottom, 20px);
   }
 
-  /* ── Page title area — compact on mobile ── */
+  /* ── Page title — compact ── */
   .page-title {
     font-size: 15px;
     margin-bottom: 2px;
@@ -3058,26 +3064,37 @@ a.sidebar-item.active::before {
     margin-bottom: 8px;
   }
 
-  /* ── Streak bar compact ── */
+  /* ── Streak bar ── */
   .streak-bar { padding: 7px 10px; margin-bottom: 8px; }
 
-  /* ── Calendar compact cells on mobile ── */
+  /* ── Calendar grid cells ──
+     FIX: remover min-height que brigava com aspect-ratio.
+     Usar aspect-ratio: 1/1 (quadrado) — garante proporção consistente
+     em qualquer largura de tela sem overflow nem sobreposição.          */
+  .cal-grid {
+    column-gap: 3px;
+    row-gap: 3px;
+  }
   .cal-day {
-    min-height: 34px;
-    padding: 4px 3px;
+    aspect-ratio: 1 / 1;   /* quadrado — sem min-height conflitante */
+    min-height: unset;
+    padding: 0;
   }
   .cal-day-num {
     font-size: 11px;
   }
+  .cal-day-pct {
+    font-size: 7.5px;
+  }
   .calendar-wrap {
-    padding: 10px 8px 8px;
+    padding: 12px 10px 10px;
   }
   .cal-weekday {
     font-size: 9px;
     padding-bottom: 4px;
   }
 
-  /* ── task-panel: altura natural (panel-area rola, não o body interno) ── */
+  /* ── TaskPanel — fluxo natural no scroll da página ── */
   .task-panel {
     height: auto;
     min-height: 0;
@@ -3086,12 +3103,11 @@ a.sidebar-item.active::before {
     overflow-y: visible;
     flex: none;
   }
+  /* footer: não mais sticky (a página que rola, não o panel) */
   .panel-footer {
-    position: sticky;
-    bottom: 0;
+    position: static;
     background: var(--surface);
     border-top: 1px solid var(--line);
-    z-index: 5;
   }
 }
 
@@ -3658,16 +3674,16 @@ a.sidebar-item:hover:not(.active) {
     -webkit-backdrop-filter: blur(6px) !important;
   }
 
-  /* Sticky panel footer — glass */
+  /* Panel footer glass (static, not sticky — page scrolls) */
   .panel-footer {
-    backdrop-filter: var(--blur-sm);
-    -webkit-backdrop-filter: var(--blur-sm);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     border-top: 1px solid var(--line-md);
   }
 
-  /* Calendar on mobile */
-  .calendar-wrap { padding: 14px 12px 10px; }
-  .cal-day { border-radius: var(--r); min-height: 40px; }
+  /* Calendar on mobile — sem min-height (já definido no bloco acima) */
+  .calendar-wrap { padding: 12px 10px 10px; }
+  .cal-day { border-radius: var(--r); }
 
   /* Disable hover transforms on touch (avoids stuck states) */
   .dash-card:hover       { transform: none; }
