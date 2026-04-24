@@ -3707,10 +3707,13 @@ a.sidebar-item:hover:not(.active) {
   .add-btn:hover         { transform: none; }
   .btn-primary:hover:not(:disabled) { transform: none; }
 
-  /* Mobile topbar */
+  /* Mobile topbar — NÃO usar shorthand padding aqui para não sobrescrever
+     padding-top: env(safe-area-inset-top) definido no bloco anterior */
   .mobile-topbar {
     border-bottom: 1px solid var(--line-md);
-    padding: 11px 16px;
+    padding-bottom: 11px;
+    padding-left:   16px;
+    padding-right:  16px;
   }
 
   /* Page title compact */
