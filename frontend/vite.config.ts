@@ -19,7 +19,7 @@ export default defineConfig({
         'logo-icon.svg',
         'logo-full.svg',
         'logo-mono.svg',
-        'apple-touch-icon-180x180.png',
+        'icons/*.png',
       ],
 
       /* ── Web App Manifest ───────────────────────────────────── */
@@ -37,27 +37,33 @@ export default defineConfig({
         categories:       ['productivity', 'lifestyle'],
         icons: [
           {
-            src:   'pwa-64x64.png',
+            // Small icon — browser tab, taskbar
+            src:   'icons/icon-64.png',
             sizes: '64x64',
             type:  'image/png',
           },
           {
-            src:   'pwa-192x192.png',
+            // Standard PWA icon — Android home screen, Chrome splash
+            src:   'icons/icon-192.png',
             sizes: '192x192',
             type:  'image/png',
           },
           {
-            src:   'pwa-512x512.png',
+            // High-res icon — store listings, splash screens
+            src:   'icons/icon-512.png',
             sizes: '512x512',
             type:  'image/png',
           },
           {
-            src:     'maskable-icon-512x512.png',
+            // Android adaptive icon — full-bleed with 12% safe-zone padding
+            // OS applies its own mask shape (circle, squircle, etc.)
+            src:     'icons/maskable-512.png',
             sizes:   '512x512',
             type:    'image/png',
-            purpose: 'maskable',   // Android adaptive icon
+            purpose: 'maskable',
           },
           {
+            // SVG fallback — crisp at any resolution (modern browsers)
             src:     'logo-icon.svg',
             sizes:   'any',
             type:    'image/svg+xml',

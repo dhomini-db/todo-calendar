@@ -139,7 +139,7 @@ export default function InstallPrompt() {
           <IconX />
         </button>
         <div className="pwa-prompt-header">
-          <img src="/logo-icon.svg" alt="TaskFlow" className="pwa-prompt-icon" />
+          <img src="/icons/icon-192.png" alt="TaskFlow" className="pwa-prompt-icon" />
           <div>
             <p className="pwa-prompt-name">TaskFlow</p>
             <p className="pwa-prompt-desc">{t('pwa.install.desc')}</p>
@@ -173,7 +173,7 @@ export default function InstallPrompt() {
         <IconX />
       </button>
       <div className="pwa-prompt-header">
-        <img src="/logo-icon.svg" alt="TaskFlow" className="pwa-prompt-icon" />
+        <img src="/icons/icon-192.png" alt="TaskFlow" className="pwa-prompt-icon" />
         <div>
           <p className="pwa-prompt-name">{t('pwa.install.title')}</p>
           <p className="pwa-prompt-desc">{t('pwa.install.desc')}</p>
