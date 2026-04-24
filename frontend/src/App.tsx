@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Navigate, Outlet } from 'react-router-dom'
-import Sidebar        from './components/Sidebar'
-import InstallPrompt  from './components/InstallPrompt'
-import OfflineBanner  from './components/OfflineBanner'
-import { useAuth }    from './contexts/AuthContext'
+import { Navigate } from 'react-router-dom'
+import Sidebar          from './components/Sidebar'
+import InstallPrompt    from './components/InstallPrompt'
+import OfflineBanner    from './components/OfflineBanner'
+import AnimatedOutlet   from './components/AnimatedOutlet'
+import { useAuth }      from './contexts/AuthContext'
 import { useNotificationScheduler } from './hooks/useNotifications'
 
 function IconMenu() {
@@ -38,7 +39,7 @@ export default function App() {
           </button>
           <span className="mobile-topbar-title">TaskFlow</span>
         </div>
-        <Outlet />
+        <AnimatedOutlet />
       </div>
 
       {/* ── PWA: install banner (bottom of viewport) */}

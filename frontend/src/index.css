@@ -93,6 +93,14 @@
   --radius:        var(--r);
   --radius-lg:     var(--r-lg);
   --radius-xl:     var(--r-xl);
+
+  /* Motion tokens — canonical easings & durations */
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);    /* smooth decelerate   */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* bouncy overshoot    */
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);      /* balanced in/out     */
+  --dur-fast:    0.15s;
+  --dur-base:    0.25s;
+  --dur-slow:    0.4s;
 }
 
 [data-theme="arctic"] {
@@ -567,13 +575,39 @@ body {
   border: 1px solid var(--line);
   border-radius: var(--r-xl);
   padding: 44px 40px;
-  animation: fadeUp 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: pageFadeIn 0.35s var(--ease-out) both;
   box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* Login exit — fade out before navigating away */
+.auth-page--leaving .auth-card {
+  animation: pageFadeOut 0.22s var(--ease-in-out) both;
+  pointer-events: none;
 }
 
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Page transition keyframes ───────────────────────────────── */
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pageFadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-6px); }
+}
+
+/* Wrapper applied to each route via AnimatedOutlet */
+.page-animate {
+  animation: pageFadeIn var(--dur-base) var(--ease-out) both;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .auth-logo {

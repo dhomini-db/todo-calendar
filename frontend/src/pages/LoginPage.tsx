@@ -11,6 +11,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error,    setError]    = useState('')
   const [loading,  setLoading]  = useState(false)
+  const [leaving,  setLeaving]  = useState(false)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -19,18 +20,19 @@ export default function LoginPage() {
     try {
       const res = await login({ email, password })
       saveAuth(res)
-      navigate('/', { replace: true })
+      // Play exit animation before navigating
+      setLeaving(true)
+      setTimeout(() => navigate('/', { replace: true }), 230)
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } })
         ?.response?.data?.error
       setError(msg ?? 'Credenciais inválidas')
-    } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="auth-page">
+    <div className={`auth-page${leaving ? ' auth-page--leaving' : ''}`}>
       <div className="auth-card">
         {/* Logo */}
         <div className="auth-logo">

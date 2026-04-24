@@ -13,6 +13,7 @@ export default function RegisterPage() {
   const [confirm,  setConfirm]  = useState('')
   const [error,    setError]    = useState('')
   const [loading,  setLoading]  = useState(false)
+  const [leaving,  setLeaving]  = useState(false)
 
   function validate(): string | null {
     if (name.trim().length < 2)  return 'Nome deve ter pelo menos 2 caracteres'
@@ -32,18 +33,18 @@ export default function RegisterPage() {
     try {
       const res = await register({ name: name.trim(), email, password })
       saveAuth(res)
-      navigate('/', { replace: true })
+      setLeaving(true)
+      setTimeout(() => navigate('/', { replace: true }), 230)
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } })
         ?.response?.data?.error
       setError(msg ?? 'Erro ao criar conta')
-    } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="auth-page">
+    <div className={`auth-page${leaving ? ' auth-page--leaving' : ''}`}>
       <div className="auth-card">
         <div className="auth-logo">
           <img src="/logo-icon.svg" alt="TaskFlow" className="auth-logo-img" />
