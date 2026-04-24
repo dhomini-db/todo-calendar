@@ -610,6 +610,91 @@ body {
   overflow: hidden;
 }
 
+/* ── Splash screen ───────────────────────────────────────────── */
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Ensure it covers safe areas on notched devices */
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+           env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+}
+.splash--out {
+  animation: splashFadeOut 0.35s var(--ease-in-out) both;
+  pointer-events: none;
+}
+.splash-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+/* Logo */
+.splash-logo-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  overflow: hidden;
+  animation: splashLogoIn 0.5s var(--ease-out) both;
+  box-shadow: 0 0 0 1px var(--line), 0 12px 40px rgba(0,0,0,0.45);
+}
+.splash-logo {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Brand name */
+.splash-brand {
+  margin: 20px 0 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  animation: splashTextIn 0.4s var(--ease-out) 0.18s both;
+}
+
+/* Loading bar */
+.splash-bar-track {
+  margin-top: 36px;
+  width: 120px;
+  height: 2px;
+  background: var(--line-md);
+  border-radius: 99px;
+  overflow: hidden;
+  animation: splashTextIn 0.3s var(--ease-out) 0.3s both;
+}
+.splash-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  border-radius: 99px;
+  animation: splashBarFill 1.1s var(--ease-out) 0.5s both;
+}
+
+/* Keyframes */
+@keyframes splashLogoIn {
+  from { opacity: 0; transform: scale(0.72); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes splashTextIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes splashBarFill {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+@keyframes splashFadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
 .auth-logo {
   display: flex;
   align-items: center;

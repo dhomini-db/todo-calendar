@@ -1,11 +1,14 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { Navigate } from 'react-router-dom'
 import Sidebar          from './components/Sidebar'
 import InstallPrompt    from './components/InstallPrompt'
 import OfflineBanner    from './components/OfflineBanner'
 import AnimatedOutlet   from './components/AnimatedOutlet'
+import SplashScreen     from './components/SplashScreen'
 import { useAuth }      from './contexts/AuthContext'
 import { useNotificationScheduler } from './hooks/useNotifications'
+
+const SPLASH_KEY = 'taskflow-splash-shown'
 
 function IconMenu() {
   return (
@@ -20,9 +23,22 @@ function IconMenu() {
 export default function App() {
   const { isAuthenticated } = useAuth()
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  // Show splash once per browser session (sessionStorage resets on tab close)
+  const [splashDone, setSplashDone] = useState(
+    () => !!sessionStorage.getItem(SPLASH_KEY)
+  )
+  const handleSplashDone = useCallback(() => {
+    sessionStorage.setItem(SPLASH_KEY, '1')
+    setSplashDone(true)
+  }, [])
+
   useNotificationScheduler()
 
   if (!isAuthenticated) return <Navigate to="/login" replace />
+
+  // Splash shown on first authenticated load each session
+  if (!splashDone) return <SplashScreen onDone={handleSplashDone} />
 
   return (
     <div className="app-shell">
