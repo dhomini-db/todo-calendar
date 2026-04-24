@@ -12,8 +12,8 @@
 
 import { useEffect, useState } from 'react'
 
-const FADE_START = 1500   // ms before fade-out starts
-const TOTAL     = 1850   // ms before onDone fires
+const FADE_START = 2200   // ms before fade-out starts
+const TOTAL     = 2600   // ms before onDone fires
 
 interface SplashScreenProps {
   onDone: () => void

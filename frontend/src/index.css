@@ -600,13 +600,16 @@ body {
   to   { opacity: 0; transform: translateY(-6px); }
 }
 
-/* Wrapper applied to each route via AnimatedOutlet */
+/* Wrapper applied to each route via AnimatedOutlet.
+   Must mirror .main-content's flex-direction so CalendarPage's
+   side-by-side (.calendar-area + .panel-area) layout is preserved. */
 .page-animate {
   animation: pageFadeIn var(--dur-base) var(--ease-out) both;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;   /* matches .main-content — calendar + panel sit side by side */
   flex: 1;
   min-height: 0;
+  min-width: 0;
   overflow: hidden;
 }
 
@@ -674,7 +677,7 @@ body {
   width: 0%;
   background: var(--accent);
   border-radius: 99px;
-  animation: splashBarFill 1.1s var(--ease-out) 0.5s both;
+  animation: splashBarFill 1.7s var(--ease-out) 0.4s both;
 }
 
 /* Keyframes */
@@ -3185,6 +3188,12 @@ a.sidebar-item.active::before {
     flex-direction: column;
     overflow-y: auto;   /* ← page-level scroll */
     overflow-x: hidden;
+  }
+
+  /* On mobile .page-animate must stack vertically (matches .main-content column) */
+  .page-animate {
+    flex-direction: column;
+    overflow: visible;  /* let .main-content handle scrolling */
   }
 
   /* ── Mobile top bar — sticky no topo do scroll container ── */
