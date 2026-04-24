@@ -9,13 +9,18 @@ import { getMonthlyPerformance } from '../api/tasks'
 import type { MonthlyPerformance } from '../types'
 import { useLanguage } from '../contexts/LanguageContext'
 
+// ── Semantic chart colors (muted, minimalist palette) ──────────
+const CLR_GOOD = '#6dbc98'   // sage green
+const CLR_AVG  = '#c4a04a'   // muted amber
+const CLR_BAD  = '#c47878'   // soft brick
+
 // ── Helpers ────────────────────────────────────────────────────
 
 function barColor(pct: number | null): string {
   if (pct === null) return 'var(--line)'
-  if (pct >= 70)   return '#4ade80'
-  if (pct >= 40)   return '#facc15'
-  return '#f87171'
+  if (pct >= 70)   return CLR_GOOD
+  if (pct >= 40)   return CLR_AVG
+  return CLR_BAD
 }
 
 function barOpacity(pct: number | null): number {
@@ -65,9 +70,9 @@ function annualTrend(data: MonthlyPerformance[], t: (k: string) => string): { la
   const first = withData.slice(0, half).reduce((s, d) => s + d.percentage, 0) / half
   const last  = withData.slice(-half).reduce((s, d) => s + d.percentage, 0) / half
   const diff  = last - first
-  if (diff > 4)  return { label: t('graf.trend.up'),     color: '#4ade80' }
-  if (diff < -4) return { label: t('graf.trend.down'),   color: '#f87171' }
-  return              { label: t('graf.trend.stable'),  color: '#facc15' }
+  if (diff > 4)  return { label: t('graf.trend.up'),     color: CLR_GOOD }
+  if (diff < -4) return { label: t('graf.trend.down'),   color: CLR_BAD  }
+  return              { label: t('graf.trend.stable'),  color: CLR_AVG  }
 }
 
 function InsightsSection({ data, t }: { data: MonthlyPerformance[]; t: (k: string) => string }) {
@@ -89,7 +94,7 @@ function InsightsSection({ data, t }: { data: MonthlyPerformance[]; t: (k: strin
     {
       label: t('graf.insights.great'),
       value: String(great),
-      color: great > 0 ? '#4ade80' : 'var(--text-3)',
+      color: great > 0 ? CLR_GOOD : 'var(--text-3)',
       sub:   t('graficos.legend.good'),
     },
     {
@@ -135,9 +140,9 @@ function DistributionSection({ data, t }: { data: MonthlyPerformance[]; t: (k: s
   const none  = data.filter(d => d.percentage === null).length
 
   const rows = [
-    { label: t('graf.dist.great'), count: great, color: '#4ade80' },
-    { label: t('graf.dist.avg'),   count: avg,   color: '#facc15' },
-    { label: t('graf.dist.low'),   count: low,   color: '#f87171' },
+    { label: t('graf.dist.great'), count: great, color: CLR_GOOD },
+    { label: t('graf.dist.avg'),   count: avg,   color: CLR_AVG  },
+    { label: t('graf.dist.low'),   count: low,   color: CLR_BAD  },
     { label: t('graf.dist.none'),  count: none,  color: 'var(--line-md)' },
   ]
 
@@ -188,7 +193,7 @@ function SummaryCards({ data }: { data: MonthlyPerformance[] }) {
       </div>
       <div className="chart-summary-card">
         <p className="chart-summary-label">{t('graficos.best')}</p>
-        <p className="chart-summary-value" style={{ color: '#4ade80' }}>
+        <p className="chart-summary-value" style={{ color: CLR_GOOD }}>
           {best.month} · {best.percentage}%
         </p>
       </div>
@@ -306,15 +311,15 @@ export default function GraficosPage() {
           {!isLoading && !isError && (
             <div className="chart-legend">
               <span className="chart-legend-item">
-                <span className="chart-legend-dot" style={{ background: '#4ade80' }} />
+                <span className="chart-legend-dot" style={{ background: CLR_GOOD }} />
                 {t('graficos.legend.good')}
               </span>
               <span className="chart-legend-item">
-                <span className="chart-legend-dot" style={{ background: '#facc15' }} />
+                <span className="chart-legend-dot" style={{ background: CLR_AVG }} />
                 {t('graficos.legend.avg')}
               </span>
               <span className="chart-legend-item">
-                <span className="chart-legend-dot" style={{ background: '#f87171' }} />
+                <span className="chart-legend-dot" style={{ background: CLR_BAD }} />
                 {t('graficos.legend.low')}
               </span>
               <span className="chart-legend-item">

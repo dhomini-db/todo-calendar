@@ -2242,19 +2242,22 @@ a.sidebar-item.active .sidebar-item-icon {
 /* ── Dashboard heatmap ───────────────────────────────────── */
 .dash-heatmap {
   display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  gap: 5px;
+  grid-template-columns: repeat(10, 26px);
+  grid-auto-rows: 26px;
+  gap: 4px;
   margin-bottom: 14px;
+  justify-content: start;
 }
 .dash-heatmap-cell {
-  aspect-ratio: 1 / 1;
-  border-radius: 4px;
+  width: 26px;
+  height: 26px;
+  border-radius: 5px;
   cursor: help;
   transition: transform 0.12s var(--ease-out), opacity 0.12s;
   position: relative;
 }
 .dash-heatmap-cell:hover {
-  transform: scale(1.25);
+  transform: scale(1.2);
   opacity: 0.85;
   z-index: 2;
 }

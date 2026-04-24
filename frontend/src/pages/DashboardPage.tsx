@@ -10,13 +10,20 @@ import { getDashboardStats } from '../api/tasks'
 import type { DashboardStats, DailyScore } from '../types'
 import { useLanguage } from '../contexts/LanguageContext'
 
+// ── Semantic chart colors (muted, minimalist palette) ──────────
+const CLR_GOOD   = '#6dbc98'   // sage green   (was #4ade80)
+const CLR_AVG    = '#c4a04a'   // muted amber  (was #facc15)
+const CLR_BAD    = '#c47878'   // soft brick   (was #f87171)
+const CLR_STREAK = '#c0804a'   // warm amber   (was #fb923c)
+const CLR_NONE   = 'var(--line-md)'
+
 // ── Color helpers ──────────────────────────────────────────────
 
 function scoreColor(pct: number | null): string {
   if (pct === null) return 'var(--text-3)'
-  if (pct >= 70)   return '#4ade80'
-  if (pct >= 40)   return '#facc15'
-  return '#f87171'
+  if (pct >= 70)   return CLR_GOOD
+  if (pct >= 40)   return CLR_AVG
+  return CLR_BAD
 }
 
 // ── Trend calculation ──────────────────────────────────────────
@@ -29,9 +36,9 @@ function calcTrend(days: DailyScore[], t: (k: string) => string): { label: strin
   const prev   = valid.slice(-14, -7).reduce((s, d) => s + d.percentage, 0) / valid.slice(-14, -7).length
 
   const diff = recent - prev
-  if (diff > 3)  return { label: t('dash.trend.up'),     color: '#4ade80', arrow: '↑' }
-  if (diff < -3) return { label: t('dash.trend.down'),   color: '#f87171', arrow: '↓' }
-  return             { label: t('dash.trend.stable'),  color: '#facc15', arrow: '→' }
+  if (diff > 3)  return { label: t('dash.trend.up'),     color: CLR_GOOD, arrow: '↑' }
+  if (diff < -3) return { label: t('dash.trend.down'),   color: CLR_BAD,  arrow: '↓' }
+  return             { label: t('dash.trend.stable'),  color: CLR_AVG,  arrow: '→' }
 }
 
 // ── Metric card icons ──────────────────────────────────────────
@@ -192,10 +199,10 @@ function PerformanceChart({ days, t }: { days: DailyScore[]; t: (k: string) => s
 // ── Activity heatmap ───────────────────────────────────────────
 
 function heatColor(pct: number | null): string {
-  if (pct === null) return 'var(--line-md)'
-  if (pct >= 70)   return '#4ade80'
-  if (pct >= 40)   return '#facc15'
-  return '#f87171'
+  if (pct === null) return CLR_NONE
+  if (pct >= 70)   return CLR_GOOD
+  if (pct >= 40)   return CLR_AVG
+  return CLR_BAD
 }
 
 function HeatmapSection({ days, t }: { days: DailyScore[]; t: (k: string) => string }) {
@@ -221,19 +228,19 @@ function HeatmapSection({ days, t }: { days: DailyScore[]; t: (k: string) => str
         {hasAny && (
           <div className="dash-heatmap-legend">
             <span className="chart-legend-item">
-              <span className="chart-legend-dot" style={{ background: 'var(--line-md)' }} />
+              <span className="chart-legend-dot" style={{ background: CLR_NONE }} />
               {t('graficos.legend.none')}
             </span>
             <span className="chart-legend-item">
-              <span className="chart-legend-dot" style={{ background: '#f87171' }} />
+              <span className="chart-legend-dot" style={{ background: CLR_BAD }} />
               {t('graficos.legend.low')}
             </span>
             <span className="chart-legend-item">
-              <span className="chart-legend-dot" style={{ background: '#facc15' }} />
+              <span className="chart-legend-dot" style={{ background: CLR_AVG }} />
               {t('graficos.legend.avg')}
             </span>
             <span className="chart-legend-item">
-              <span className="chart-legend-dot" style={{ background: '#4ade80' }} />
+              <span className="chart-legend-dot" style={{ background: CLR_GOOD }} />
               {t('graficos.legend.good')}
             </span>
           </div>
@@ -427,7 +434,7 @@ export default function DashboardPage() {
               label={t('dash.metric.streak')}
               value={`${data.streakAtual} ${data.streakAtual === 1 ? t('dash.streak.day') : t('dash.streak.days')}`}
               sub={data.streakAtual > 0 ? t('dash.streak.sub') : t('dash.streak.none')}
-              accent={data.streakAtual > 0 ? '#fb923c' : undefined}
+              accent={data.streakAtual > 0 ? CLR_STREAK : undefined}
             />
             <MetricCard
               icon={<IconCheck />}
