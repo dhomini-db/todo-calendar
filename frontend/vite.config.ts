@@ -8,9 +8,10 @@ export default defineConfig({
 
     VitePWA({
       /* ── Strategy ──────────────────────────────────────────────
-         autoUpdate: the SW updates silently in the background.
-         The user gets the new version on next page load.
+         selfDestroying: unregisters the old SW and clears all
+         caches on next load, forcing fresh content from network.
       ─────────────────────────────────────────────────────────── */
+      selfDestroying: true,
       registerType: 'autoUpdate',
 
       /* ── Extra static assets to include in precache ─────────── */
