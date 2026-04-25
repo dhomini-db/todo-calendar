@@ -83,14 +83,18 @@ export default defineConfig({
         // Don't intercept /api/ routes with the navigation fallback
         navigateFallbackDenylist: [/^\/api\//],
 
+        // Force new SW to take control immediately (no waiting)
+        skipWaiting: true,
+        clientsClaim: true,
+
+        // Renamed caches to bust stale PWA cache from old builds
         // ── Runtime caching rules ─────────────────────────────
         runtimeCaching: [
           {
-            // Google Fonts — stylesheet (CacheFirst, 1 year)
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'google-fonts-styles',
+              cacheName: 'gfonts-styles-v2',
               expiration: {
                 maxEntries: 10,
                 maxAgeSeconds: 365 * 24 * 60 * 60,
@@ -99,11 +103,10 @@ export default defineConfig({
             },
           },
           {
-            // Google Fonts — font files (CacheFirst, 1 year)
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'google-fonts-files',
+              cacheName: 'gfonts-files-v2',
               expiration: {
                 maxEntries: 20,
                 maxAgeSeconds: 365 * 24 * 60 * 60,
@@ -112,12 +115,10 @@ export default defineConfig({
             },
           },
           {
-            // API calls — NetworkFirst (try network → cached data → fail)
-            // Gives 8s before falling back to cache; caches 200 responses for 5min
             urlPattern: /\/api\/.*/i,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'api-cache',
+              cacheName: 'api-cache-v2',
               networkTimeoutSeconds: 8,
               expiration: {
                 maxEntries: 100,
