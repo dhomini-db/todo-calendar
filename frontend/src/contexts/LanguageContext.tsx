@@ -45,6 +45,8 @@ const translations: Record<Lang, Record<string, string>> = {
     'social.streak_best':    'Melhor streak',
     'social.profile_title':  'Perfil',
     'social.cant_follow_self': 'Esse é você!',
+    'social.no_followers':   'Ninguém segue ainda',
+    'social.no_following':   'Não está seguindo ninguém',
 
     // ── Common ─────────────────────────────────────────────────
     'common.save':       'Salvar',
@@ -368,6 +370,8 @@ const translations: Record<Lang, Record<string, string>> = {
     'social.streak_best':    'Best streak',
     'social.profile_title':  'Profile',
     'social.cant_follow_self': 'That\'s you!',
+    'social.no_followers':   'No followers yet',
+    'social.no_following':   'Not following anyone yet',
 
     // ── Common ─────────────────────────────────────────────────
     'common.save':       'Save',

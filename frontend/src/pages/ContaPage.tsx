@@ -5,6 +5,7 @@ import { useLanguage } from '../contexts/LanguageContext'
 import { updateProfile, changePassword, uploadAvatar, removeAvatar, uploadBanner, removeBanner, saveBannerPosition, getUserPublicProfile } from '../api/tasks'
 import type { UpdateProfileRequest, ChangePasswordRequest } from '../types'
 import ImageCropper from '../components/ImageCropper'
+import FollowListModal from '../components/FollowListModal'
 
 /* ── Icons ───────────────────────────────────────────────────── */
 function IconCamera() {
@@ -40,9 +41,9 @@ function passwordStrength(pwd: string, t: (k: string) => string) {
 }
 
 /* ── Social stat card ─────────────────────────────────────────── */
-function SocialStat({ value, label, icon }: { value: string | number; label: string; icon?: React.ReactNode }) {
+function SocialStat({ value, label, icon, onClick }: { value: string | number; label: string; icon?: React.ReactNode; onClick?: () => void }) {
   return (
-    <div className="profile-social-stat">
+    <div className={`profile-social-stat${onClick ? ' profile-social-stat--clickable' : ''}`} onClick={onClick}>
       <p className="profile-social-stat-value">
         {icon && <span className="profile-social-stat-icon">{icon}</span>}
         {value}
@@ -146,9 +147,16 @@ export default function ContaPage() {
   })
   const savePosMut = useMutation({
     mutationFn: () => saveBannerPosition(Math.round(bannerPos)),
+    onMutate: () => {
+      // Optimistic: hide the bar immediately
+      setSavedPos(bannerPos)
+    },
     onSuccess: (res) => {
       updateUser({ bannerPosition: res.bannerPosition })
       setSavedPos(res.bannerPosition)
+    },
+    onError: () => {
+      // silently fail — position stays as dragged but backend didn't save
     },
   })
 
@@ -237,6 +245,9 @@ export default function ContaPage() {
     profileMutation.mutate({ name: profileName.trim(), email: profileEmail.trim().toLowerCase(), bio: profileBio.trim() || null })
   }
 
+  /* ── Follow list modal ──────────────────────────────────────── */
+  const [followModal, setFollowModal] = useState<'followers' | 'following' | null>(null)
+
   /* ── Change password ────────────────────────────────────────── */
   const [pwdOpen,    setPwdOpen]    = useState(false)
   const [curPwd,     setCurPwd]     = useState('')
@@ -265,6 +276,13 @@ export default function ContaPage() {
   return (
     <div className="inner-page">
       {cropSrc && <ImageCropper src={cropSrc} onCrop={handleCropDone} onCancel={handleCropCancel} />}
+      {followModal && user && (
+        <FollowListModal
+          userId={user.userId}
+          tab={followModal}
+          onClose={() => setFollowModal(null)}
+        />
+      )}
 
       <div className="inner-page-header">
         <h1 className="page-title">{t('conta.title')}</h1>
@@ -447,10 +465,12 @@ export default function ContaPage() {
           <SocialStat
             value={publicProfile?.followersCount ?? '—'}
             label={t('conta.social.followers')}
+            onClick={() => setFollowModal('followers')}
           />
           <SocialStat
             value={publicProfile?.followingCount ?? '—'}
             label={t('conta.social.following')}
+            onClick={() => setFollowModal('following')}
           />
           <SocialStat
             value={publicProfile?.currentStreak ?? user?.profileImageUrl !== undefined ? (publicProfile?.currentStreak ?? '—') : '—'}

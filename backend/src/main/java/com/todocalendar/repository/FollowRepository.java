@@ -22,4 +22,12 @@ public interface FollowRepository extends JpaRepository<Follow, Follow.FollowId>
     /** IDs of users that the given user follows — used for bulk isFollowing checks. */
     @Query("SELECT f.id.followingId FROM Follow f WHERE f.id.followerId = :followerId")
     List<Long> findFollowingIdsByFollowerId(@Param("followerId") Long followerId);
+
+    /** Users who follow the given user (followers list). */
+    @Query("SELECT f.follower FROM Follow f WHERE f.id.followingId = :userId")
+    List<com.todocalendar.entity.User> findFollowersByUserId(@Param("userId") Long userId);
+
+    /** Users that the given user follows (following list). */
+    @Query("SELECT f.following FROM Follow f WHERE f.id.followerId = :userId")
+    List<com.todocalendar.entity.User> findFollowingByUserId(@Param("userId") Long userId);
 }

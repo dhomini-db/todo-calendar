@@ -143,6 +143,16 @@ export interface AiChatResponse {
 
 // ── Social / Rankings ──────────────────────────────────────────
 
+export interface FollowUser {
+  id: number
+  name: string
+  initial: string
+  profileImageUrl?: string | null
+  bio?: string | null
+  isFollowing: boolean
+}
+
+
 export interface UserRanking {
   id: number
   name: string

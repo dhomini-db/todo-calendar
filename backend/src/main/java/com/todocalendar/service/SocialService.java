@@ -1,5 +1,6 @@
 package com.todocalendar.service;
 
+import com.todocalendar.dto.social.FollowUserResponse;
 import com.todocalendar.dto.social.PublicProfileResponse;
 import com.todocalendar.dto.social.UserRankingResponse;
 import com.todocalendar.entity.Follow;
@@ -78,6 +79,38 @@ public class SocialService {
                 u.getBannerImageUrl(),
                 u.getBannerPosition()
         );
+    }
+
+    // ── Followers / Following lists ────────────────────────────────────────────
+
+    public List<FollowUserResponse> getFollowers(Long profileUserId, Long currentUserId) {
+        List<User> followers = followRepository.findFollowersByUserId(profileUserId);
+        Set<Long> followingIds = Set.copyOf(followRepository.findFollowingIdsByFollowerId(currentUserId));
+        return followers.stream()
+                .map(u -> new FollowUserResponse(
+                        u.getId(),
+                        u.getName(),
+                        extractInitial(u.getName()),
+                        u.getProfileImageUrl(),
+                        u.getBio(),
+                        followingIds.contains(u.getId())
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public List<FollowUserResponse> getFollowing(Long profileUserId, Long currentUserId) {
+        List<User> following = followRepository.findFollowingByUserId(profileUserId);
+        Set<Long> followingIds = Set.copyOf(followRepository.findFollowingIdsByFollowerId(currentUserId));
+        return following.stream()
+                .map(u -> new FollowUserResponse(
+                        u.getId(),
+                        u.getName(),
+                        extractInitial(u.getName()),
+                        u.getProfileImageUrl(),
+                        u.getBio(),
+                        followingIds.contains(u.getId())
+                ))
+                .collect(Collectors.toList());
     }
 
     // ── Follow / Unfollow ──────────────────────────────────────────────────────

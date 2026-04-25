@@ -1,5 +1,6 @@
 package com.todocalendar.controller;
 
+import com.todocalendar.dto.social.FollowUserResponse;
 import com.todocalendar.dto.social.PublicProfileResponse;
 import com.todocalendar.dto.social.UserRankingResponse;
 import com.todocalendar.entity.User;
@@ -30,6 +31,22 @@ public class SocialController {
             @PathVariable Long userId,
             @AuthenticationPrincipal User currentUser) {
         return socialService.getPublicProfile(userId, currentUser.getId());
+    }
+
+    /** GET /api/social/followers/{userId} — list of users following this user */
+    @GetMapping("/followers/{userId}")
+    public List<FollowUserResponse> getFollowers(
+            @PathVariable Long userId,
+            @AuthenticationPrincipal User currentUser) {
+        return socialService.getFollowers(userId, currentUser.getId());
+    }
+
+    /** GET /api/social/following/{userId} — list of users this user follows */
+    @GetMapping("/following/{userId}")
+    public List<FollowUserResponse> getFollowing(
+            @PathVariable Long userId,
+            @AuthenticationPrincipal User currentUser) {
+        return socialService.getFollowing(userId, currentUser.getId());
     }
 
     /** POST /api/social/follow/{userId} — follow a user */

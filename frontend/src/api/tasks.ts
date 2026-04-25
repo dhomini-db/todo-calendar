@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { Task, TaskRequest, DaySummary, AuthResponse, LoginRequest, RegisterRequest, TaskTemplate, TaskTemplateRequest, StreakData, UserProfile, UpdateProfileRequest, ChangePasswordRequest, MonthlyPerformance, DashboardStats, AiChatRequest, AiChatResponse, UserRanking, PublicProfile } from '../types'
+import type { Task, TaskRequest, DaySummary, AuthResponse, LoginRequest, RegisterRequest, TaskTemplate, TaskTemplateRequest, StreakData, UserProfile, UpdateProfileRequest, ChangePasswordRequest, MonthlyPerformance, DashboardStats, AiChatRequest, AiChatResponse, UserRanking, PublicProfile, FollowUser } from '../types'
 
 /**
  * Em dev  → Vite proxy redireciona /api para localhost:8081 (sem CORS)
@@ -167,3 +167,9 @@ export const followUser = (userId: number): Promise<void> =>
 
 export const unfollowUser = (userId: number): Promise<void> =>
   api.delete(`/social/follow/${userId}`).then(() => undefined)
+
+export const getFollowers = (userId: number): Promise<FollowUser[]> =>
+  api.get<FollowUser[]>(`/social/followers/${userId}`).then(r => r.data)
+
+export const getFollowing = (userId: number): Promise<FollowUser[]> =>
+  api.get<FollowUser[]>(`/social/following/${userId}`).then(r => r.data)
