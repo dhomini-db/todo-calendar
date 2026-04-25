@@ -111,7 +111,10 @@ export default function UserProfileModal({ userId, onClose }: Props) {
           <>
             {/* Banner */}
             {data.bannerImageUrl && (
-              <div className="upm-banner" style={{ backgroundImage: `url(${data.bannerImageUrl})` }} />
+              <div className="upm-banner" style={{
+                backgroundImage: `url(${data.bannerImageUrl})`,
+                backgroundPositionY: `${data.bannerPosition ?? 50}%`,
+              }} />
             )}
 
             {/* Avatar + name */}

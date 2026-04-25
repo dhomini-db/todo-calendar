@@ -199,6 +199,16 @@ public class UserService implements UserDetailsService {
     public UserProfileResponse removeBanner(User currentUser) {
         User managed = findOrThrow(currentUser.getId());
         managed.setBannerImageUrl(null);
+        managed.setBannerPosition(50);
+        userRepository.save(managed);
+        return toProfileResponse(managed);
+    }
+
+    @Transactional
+    public UserProfileResponse saveBannerPosition(User currentUser, int position) {
+        int clamped = Math.max(0, Math.min(100, position));
+        User managed = findOrThrow(currentUser.getId());
+        managed.setBannerPosition(clamped);
         userRepository.save(managed);
         return toProfileResponse(managed);
     }
@@ -212,6 +222,7 @@ public class UserService implements UserDetailsService {
                 .createdAt(user.getCreatedAt())
                 .profileImageUrl(user.getProfileImageUrl())
                 .bannerImageUrl(user.getBannerImageUrl())
+                .bannerPosition(user.getBannerPosition())
                 .build();
     }
 

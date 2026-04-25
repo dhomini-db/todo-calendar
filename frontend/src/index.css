@@ -5528,6 +5528,36 @@ a.sidebar-item:hover:not(.active) {
 /* Keep empty-state icon hidden when there's an overlay that appears */
 .profile-banner:hover .profile-banner-empty { opacity: 0; }
 
+/* When banner has an image — always draggable */
+.profile-banner--draggable {
+  cursor: grab;
+  user-select: none;
+}
+.profile-banner--draggable:active { cursor: grabbing; }
+
+/* Drag hint — subtle pill shown at bottom on hover (below the change overlay) */
+.profile-banner-drag-hint {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  z-index: 3;
+}
+.profile-banner--draggable:hover .profile-banner-drag-hint { opacity: 1; }
+.profile-banner-drag-hint span {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.9);
+  padding: 4px 12px;
+  background: rgba(0, 0, 0, 0.65);
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.15);
+  white-space: nowrap;
+}
+
 .profile-remove-banner-btn {
   font-size: 11px;
   color: var(--text-3);

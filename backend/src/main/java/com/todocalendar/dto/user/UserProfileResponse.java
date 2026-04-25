@@ -20,4 +20,5 @@ public class UserProfileResponse {
     private LocalDateTime createdAt;
     private String profileImageUrl;
     private String bannerImageUrl;
+    private int    bannerPosition;
 }

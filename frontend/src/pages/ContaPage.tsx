@@ -1,8 +1,8 @@
-import { useState, useRef, useCallback, type FormEvent } from 'react'
+import { useState, useRef, useCallback, useEffect, type FormEvent } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useAuth } from '../contexts/AuthContext'
 import { useLanguage } from '../contexts/LanguageContext'
-import { updateProfile, changePassword, uploadAvatar, removeAvatar, uploadBanner, removeBanner, getUserPublicProfile } from '../api/tasks'
+import { updateProfile, changePassword, uploadAvatar, removeAvatar, uploadBanner, removeBanner, saveBannerPosition, getUserPublicProfile } from '../api/tasks'
 import type { UpdateProfileRequest, ChangePasswordRequest } from '../types'
 import ImageCropper from '../components/ImageCropper'
 
@@ -69,11 +69,20 @@ export default function ContaPage() {
     staleTime: 60_000,
   })
 
-  /* ── Banner upload ──────────────────────────────────────────── */
-  const bannerInputRef = useRef<HTMLInputElement>(null)
+  /* ── Banner upload + reposition ────────────────────────────── */
+  const bannerInputRef  = useRef<HTMLInputElement>(null)
+  const bannerRef       = useRef<HTMLDivElement>(null)
   const [bannerPending,  setBannerPending]  = useState<File | null>(null)
   const [bannerPreview,  setBannerPreview]  = useState<string | null>(null)
   const [bannerError,    setBannerError]    = useState('')
+  const [bannerPos,      setBannerPos]      = useState<number>(user?.bannerPosition ?? 50)
+  const [savedPos,       setSavedPos]       = useState<number>(user?.bannerPosition ?? 50)
+  const dragStartY   = useRef(0)
+  const dragStartPos = useRef(50)
+  const isDragging   = useRef(false)
+
+  const hasBanner = !!(bannerPreview ?? user?.bannerImageUrl)
+  const posChanged = hasBanner && Math.round(bannerPos) !== Math.round(savedPos)
 
   const handleBannerChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -86,10 +95,42 @@ export default function ContaPage() {
     setBannerPending(file)
   }, [])
 
+  // Always-active drag — works whenever a banner image exists
+  function startDrag(e: React.MouseEvent | React.TouchEvent) {
+    if (!hasBanner) return
+    isDragging.current   = true
+    dragStartY.current   = 'touches' in e ? e.touches[0].clientY : e.clientY
+    dragStartPos.current = bannerPos
+    e.preventDefault()
+  }
+  useEffect(() => {
+    function onMove(e: MouseEvent | TouchEvent) {
+      if (!isDragging.current || !bannerRef.current) return
+      const clientY = 'touches' in e ? (e as TouchEvent).touches[0].clientY : (e as MouseEvent).clientY
+      const dy      = clientY - dragStartY.current
+      const h       = bannerRef.current.clientHeight
+      const delta   = (dy / h) * 100
+      setBannerPos(Math.max(0, Math.min(100, dragStartPos.current + delta)))
+    }
+    function onUp() { isDragging.current = false }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('touchmove', onMove, { passive: false })
+    window.addEventListener('mouseup',   onUp)
+    window.addEventListener('touchend',  onUp)
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('touchmove', onMove)
+      window.removeEventListener('mouseup',   onUp)
+      window.removeEventListener('touchend',  onUp)
+    }
+  }, [])
+
   const uploadBannerMut = useMutation({
     mutationFn: (file: File) => uploadBanner(file),
     onSuccess: (res) => {
-      updateUser({ bannerImageUrl: res.bannerImageUrl })
+      updateUser({ bannerImageUrl: res.bannerImageUrl, bannerPosition: res.bannerPosition })
+      setBannerPos(res.bannerPosition)
+      setSavedPos(res.bannerPosition)
       if (bannerPreview) URL.revokeObjectURL(bannerPreview)
       setBannerPending(null); setBannerPreview(null); setBannerError('')
     },
@@ -97,8 +138,18 @@ export default function ContaPage() {
   })
   const removeBannerMut = useMutation({
     mutationFn: removeBanner,
-    onSuccess: () => { updateUser({ bannerImageUrl: null }); setBannerError('') },
+    onSuccess: () => {
+      updateUser({ bannerImageUrl: null, bannerPosition: 50 })
+      setBannerPos(50); setSavedPos(50); setBannerError('')
+    },
     onError: () => setBannerError(t('conta.banner.err.remove')),
+  })
+  const savePosMut = useMutation({
+    mutationFn: () => saveBannerPosition(Math.round(bannerPos)),
+    onSuccess: (res) => {
+      updateUser({ bannerPosition: res.bannerPosition })
+      setSavedPos(res.bannerPosition)
+    },
   })
 
   const currentBanner = bannerPreview ?? user?.bannerImageUrl ?? null
@@ -224,12 +275,16 @@ export default function ContaPage() {
       <div className="settings-section">
         <p className="settings-section-title">{t('conta.section.public')}</p>
 
-        {/* Banner */}
+        {/* Banner — always draggable when image exists */}
         <div
-          className="profile-banner"
-          onClick={() => bannerInputRef.current?.click()}
-          title={t('conta.banner.change')}
-          style={currentBanner ? { backgroundImage: `url(${currentBanner})` } : undefined}
+          ref={bannerRef}
+          className={`profile-banner${hasBanner ? ' profile-banner--draggable' : ''}`}
+          onClick={() => { if (!isDragging.current && !bannerPending) bannerInputRef.current?.click() }}
+          onMouseDown={startDrag}
+          onTouchStart={startDrag}
+          style={currentBanner
+            ? { backgroundImage: `url(${currentBanner})`, backgroundPositionY: `${bannerPos}%` }
+            : undefined}
         >
           {!currentBanner && (
             <div className="profile-banner-empty">
@@ -237,15 +292,35 @@ export default function ContaPage() {
               <span>{t('conta.banner.hint')}</span>
             </div>
           )}
-          <div className="profile-banner-overlay">
-            <IconCamera />
-            <span>{t('conta.banner.change')}</span>
-          </div>
+          {currentBanner && (
+            <div className="profile-banner-overlay">
+              <IconCamera />
+              <span>{t('conta.banner.change')}</span>
+            </div>
+          )}
+          {currentBanner && (
+            <div className="profile-banner-drag-hint">
+              <span>{t('conta.banner.reposition.hint')}</span>
+            </div>
+          )}
         </div>
         <input ref={bannerInputRef} type="file" accept="image/jpeg,image/png,image/webp"
           style={{ display: 'none' }} onChange={handleBannerChange} />
 
-        {/* Banner action bar */}
+        {/* Save position bar — appears only when position changed */}
+        {posChanged && !bannerPending && (
+          <div className="conta-photo-bar">
+            <span className="conta-photo-bar-label">{t('conta.banner.reposition')}</span>
+            <div className="conta-photo-bar-actions">
+              <button className="conta-btn-cancel" onClick={() => setBannerPos(savedPos)} disabled={savePosMut.isPending}>{t('common.cancel')}</button>
+              <button className="conta-btn-save" onClick={() => savePosMut.mutate()} disabled={savePosMut.isPending}>
+                {savePosMut.isPending ? t('common.saving') : t('conta.banner.save_pos')}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Upload pending bar */}
         {bannerPending && (
           <div className="conta-photo-bar">
             <span className="conta-photo-bar-label">
@@ -259,7 +334,9 @@ export default function ContaPage() {
             </div>
           </div>
         )}
-        {!bannerPending && (currentBanner || user?.bannerImageUrl) && (
+
+        {/* Remove button */}
+        {!bannerPending && !posChanged && currentBanner && (
           <button className="profile-remove-banner-btn" onClick={() => removeBannerMut.mutate()} disabled={removeBannerMut.isPending}>
             {removeBannerMut.isPending ? '…' : t('conta.banner.remove')}
           </button>

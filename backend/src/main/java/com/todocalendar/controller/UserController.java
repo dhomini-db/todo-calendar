@@ -98,4 +98,16 @@ public class UserController {
             @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(userService.removeBanner(currentUser));
     }
+
+    /**
+     * PATCH /api/users/me/banner/position
+     * Salva a posição vertical do banner (0–100). Body: { "position": 42 }
+     */
+    @PatchMapping("/me/banner/position")
+    public ResponseEntity<UserProfileResponse> saveBannerPosition(
+            @RequestBody Map<String, Integer> body,
+            @AuthenticationPrincipal User currentUser) {
+        int position = body.getOrDefault("position", 50);
+        return ResponseEntity.ok(userService.saveBannerPosition(currentUser, position));
+    }
 }

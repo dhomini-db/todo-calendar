@@ -108,6 +108,7 @@ export interface UserProfile {
   createdAt: string
   profileImageUrl?: string | null
   bannerImageUrl?: string | null
+  bannerPosition: number
 }
 
 export interface UpdateProfileRequest {
@@ -167,6 +168,7 @@ export interface PublicProfile {
   followingCount: number
   profileImageUrl?: string | null
   bannerImageUrl?: string | null
+  bannerPosition: number
 }
 
 // ── Autenticação ───────────────────────────────────────────────
@@ -178,6 +180,7 @@ export interface AuthUser {
   bio?: string | null
   profileImageUrl?: string | null
   bannerImageUrl?: string | null
+  bannerPosition?: number
 }
 
 export interface AuthResponse {

@@ -118,6 +118,9 @@ export const uploadBanner = (file: File): Promise<UserProfile> => {
 export const removeBanner = (): Promise<UserProfile> =>
   api.delete<UserProfile>('/users/me/banner').then(r => r.data)
 
+export const saveBannerPosition = (position: number): Promise<UserProfile> =>
+  api.patch<UserProfile>('/users/me/banner/position', { position }).then(r => r.data)
+
 // ── Export ─────────────────────────────────────────────────────
 
 export const exportTasksCsv = async (): Promise<void> => {

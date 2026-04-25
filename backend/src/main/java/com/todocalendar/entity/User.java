@@ -70,6 +70,12 @@ public class User implements UserDetails {
     @Column(name = "banner_image_url", columnDefinition = "TEXT")
     private String bannerImageUrl;
 
+    /** Posição vertical do banner em % (0 = topo, 50 = centro, 100 = base). */
+    @Column(name = "banner_position")
+    @ColumnDefault("50")
+    @Builder.Default
+    private int bannerPosition = 50;
+
     // ── UserDetails ────────────────────────────────────────────
     // Sem roles por ora: todos os usuários têm o mesmo nível de acesso.
 
