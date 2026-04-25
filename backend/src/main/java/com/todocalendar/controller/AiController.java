@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/ai")
 @RequiredArgsConstructor
@@ -24,5 +26,14 @@ public class AiController {
             Authentication auth
     ) {
         return aiService.chat(auth.getName(), request);
+    }
+
+    /**
+     * GET /api/ai/status
+     * Returns whether the AI is configured (has a valid API key).
+     */
+    @GetMapping("/status")
+    public Map<String, Object> status() {
+        return Map.of("configured", aiService.isConfigured());
     }
 }

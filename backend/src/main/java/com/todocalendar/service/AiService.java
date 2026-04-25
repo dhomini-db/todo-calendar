@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
@@ -31,8 +32,13 @@ public class AiService {
     private String apiKey;
 
     private static final String ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
-    private static final String MODEL = "claude-opus-4-5";
-    private static final int MAX_TOKENS = 1024;
+    private static final String MODEL         = "claude-3-5-haiku-20241022";
+    private static final int    MAX_TOKENS    = 1024;
+
+    /** Returns true if the Anthropic API key is configured. */
+    public boolean isConfigured() {
+        return apiKey != null && !apiKey.isBlank();
+    }
 
     /**
      * Sends a chat message to the Anthropic Claude API with user context injected
@@ -78,8 +84,17 @@ public class AiService {
             String text = extractText(responseEntity.getBody());
             return AiChatResponse.ok(text);
 
+        } catch (HttpClientErrorException e) {
+            log.error("Erro HTTP ao chamar a API do Claude: {} — {}", e.getStatusCode(), e.getResponseBodyAsString());
+            if (e.getStatusCode().value() == 401) {
+                return AiChatResponse.error("Chave de API inválida ou não autorizada");
+            }
+            if (e.getStatusCode().value() == 429) {
+                return AiChatResponse.error("Limite de requisições atingido, tente novamente em instantes");
+            }
+            return AiChatResponse.error("Erro ao chamar a IA: " + e.getStatusCode());
         } catch (Exception e) {
-            log.error("Erro ao chamar a API do Claude: {}", e.getMessage(), e);
+            log.error("Erro inesperado ao chamar a API do Claude: {}", e.getMessage(), e);
             return AiChatResponse.error("Erro ao processar sua mensagem");
         }
     }

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { sendAiMessage } from '../api/tasks'
+import { sendAiMessage, getAiStatus } from '../api/tasks'
 import { useLanguage } from '../contexts/LanguageContext'
 import type { AiChatMessage } from '../types'
 
@@ -20,7 +20,8 @@ const QUICK_ACTIONS_EN = [
 
 function IconSend() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
       <line x1="22" y1="2" x2="11" y2="13"/>
       <polygon points="22 2 15 22 11 13 2 9 22 2"/>
     </svg>
@@ -29,21 +30,31 @@ function IconSend() {
 
 export default function AIChatPanel({ onClose }: Props) {
   const { t, lang } = useLanguage()
-  const [messages, setMessages] = useState<AiChatMessage[]>([])
-  const [input, setInput]       = useState('')
-  const [loading, setLoading]   = useState(false)
-  const bottomRef               = useRef<HTMLDivElement>(null)
-  const inputRef                = useRef<HTMLInputElement>(null)
+  const [messages,    setMessages]    = useState<AiChatMessage[]>([])
+  const [input,       setInput]       = useState('')
+  const [loading,     setLoading]     = useState(false)
+  const [configured,  setConfigured]  = useState<boolean | null>(null)  // null = checking
+  const bottomRef  = useRef<HTMLDivElement>(null)
+  const inputRef   = useRef<HTMLInputElement>(null)
 
   const quickActions = lang === 'pt' ? QUICK_ACTIONS_PT : QUICK_ACTIONS_EN
+
+  // Check if AI is configured on mount
+  useEffect(() => {
+    getAiStatus()
+      .then(s => setConfigured(s.configured))
+      .catch(() => setConfigured(false))
+  }, [])
 
   // Auto-scroll to newest message
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
 
-  // Focus input when panel opens
-  useEffect(() => { inputRef.current?.focus() }, [])
+  // Focus input when panel opens (only if configured)
+  useEffect(() => {
+    if (configured) inputRef.current?.focus()
+  }, [configured])
 
   const handleSend = useCallback(async (text?: string) => {
     const msg = (text ?? input).trim()
@@ -91,7 +102,8 @@ export default function AIChatPanel({ onClose }: Props) {
           </div>
         </div>
         <button className="ai-panel-close" onClick={onClose} aria-label={t('common.close')}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            strokeWidth="2.2" strokeLinecap="round">
             <line x1="18" y1="6" x2="6" y2="18"/>
             <line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
@@ -100,65 +112,94 @@ export default function AIChatPanel({ onClose }: Props) {
 
       {/* ── Messages ───────────────────────────────────────────── */}
       <div className="ai-panel-messages">
-        {messages.length === 0 && !loading && (
+
+        {/* Checking status */}
+        {configured === null && (
           <div className="ai-panel-empty">
-            <p className="ai-empty-greeting">{t('ai.greeting')}</p>
-            <div className="ai-quick-grid">
-              {quickActions.map((q, i) => (
-                <button
-                  key={i}
-                  className="ai-quick-btn"
-                  onClick={() => handleSend(q)}
-                  disabled={loading}
-                >
-                  {q}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {messages.map((msg, i) => (
-          <div key={i} className={`ai-msg ai-msg--${msg.role}`}>
-            {msg.role === 'assistant' && (
-              <span className="ai-msg-avatar">✨</span>
-            )}
-            <div className="ai-msg-bubble">
-              {msg.content.split('\n').map((line, j) => (
-                line ? <p key={j}>{line}</p> : <br key={j} />
-              ))}
-            </div>
-          </div>
-        ))}
-
-        {loading && (
-          <div className="ai-msg ai-msg--assistant">
-            <span className="ai-msg-avatar">✨</span>
-            <div className="ai-msg-bubble ai-typing">
+            <div className="ai-typing" style={{ margin: '0 auto' }}>
               <span /><span /><span />
             </div>
           </div>
         )}
 
+        {/* Not configured */}
+        {configured === false && (
+          <div className="ai-panel-empty">
+            <div className="ai-unconfigured">
+              <p className="ai-unconfigured-icon">🔑</p>
+              <p className="ai-unconfigured-title">IA não configurada</p>
+              <p className="ai-unconfigured-desc">
+                A chave <code>ANTHROPIC_API_KEY</code> não está definida no servidor.
+                Configure a variável de ambiente no Railway para ativar o assistente.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Configured — normal state */}
+        {configured === true && (
+          <>
+            {messages.length === 0 && !loading && (
+              <div className="ai-panel-empty">
+                <p className="ai-empty-greeting">{t('ai.greeting')}</p>
+                <div className="ai-quick-grid">
+                  {quickActions.map((q, i) => (
+                    <button
+                      key={i}
+                      className="ai-quick-btn"
+                      onClick={() => handleSend(q)}
+                      disabled={loading}
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {messages.map((msg, i) => (
+              <div key={i} className={`ai-msg ai-msg--${msg.role}`}>
+                {msg.role === 'assistant' && (
+                  <span className="ai-msg-avatar">✨</span>
+                )}
+                <div className="ai-msg-bubble">
+                  {msg.content.split('\n').map((line, j) => (
+                    line ? <p key={j}>{line}</p> : <br key={j} />
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            {loading && (
+              <div className="ai-msg ai-msg--assistant">
+                <span className="ai-msg-avatar">✨</span>
+                <div className="ai-msg-bubble ai-typing">
+                  <span /><span /><span />
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
         <div ref={bottomRef} />
       </div>
 
-      {/* ── Input ──────────────────────────────────────────────── */}
-      <div className="ai-panel-input-row">
+      {/* ── Input (only when configured) ───────────────────────── */}
+      <div className={`ai-panel-input-row${configured !== true ? ' ai-panel-input-row--disabled' : ''}`}>
         <input
           ref={inputRef}
           className="ai-panel-input"
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={handleKey}
-          placeholder={t('ai.placeholder')}
-          disabled={loading}
+          placeholder={configured === false ? 'IA não disponível' : t('ai.placeholder')}
+          disabled={loading || configured !== true}
           maxLength={800}
         />
         <button
           className="ai-panel-send"
           onClick={() => handleSend()}
-          disabled={!input.trim() || loading}
+          disabled={!input.trim() || loading || configured !== true}
           aria-label={t('ai.send')}
         >
           <IconSend />

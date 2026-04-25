@@ -154,6 +154,9 @@ export const getStreak = (): Promise<StreakData> =>
 export const sendAiMessage = (data: AiChatRequest): Promise<AiChatResponse> =>
   api.post<AiChatResponse>('/ai/chat', data).then(r => r.data)
 
+export const getAiStatus = (): Promise<{ configured: boolean }> =>
+  api.get<{ configured: boolean }>('/ai/status').then(r => r.data)
+
 // ── Social ─────────────────────────────────────────────────────
 
 export const getSocialRankings = (): Promise<UserRanking[]> =>
