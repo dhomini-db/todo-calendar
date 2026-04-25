@@ -1,13 +1,12 @@
 import { useState, useRef, useCallback, type FormEvent } from 'react'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useAuth } from '../contexts/AuthContext'
 import { useLanguage } from '../contexts/LanguageContext'
-import { updateProfile, changePassword, uploadAvatar, removeAvatar } from '../api/tasks'
+import { updateProfile, changePassword, uploadAvatar, removeAvatar, getUserPublicProfile } from '../api/tasks'
 import type { UpdateProfileRequest, ChangePasswordRequest } from '../types'
 import ImageCropper from '../components/ImageCropper'
 
-// ── Camera icon ────────────────────────────────────────────────
-
+/* ── Icons ───────────────────────────────────────────────────── */
 function IconCamera() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -17,10 +16,16 @@ function IconCamera() {
     </svg>
   )
 }
+function IconFlame() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8.5 14.5A2.5 2.5 0 0 0 11 17c1.387 0 2.5-1.343 2.5-3 0-1.657-1.5-3-1.5-5 0 0 3 1.343 3 4.5 0 2.485-2.015 4.5-4.5 4.5S6 15.985 6 13.5C6 11.5 8 8 12 6c0 0-1 3.5 1 5.5"/>
+    </svg>
+  )
+}
 
-// ── Password strength ──────────────────────────────────────────
-
-function passwordStrength(pwd: string, t: (k: string) => string): { score: number; label: string; color: string } {
+/* ── Password strength ────────────────────────────────────────── */
+function passwordStrength(pwd: string, t: (k: string) => string) {
   if (!pwd) return { score: 0, label: '', color: '' }
   let score = 0
   if (pwd.length >= 8)           score++
@@ -34,82 +39,67 @@ function passwordStrength(pwd: string, t: (k: string) => string): { score: numbe
   return               { score, label: t('conta.pwd.strong'),  color: '#4ade80' }
 }
 
-// ── Avatar component ───────────────────────────────────────────
-
-interface AvatarProps {
-  src?: string | null
-  initials: string
-  size?: 'sm' | 'lg'
-}
-
-function Avatar({ src, initials, size = 'lg' }: AvatarProps) {
+/* ── Social stat card ─────────────────────────────────────────── */
+function SocialStat({ value, label, icon }: { value: string | number; label: string; icon?: React.ReactNode }) {
   return (
-    <div className={`conta-avatar conta-avatar--${size}`}>
-      {src
-        ? <img src={src} alt="avatar" className="conta-avatar-img" />
-        : initials
-      }
+    <div className="profile-social-stat">
+      <p className="profile-social-stat-value">
+        {icon && <span className="profile-social-stat-icon">{icon}</span>}
+        {value}
+      </p>
+      <p className="profile-social-stat-label">{label}</p>
     </div>
   )
 }
 
-// ── Main component ─────────────────────────────────────────────
-
+/* ── Main component ───────────────────────────────────────────── */
 export default function ContaPage() {
-  const { user, updateUser, logout } = useAuth()
+  const { user, updateUser } = useAuth()
   const { t } = useLanguage()
 
   const initials = user?.name
     ? user.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
     : '?'
 
-  // ── Avatar upload state ────────────────────────────────────
+  /* ── Social stats (public profile data) ────────────────────── */
+  const { data: publicProfile } = useQuery({
+    queryKey: ['social', 'profile', user?.userId],
+    queryFn: () => getUserPublicProfile(user!.userId),
+    enabled: !!user?.userId,
+    staleTime: 60_000,
+  })
+
+  /* ── Avatar upload ──────────────────────────────────────────── */
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [pendingFile,   setPendingFile]   = useState<File | null>(null)
-  const [cropSrc,       setCropSrc]       = useState<string | null>(null)   // raw blob URL → cropper
-  const [previewUrl,    setPreviewUrl]    = useState<string | null>(null)   // cropped blob URL → preview
+  const [cropSrc,       setCropSrc]       = useState<string | null>(null)
+  const [previewUrl,    setPreviewUrl]    = useState<string | null>(null)
   const [avatarError,   setAvatarError]   = useState('')
 
-  // 1. User picks a file → open cropper
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    e.target.value = ''  // allow re-selecting same file
-
-    if (file.size > 10 * 1024 * 1024) {
-      setAvatarError('Arquivo muito grande. Máximo 10 MB.')
-      return
-    }
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      setAvatarError('Formato inválido. Use JPG, PNG ou WebP.')
-      return
-    }
-
+    e.target.value = ''
+    if (file.size > 10 * 1024 * 1024) { setAvatarError('Arquivo muito grande. Máximo 10 MB.'); return }
+    if (!['image/jpeg','image/png','image/webp'].includes(file.type)) { setAvatarError('Formato inválido. Use JPG, PNG ou WebP.'); return }
     setAvatarError('')
-    setCropSrc(URL.createObjectURL(file))   // open cropper
+    setCropSrc(URL.createObjectURL(file))
   }, [])
 
-  // 2. Cropper confirms → get cropped blob
   function handleCropDone(blob: Blob) {
     if (cropSrc) URL.revokeObjectURL(cropSrc)
     setCropSrc(null)
-
     const croppedFile = new File([blob], 'avatar.jpg', { type: 'image/jpeg' })
     setPendingFile(croppedFile)
     setPreviewUrl(URL.createObjectURL(blob))
   }
-
-  // 2b. Cropper cancelled
   function handleCropCancel() {
     if (cropSrc) URL.revokeObjectURL(cropSrc)
     setCropSrc(null)
   }
-
   function cancelPhotoUpload() {
     if (previewUrl) URL.revokeObjectURL(previewUrl)
-    setPendingFile(null)
-    setPreviewUrl(null)
-    setAvatarError('')
+    setPendingFile(null); setPreviewUrl(null); setAvatarError('')
   }
 
   const uploadMutation = useMutation({
@@ -117,158 +107,110 @@ export default function ContaPage() {
     onSuccess: (res) => {
       updateUser({ profileImageUrl: res.profileImageUrl })
       if (previewUrl) URL.revokeObjectURL(previewUrl)
-      setPendingFile(null)
-      setPreviewUrl(null)
-      setAvatarError('')
+      setPendingFile(null); setPreviewUrl(null); setAvatarError('')
     },
     onError: (err: unknown) => {
-      const msg = (err as { response?: { data?: { error?: string } } })
-        ?.response?.data?.error ?? t('conta.avatar.err.upload')
-      setAvatarError(msg)
+      setAvatarError((err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? t('conta.avatar.err.upload'))
     },
   })
-
   const removeMutation = useMutation({
     mutationFn: removeAvatar,
-    onSuccess: () => {
-      updateUser({ profileImageUrl: null })
-      setAvatarError('')
-    },
+    onSuccess: () => { updateUser({ profileImageUrl: null }); setAvatarError('') },
     onError: () => setAvatarError(t('conta.avatar.err.remove')),
   })
 
-  function handleSavePhoto() {
-    if (!pendingFile) return
-    uploadMutation.mutate(pendingFile)
-  }
-
-  // Current avatar src: pending preview > saved photo > null (shows initials)
   const currentAvatarSrc = previewUrl ?? user?.profileImageUrl ?? null
 
-  // ── Edit profile state ─────────────────────────────────────
-  const [editOpen,      setEditOpen]      = useState(false)
-  const [profileName,   setProfileName]   = useState(user?.name  ?? '')
-  const [profileEmail,  setProfileEmail]  = useState(user?.email ?? '')
-  const [profileError,  setProfileError]  = useState('')
-  const [profileOk,     setProfileOk]     = useState(false)
+  /* ── Edit profile ───────────────────────────────────────────── */
+  const [editOpen,     setEditOpen]     = useState(false)
+  const [profileName,  setProfileName]  = useState(user?.name  ?? '')
+  const [profileEmail, setProfileEmail] = useState(user?.email ?? '')
+  const [profileBio,   setProfileBio]   = useState(user?.bio   ?? '')
+  const [profileError, setProfileError] = useState('')
+  const [profileOk,    setProfileOk]    = useState(false)
 
   const profileMutation = useMutation({
     mutationFn: (data: UpdateProfileRequest) => updateProfile(data),
     onSuccess: (res) => {
-      updateUser({ name: res.name, email: res.email })
-      setProfileOk(true)
-      setProfileError('')
+      updateUser({ name: res.name, email: res.email, bio: res.bio ?? null })
+      setProfileOk(true); setProfileError('')
       setTimeout(() => { setProfileOk(false); setEditOpen(false) }, 1200)
     },
     onError: (err: unknown) => {
-      const msg = (err as { response?: { data?: { error?: string } } })
-        ?.response?.data?.error ?? t('conta.err.profile')
-      setProfileError(msg)
+      setProfileError((err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? t('conta.err.profile'))
     },
   })
-
-  function handleProfileSave(e: FormEvent) {
-    e.preventDefault()
-    setProfileError('')
-    setProfileOk(false)
-    profileMutation.mutate({ name: profileName.trim(), email: profileEmail.trim().toLowerCase() })
-  }
 
   function openEdit() {
     setProfileName(user?.name  ?? '')
     setProfileEmail(user?.email ?? '')
-    setProfileError('')
-    setProfileOk(false)
-    setEditOpen(true)
+    setProfileBio(user?.bio   ?? '')
+    setProfileError(''); setProfileOk(false); setEditOpen(true)
+  }
+  function handleProfileSave(e: FormEvent) {
+    e.preventDefault(); setProfileError(''); setProfileOk(false)
+    profileMutation.mutate({ name: profileName.trim(), email: profileEmail.trim().toLowerCase(), bio: profileBio.trim() || null })
   }
 
-  // ── Change password state ──────────────────────────────────
+  /* ── Change password ────────────────────────────────────────── */
   const [pwdOpen,    setPwdOpen]    = useState(false)
   const [curPwd,     setCurPwd]     = useState('')
   const [newPwd,     setNewPwd]     = useState('')
   const [confirmPwd, setConfirmPwd] = useState('')
   const [pwdError,   setPwdError]   = useState('')
   const [pwdOk,      setPwdOk]      = useState(false)
-
   const strength = passwordStrength(newPwd, t)
 
   const pwdMutation = useMutation({
     mutationFn: (data: ChangePasswordRequest) => changePassword(data),
     onSuccess: () => {
-      setPwdOk(true)
-      setPwdError('')
-      setCurPwd(''); setNewPwd(''); setConfirmPwd('')
+      setPwdOk(true); setPwdError(''); setCurPwd(''); setNewPwd(''); setConfirmPwd('')
       setTimeout(() => { setPwdOk(false); setPwdOpen(false) }, 1400)
     },
     onError: (err: unknown) => {
-      const msg = (err as { response?: { data?: { error?: string } } })
-        ?.response?.data?.error ?? t('conta.err.pwd')
-      setPwdError(msg)
+      setPwdError((err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? t('conta.err.pwd'))
     },
   })
-
   function handlePwdSave(e: FormEvent) {
-    e.preventDefault()
-    setPwdError('')
-    setPwdOk(false)
-    if (newPwd !== confirmPwd) {
-      setPwdError('A confirmação não coincide com a nova senha')
-      return
-    }
+    e.preventDefault(); setPwdError(''); setPwdOk(false)
+    if (newPwd !== confirmPwd) { setPwdError('A confirmação não coincide com a nova senha'); return }
     pwdMutation.mutate({ currentPassword: curPwd, newPassword: newPwd, confirmNewPassword: confirmPwd })
   }
 
   return (
     <div className="inner-page">
-      {/* Cropper modal — shown right after file selection */}
-      {cropSrc && (
-        <ImageCropper
-          src={cropSrc}
-          onCrop={handleCropDone}
-          onCancel={handleCropCancel}
-        />
-      )}
+      {cropSrc && <ImageCropper src={cropSrc} onCrop={handleCropDone} onCancel={handleCropCancel} />}
+
       <div className="inner-page-header">
         <h1 className="page-title">{t('conta.title')}</h1>
         <p className="page-sub">{t('conta.sub')}</p>
       </div>
 
-      {/* ── Profile card ──────────────────────────────────────── */}
+      {/* ── Public Profile Card ──────────────────────────────────── */}
       <div className="settings-section">
-        <p className="settings-section-title">{t('conta.section.profile')}</p>
-        <div className="conta-card">
+        <p className="settings-section-title">{t('conta.section.public')}</p>
 
-          {/* Avatar — clicável para abrir seletor */}
-          <div
-            className="conta-avatar-wrap"
-            onClick={() => !pendingFile && fileInputRef.current?.click()}
-            title={t('conta.avatar.change')}
-          >
-            <Avatar src={currentAvatarSrc} initials={initials} size="lg" />
-            {!pendingFile && (
-              <div className="conta-avatar-overlay">
-                <IconCamera />
-              </div>
-            )}
-          </div>
-
-          {/* Hidden file input */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            style={{ display: 'none' }}
-            onChange={handleFileChange}
-          />
-
-          <div className="conta-info">
-            <p className="conta-name">{user?.name}</p>
-            <p className="conta-email">{user?.email}</p>
-
-            {/* Remove photo — só aparece se tiver foto salva e não há pending */}
+        <div className="profile-hero">
+          {/* Avatar */}
+          <div className="profile-avatar-wrap">
+            <div
+              className="profile-avatar"
+              onClick={() => !pendingFile && fileInputRef.current?.click()}
+              title={t('conta.avatar.change')}
+            >
+              {currentAvatarSrc
+                ? <img src={currentAvatarSrc} alt="avatar" className="profile-avatar-img" />
+                : <span className="profile-avatar-initials">{initials}</span>
+              }
+              {!pendingFile && (
+                <div className="profile-avatar-overlay">
+                  <IconCamera />
+                </div>
+              )}
+            </div>
             {user?.profileImageUrl && !pendingFile && (
               <button
-                className="conta-remove-photo"
+                className="profile-remove-photo"
                 onClick={() => removeMutation.mutate()}
                 disabled={removeMutation.isPending}
               >
@@ -277,67 +219,69 @@ export default function ContaPage() {
             )}
           </div>
 
-          <button className="conta-edit-btn" onClick={openEdit}>{t('common.edit')}</button>
+          <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp"
+            style={{ display: 'none' }} onChange={handleFileChange} />
+
+          {/* Name, bio, edit button */}
+          <div className="profile-hero-info">
+            <div className="profile-hero-top">
+              <div>
+                <h2 className="profile-hero-name">{user?.name}</h2>
+                <p className="profile-hero-email">{user?.email}</p>
+              </div>
+              <button className="profile-edit-btn" onClick={openEdit}>{t('common.edit')}</button>
+            </div>
+            <p className="profile-hero-bio">
+              {user?.bio || <span className="profile-bio-empty">{t('conta.bio.empty')}</span>}
+            </p>
+          </div>
         </div>
 
-        {/* Photo preview + save/cancel — aparece só quando há arquivo pendente */}
+        {/* Photo pending bar */}
         {pendingFile && (
           <div className="conta-photo-bar">
             <span className="conta-photo-bar-label">
               {uploadMutation.isPending ? t('conta.avatar.saving') : `${t('conta.avatar.selected')} ${pendingFile.name}`}
             </span>
             <div className="conta-photo-bar-actions">
-              <button
-                className="conta-btn-cancel"
-                onClick={cancelPhotoUpload}
-                disabled={uploadMutation.isPending}
-              >
-                {t('common.cancel')}
-              </button>
-              <button
-                className="conta-btn-save"
-                onClick={handleSavePhoto}
-                disabled={uploadMutation.isPending}
-              >
+              <button className="conta-btn-cancel" onClick={cancelPhotoUpload} disabled={uploadMutation.isPending}>{t('common.cancel')}</button>
+              <button className="conta-btn-save"   onClick={() => uploadMutation.mutate(pendingFile!)} disabled={uploadMutation.isPending}>
                 {uploadMutation.isPending ? t('common.saving') : t('conta.avatar.save')}
               </button>
             </div>
           </div>
         )}
-
-        {/* Avatar error */}
         {avatarError && <p className="conta-error" style={{ marginTop: 8 }}>{avatarError}</p>}
 
-        {/* Edit profile form */}
+        {/* Edit form */}
         {editOpen && (
-          <form className="conta-form" onSubmit={handleProfileSave}>
+          <form className="conta-form" onSubmit={handleProfileSave} style={{ marginTop: 16 }}>
             <div className="conta-form-row">
               <label className="conta-label">{t('conta.label.name')}</label>
-              <input
-                className="conta-input"
-                value={profileName}
-                onChange={e => setProfileName(e.target.value)}
-                placeholder={t('conta.ph.name')}
-                required
-              />
+              <input className="conta-input" value={profileName}
+                onChange={e => setProfileName(e.target.value)} placeholder={t('conta.ph.name')} required />
             </div>
             <div className="conta-form-row">
               <label className="conta-label">{t('conta.label.email')}</label>
-              <input
-                className="conta-input"
-                type="email"
-                value={profileEmail}
-                onChange={e => setProfileEmail(e.target.value)}
-                placeholder="seu@email.com"
-                required
+              <input className="conta-input" type="email" value={profileEmail}
+                onChange={e => setProfileEmail(e.target.value)} placeholder="seu@email.com" required />
+            </div>
+            <div className="conta-form-row">
+              <label className="conta-label">{t('conta.label.bio')}</label>
+              <textarea
+                className="conta-input conta-textarea"
+                value={profileBio}
+                onChange={e => setProfileBio(e.target.value)}
+                placeholder={t('conta.ph.bio')}
+                maxLength={160}
+                rows={3}
               />
+              <span className="conta-bio-count">{profileBio.length}/160</span>
             </div>
             {profileError && <p className="conta-error">{profileError}</p>}
             {profileOk    && <p className="conta-success">{t('conta.profile.ok')}</p>}
             <div className="conta-form-actions">
-              <button type="button" className="conta-btn-cancel" onClick={() => setEditOpen(false)}>
-                {t('common.cancel')}
-              </button>
+              <button type="button" className="conta-btn-cancel" onClick={() => setEditOpen(false)}>{t('common.cancel')}</button>
               <button type="submit" className="conta-btn-save" disabled={profileMutation.isPending}>
                 {profileMutation.isPending ? t('common.saving') : t('common.save')}
               </button>
@@ -346,7 +290,31 @@ export default function ContaPage() {
         )}
       </div>
 
-      {/* ── Change password ────────────────────────────────────── */}
+      {/* ── Social Activity ──────────────────────────────────────── */}
+      <div className="settings-section">
+        <p className="settings-section-title">{t('conta.section.social')}</p>
+        <div className="profile-social-grid">
+          <SocialStat
+            value={publicProfile?.followersCount ?? '—'}
+            label={t('conta.social.followers')}
+          />
+          <SocialStat
+            value={publicProfile?.followingCount ?? '—'}
+            label={t('conta.social.following')}
+          />
+          <SocialStat
+            value={publicProfile?.currentStreak ?? user?.profileImageUrl !== undefined ? (publicProfile?.currentStreak ?? '—') : '—'}
+            label={t('conta.social.streak')}
+            icon={<IconFlame />}
+          />
+          <SocialStat
+            value={publicProfile?.totalTasksCompleted ?? '—'}
+            label={t('conta.social.tasks')}
+          />
+        </div>
+      </div>
+
+      {/* ── Security ─────────────────────────────────────────────── */}
       <div className="settings-section">
         <p className="settings-section-title">{t('conta.section.security')}</p>
         <div className="conta-action-row" onClick={() => { setPwdOpen(o => !o); setPwdError(''); setPwdOk(false) }}>
@@ -356,83 +324,44 @@ export default function ContaPage() {
           </div>
           <span className="conta-chevron">{pwdOpen ? '▲' : '▼'}</span>
         </div>
-
         {pwdOpen && (
           <form className="conta-form conta-form--indent" onSubmit={handlePwdSave}>
             <div className="conta-form-row">
               <label className="conta-label">{t('conta.label.pwd.current')}</label>
-              <input
-                className="conta-input"
-                type="password"
-                value={curPwd}
-                onChange={e => setCurPwd(e.target.value)}
-                placeholder="••••••••"
-                required
-              />
+              <input className="conta-input" type="password" value={curPwd}
+                onChange={e => setCurPwd(e.target.value)} placeholder="••••••••" required />
             </div>
             <div className="conta-form-row">
               <label className="conta-label">{t('conta.label.pwd.new')}</label>
-              <input
-                className="conta-input"
-                type="password"
-                value={newPwd}
-                onChange={e => setNewPwd(e.target.value)}
-                placeholder={t('conta.ph.pwd.new')}
-                required
-                minLength={8}
-              />
+              <input className="conta-input" type="password" value={newPwd}
+                onChange={e => setNewPwd(e.target.value)} placeholder={t('conta.ph.pwd.new')} required minLength={8} />
               {newPwd && (
                 <div className="pwd-strength">
                   <div className="pwd-strength-bar">
                     {[1,2,3,4,5].map(i => (
-                      <div
-                        key={i}
-                        className="pwd-strength-seg"
-                        style={{ background: i <= strength.score ? strength.color : 'var(--line)' }}
-                      />
+                      <div key={i} className="pwd-strength-seg"
+                        style={{ background: i <= strength.score ? strength.color : 'var(--line)' }} />
                     ))}
                   </div>
-                  <span className="pwd-strength-label" style={{ color: strength.color }}>
-                    {strength.label}
-                  </span>
+                  <span className="pwd-strength-label" style={{ color: strength.color }}>{strength.label}</span>
                 </div>
               )}
             </div>
             <div className="conta-form-row">
               <label className="conta-label">{t('conta.label.pwd.confirm')}</label>
-              <input
-                className="conta-input"
-                type="password"
-                value={confirmPwd}
-                onChange={e => setConfirmPwd(e.target.value)}
-                placeholder="••••••••"
-                required
-              />
+              <input className="conta-input" type="password" value={confirmPwd}
+                onChange={e => setConfirmPwd(e.target.value)} placeholder="••••••••" required />
             </div>
             {pwdError && <p className="conta-error">{pwdError}</p>}
             {pwdOk    && <p className="conta-success">{t('conta.pwd.ok')}</p>}
             <div className="conta-form-actions">
-              <button type="button" className="conta-btn-cancel" onClick={() => setPwdOpen(false)}>
-                {t('common.cancel')}
-              </button>
+              <button type="button" className="conta-btn-cancel" onClick={() => setPwdOpen(false)}>{t('common.cancel')}</button>
               <button type="submit" className="conta-btn-save" disabled={pwdMutation.isPending}>
                 {pwdMutation.isPending ? t('common.saving') : t('conta.pwd.btn')}
               </button>
             </div>
           </form>
         )}
-      </div>
-
-      {/* ── Danger zone ────────────────────────────────────────── */}
-      <div className="settings-section">
-        <p className="settings-section-title">{t('conta.section.session')}</p>
-        <div className="conta-logout-row">
-          <div>
-            <p className="conta-action-title">{t('conta.logout.title')}</p>
-            <p className="conta-action-desc">{t('conta.logout.desc')}</p>
-          </div>
-          <button className="conta-btn-logout" onClick={logout}>{t('conta.logout.btn')}</button>
-        </div>
       </div>
     </div>
   )

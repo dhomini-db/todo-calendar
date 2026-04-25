@@ -8,9 +8,7 @@ const SIDEBAR_MAX     = 400
 const SIDEBAR_DEFAULT = 260
 const STORAGE_KEY     = 'sidebar-width'
 
-/* ── SVG Icons ────────────────────────────────────────────────
-   16×16, stroke-based, strokeWidth 1.75 for refined look
-─────────────────────────────────────────────────────────────── */
+/* ── SVG Icons ──────────────────────────────────────────────── */
 function IconCalendar() {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -68,7 +66,7 @@ function IconPeople() {
 }
 function IconSettings() {
   return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="3"/>
       <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
     </svg>
@@ -76,10 +74,17 @@ function IconSettings() {
 }
 function IconLogout() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
       <polyline points="16 17 21 12 16 7"/>
       <line x1="21" y1="12" x2="9" y2="12"/>
+    </svg>
+  )
+}
+function IconChevronUp() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="18 15 12 9 6 15"/>
     </svg>
   )
 }
@@ -101,6 +106,45 @@ function NavItem({ to, icon, label, end, onClick }: NavItemProps) {
   )
 }
 
+/* ── User Menu Popup ──────────────────────────────────────────── */
+interface UserMenuProps {
+  onClose: () => void
+  onNavigate: (path: string) => void
+  onLogout: () => void
+  t: (key: string) => string
+}
+
+function UserMenu({ onClose, onNavigate, onLogout, t }: UserMenuProps) {
+  const ref = useRef<HTMLDivElement>(null)
+
+  // Close on outside click
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose()
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [onClose])
+
+  return (
+    <div className="sidebar-user-menu" ref={ref}>
+      <button className="sidebar-user-menu-item" onClick={() => { onNavigate('/personalizar'); onClose() }}>
+        <IconPalette />
+        {t('sidebar.menu.appearance')}
+      </button>
+      <button className="sidebar-user-menu-item" onClick={() => { onNavigate('/configuracoes'); onClose() }}>
+        <IconSettings />
+        {t('sidebar.menu.settings')}
+      </button>
+      <div className="sidebar-user-menu-divider" />
+      <button className="sidebar-user-menu-item sidebar-user-menu-item--danger" onClick={() => { onLogout(); onClose() }}>
+        <IconLogout />
+        {t('sidebar.menu.logout')}
+      </button>
+    </div>
+  )
+}
+
 /* ── Sidebar ──────────────────────────────────────────────────── */
 interface SidebarProps { mobileOpen?: boolean; onMobileClose?: () => void }
 
@@ -108,6 +152,7 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const { user, logout } = useAuth()
   const { t } = useLanguage()
   const navigate = useNavigate()
+  const [menuOpen, setMenuOpen] = useState(false)
 
   /* ── Resize logic ─────────────────────────────────────────── */
   const [width, setWidth] = useState<number>(() => {
@@ -125,7 +170,6 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const currentW   = useRef(width)
   const handleRef  = useRef<HTMLDivElement>(null)
 
-  // Keep ref in sync for use inside event handlers
   useEffect(() => { currentW.current = width }, [width])
 
   useEffect(() => {
@@ -178,60 +222,72 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         <div className="sidebar-backdrop" onClick={onMobileClose} aria-hidden="true" />
       )}
 
-    <aside
-      className={`sidebar${mobileOpen ? ' sidebar--open' : ''}`}
-      style={{ width }}
-    >
-      {/* Logo */}
-      <div className="sidebar-logo">
-        <img src="/logo-icon.svg" alt="TaskFlow" className="sidebar-logo-img" />
-        <span className="sidebar-logo-text">TaskFlow</span>
-      </div>
+      <aside
+        className={`sidebar${mobileOpen ? ' sidebar--open' : ''}`}
+        style={{ width }}
+      >
+        {/* Logo */}
+        <div className="sidebar-logo">
+          <img src="/logo-icon.svg" alt="TaskFlow" className="sidebar-logo-img" />
+          <span className="sidebar-logo-text">TaskFlow</span>
+        </div>
 
-      {/* Nav */}
-      <nav className="sidebar-nav">
-        <p className="sidebar-section-label">{t('nav.workspace')}</p>
-        <NavItem to="/"          icon={<IconCalendar />} label={t('nav.calendar')}   end onClick={onMobileClose} />
-        <NavItem to="/dashboard" icon={<IconGrid />}     label={t('nav.dashboard')}      onClick={onMobileClose} />
-        <NavItem to="/graficos"  icon={<IconChart />}    label={t('nav.charts')}         onClick={onMobileClose} />
-        <NavItem to="/social"    icon={<IconPeople />}   label={t('nav.social')}         onClick={onMobileClose} />
+        {/* Nav */}
+        <nav className="sidebar-nav">
+          <p className="sidebar-section-label">{t('nav.workspace')}</p>
+          <NavItem to="/"          icon={<IconCalendar />} label={t('nav.calendar')}   end onClick={onMobileClose} />
+          <NavItem to="/dashboard" icon={<IconGrid />}     label={t('nav.dashboard')}      onClick={onMobileClose} />
+          <NavItem to="/graficos"  icon={<IconChart />}    label={t('nav.charts')}         onClick={onMobileClose} />
+          <NavItem to="/social"    icon={<IconPeople />}   label={t('nav.social')}         onClick={onMobileClose} />
 
-        <p className="sidebar-section-label" style={{ marginTop: 12 }}>{t('nav.account')}</p>
-        <NavItem to="/conta"         icon={<IconUser />}     label={t('nav.profile')}     onClick={onMobileClose} />
-        <NavItem to="/personalizar"  icon={<IconPalette />}  label={t('nav.appearance')}  onClick={onMobileClose} />
-        <NavItem to="/configuracoes" icon={<IconSettings />} label={t('nav.settings')}    onClick={onMobileClose} />
-      </nav>
+          <p className="sidebar-section-label" style={{ marginTop: 12 }}>{t('nav.account')}</p>
+          <NavItem to="/conta" icon={<IconUser />} label={t('nav.profile')} onClick={onMobileClose} />
+        </nav>
 
-      {/* Footer */}
-      <div className="sidebar-footer">
-        {user && (
-          <div className="sidebar-user-info">
-            <div className="sidebar-user-avatar">
-              {user?.profileImageUrl
-                ? <img src={user.profileImageUrl} alt={user.name} className="sidebar-user-avatar-img" />
-                : initials
-              }
-            </div>
-            <div className="sidebar-user-text">
-              <p className="sidebar-user-name">{user.name}</p>
-              <p className="sidebar-user-email">{user.email}</p>
-            </div>
-          </div>
-        )}
-        <button className="sidebar-logout" onClick={handleLogout}>
-          <IconLogout />
-          Sair
-        </button>
-      </div>
+        {/* Footer — clicável abre o menu */}
+        <div className="sidebar-footer" style={{ position: 'relative' }}>
+          {/* User menu popup */}
+          {menuOpen && (
+            <UserMenu
+              onClose={() => setMenuOpen(false)}
+              onNavigate={path => { navigate(path); onMobileClose?.() }}
+              onLogout={handleLogout}
+              t={t}
+            />
+          )}
 
-      {/* Drag handle — right edge */}
-      <div
-        ref={handleRef}
-        className="sidebar-resize-handle"
-        onMouseDown={startResize}
-        aria-hidden="true"
-      />
-    </aside>
+          {user && (
+            <button
+              className={`sidebar-user-info sidebar-user-info--btn${menuOpen ? ' sidebar-user-info--active' : ''}`}
+              onClick={() => setMenuOpen(o => !o)}
+              aria-label="Menu do usuário"
+              aria-expanded={menuOpen}
+            >
+              <div className="sidebar-user-avatar">
+                {user?.profileImageUrl
+                  ? <img src={user.profileImageUrl} alt={user.name} className="sidebar-user-avatar-img" />
+                  : initials
+                }
+              </div>
+              <div className="sidebar-user-text">
+                <p className="sidebar-user-name">{user.name}</p>
+                <p className="sidebar-user-email">{user.email}</p>
+              </div>
+              <span className={`sidebar-user-chevron${menuOpen ? ' sidebar-user-chevron--open' : ''}`}>
+                <IconChevronUp />
+              </span>
+            </button>
+          )}
+        </div>
+
+        {/* Drag handle */}
+        <div
+          ref={handleRef}
+          className="sidebar-resize-handle"
+          onMouseDown={startResize}
+          aria-hidden="true"
+        />
+      </aside>
     </>
   )
 }

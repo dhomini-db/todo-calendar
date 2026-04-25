@@ -104,6 +104,7 @@ export interface UserProfile {
   id: number
   name: string
   email: string
+  bio?: string | null
   createdAt: string
   profileImageUrl?: string | null
 }
@@ -111,6 +112,7 @@ export interface UserProfile {
 export interface UpdateProfileRequest {
   name: string
   email: string
+  bio?: string | null
 }
 
 export interface ChangePasswordRequest {
@@ -155,6 +157,7 @@ export interface PublicProfile {
   id: number
   name: string
   initial: string
+  bio?: string | null
   currentStreak: number
   bestStreak: number
   totalTasksCompleted: number
@@ -170,6 +173,7 @@ export interface AuthUser {
   userId: number
   name: string
   email: string
+  bio?: string | null
   profileImageUrl?: string | null
 }
 

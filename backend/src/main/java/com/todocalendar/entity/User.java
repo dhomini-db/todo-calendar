@@ -60,6 +60,11 @@ public class User implements UserDetails {
     @Column(name = "profile_image_url", columnDefinition = "TEXT")
     private String profileImageUrl;
 
+    // ── Bio pública ─────────────────────────────────────────────
+
+    @Column(name = "bio", length = 160)
+    private String bio;
+
     // ── UserDetails ────────────────────────────────────────────
     // Sem roles por ora: todos os usuários têm o mesmo nível de acesso.
 

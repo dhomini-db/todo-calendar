@@ -4,6 +4,7 @@ public record PublicProfileResponse(
         Long    id,
         String  name,
         String  initial,
+        String  bio,
         int     currentStreak,
         int     bestStreak,
         long    totalTasksCompleted,

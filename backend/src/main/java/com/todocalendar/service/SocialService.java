@@ -67,6 +67,7 @@ public class SocialService {
                 u.getId(),
                 u.getName(),
                 extractInitial(u.getName()),
+                u.getBio(),
                 u.getCurrentStreak(),
                 u.getBestStreak(),
                 completed,

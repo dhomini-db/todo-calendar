@@ -89,6 +89,9 @@ public class UserService implements UserDetailsService {
 
         user.setName(request.getName().trim());
         user.setEmail(request.getEmail().trim().toLowerCase());
+        if (request.getBio() != null) {
+            user.setBio(request.getBio().trim().isEmpty() ? null : request.getBio().trim());
+        }
         userRepository.save(user);
 
         return toProfileResponse(user);
@@ -175,6 +178,7 @@ public class UserService implements UserDetailsService {
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
+                .bio(user.getBio())
                 .createdAt(user.getCreatedAt())
                 .profileImageUrl(user.getProfileImageUrl())
                 .build();
