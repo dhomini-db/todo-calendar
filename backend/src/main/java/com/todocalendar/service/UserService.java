@@ -173,6 +173,36 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
     }
 
+    @Transactional
+    public UserProfileResponse uploadBanner(User currentUser, MultipartFile file) {
+        if (file == null || file.isEmpty()) throw new IllegalArgumentException("Arquivo vazio");
+        String contentType = file.getContentType();
+        if (contentType == null ||
+                (!contentType.equals("image/jpeg") && !contentType.equals("image/png") && !contentType.equals("image/webp")))
+            throw new IllegalArgumentException("Formato inválido. Use JPG, PNG ou WebP");
+        if (file.getSize() > MAX_AVATAR_BYTES)
+            throw new IllegalArgumentException("Arquivo muito grande. Máximo 2 MB");
+        try {
+            byte[] bytes   = file.getBytes();
+            String base64  = Base64.getEncoder().encodeToString(bytes);
+            String dataUri = "data:" + contentType + ";base64," + base64;
+            User managed   = findOrThrow(currentUser.getId());
+            managed.setBannerImageUrl(dataUri);
+            userRepository.save(managed);
+            return toProfileResponse(managed);
+        } catch (IOException e) {
+            throw new RuntimeException("Erro ao processar imagem");
+        }
+    }
+
+    @Transactional
+    public UserProfileResponse removeBanner(User currentUser) {
+        User managed = findOrThrow(currentUser.getId());
+        managed.setBannerImageUrl(null);
+        userRepository.save(managed);
+        return toProfileResponse(managed);
+    }
+
     private UserProfileResponse toProfileResponse(User user) {
         return UserProfileResponse.builder()
                 .id(user.getId())
@@ -181,6 +211,7 @@ public class UserService implements UserDetailsService {
                 .bio(user.getBio())
                 .createdAt(user.getCreatedAt())
                 .profileImageUrl(user.getProfileImageUrl())
+                .bannerImageUrl(user.getBannerImageUrl())
                 .build();
     }
 

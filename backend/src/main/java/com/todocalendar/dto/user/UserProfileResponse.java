@@ -19,4 +19,5 @@ public class UserProfileResponse {
     private String bio;
     private LocalDateTime createdAt;
     private String profileImageUrl;
+    private String bannerImageUrl;
 }

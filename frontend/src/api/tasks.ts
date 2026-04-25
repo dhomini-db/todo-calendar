@@ -107,6 +107,17 @@ export const uploadAvatar = (file: File): Promise<UserProfile> => {
 export const removeAvatar = (): Promise<UserProfile> =>
   api.delete<UserProfile>('/users/me/avatar').then(r => r.data)
 
+export const uploadBanner = (file: File): Promise<UserProfile> => {
+  const form = new FormData()
+  form.append('file', file)
+  return api.post<UserProfile>('/users/me/banner', form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }).then(r => r.data)
+}
+
+export const removeBanner = (): Promise<UserProfile> =>
+  api.delete<UserProfile>('/users/me/banner').then(r => r.data)
+
 // ── Export ─────────────────────────────────────────────────────
 
 export const exportTasksCsv = async (): Promise<void> => {

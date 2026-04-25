@@ -109,14 +109,22 @@ export default function UserProfileModal({ userId, onClose }: Props) {
 
         {data && (
           <>
-            {/* Avatar */}
-            <div className="upm-header">
+            {/* Banner */}
+            {data.bannerImageUrl && (
+              <div className="upm-banner" style={{ backgroundImage: `url(${data.bannerImageUrl})` }} />
+            )}
+
+            {/* Avatar + name */}
+            <div className={`upm-header${data.bannerImageUrl ? ' upm-header--has-banner' : ''}`}>
               <div className="upm-avatar" style={{ background: avatarBg }}>
                 {data.profileImageUrl
                   ? <img src={data.profileImageUrl} alt={data.name} className="upm-avatar-img" />
                   : data.initial}
               </div>
               <h2 className="upm-name">{data.name}</h2>
+
+              {/* Bio */}
+              {data.bio && <p className="upm-bio">{data.bio}</p>}
 
               {/* Follow counts */}
               <div className="upm-follow-counts">

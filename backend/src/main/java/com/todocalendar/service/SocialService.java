@@ -74,7 +74,8 @@ public class SocialService {
                 isFollowing,
                 followers,
                 following,
-                u.getProfileImageUrl()
+                u.getProfileImageUrl(),
+                u.getBannerImageUrl()
         );
     }
 

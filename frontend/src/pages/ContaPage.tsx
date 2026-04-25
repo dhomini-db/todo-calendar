@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, type FormEvent } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useAuth } from '../contexts/AuthContext'
 import { useLanguage } from '../contexts/LanguageContext'
-import { updateProfile, changePassword, uploadAvatar, removeAvatar, getUserPublicProfile } from '../api/tasks'
+import { updateProfile, changePassword, uploadAvatar, removeAvatar, uploadBanner, removeBanner, getUserPublicProfile } from '../api/tasks'
 import type { UpdateProfileRequest, ChangePasswordRequest } from '../types'
 import ImageCropper from '../components/ImageCropper'
 
@@ -68,6 +68,40 @@ export default function ContaPage() {
     enabled: !!user?.userId,
     staleTime: 60_000,
   })
+
+  /* ── Banner upload ──────────────────────────────────────────── */
+  const bannerInputRef = useRef<HTMLInputElement>(null)
+  const [bannerPending,  setBannerPending]  = useState<File | null>(null)
+  const [bannerPreview,  setBannerPreview]  = useState<string | null>(null)
+  const [bannerError,    setBannerError]    = useState('')
+
+  const handleBannerChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+    if (file.size > 10 * 1024 * 1024) { setBannerError('Arquivo muito grande. Máximo 10 MB.'); return }
+    if (!['image/jpeg','image/png','image/webp'].includes(file.type)) { setBannerError('Formato inválido. Use JPG, PNG ou WebP.'); return }
+    setBannerError('')
+    setBannerPreview(URL.createObjectURL(file))
+    setBannerPending(file)
+  }, [])
+
+  const uploadBannerMut = useMutation({
+    mutationFn: (file: File) => uploadBanner(file),
+    onSuccess: (res) => {
+      updateUser({ bannerImageUrl: res.bannerImageUrl })
+      if (bannerPreview) URL.revokeObjectURL(bannerPreview)
+      setBannerPending(null); setBannerPreview(null); setBannerError('')
+    },
+    onError: () => setBannerError(t('conta.banner.err.upload')),
+  })
+  const removeBannerMut = useMutation({
+    mutationFn: removeBanner,
+    onSuccess: () => { updateUser({ bannerImageUrl: null }); setBannerError('') },
+    onError: () => setBannerError(t('conta.banner.err.remove')),
+  })
+
+  const currentBanner = bannerPreview ?? user?.bannerImageUrl ?? null
 
   /* ── Avatar upload ──────────────────────────────────────────── */
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -190,6 +224,49 @@ export default function ContaPage() {
       <div className="settings-section">
         <p className="settings-section-title">{t('conta.section.public')}</p>
 
+        {/* Banner */}
+        <div
+          className="profile-banner"
+          onClick={() => bannerInputRef.current?.click()}
+          title={t('conta.banner.change')}
+          style={currentBanner ? { backgroundImage: `url(${currentBanner})` } : undefined}
+        >
+          {!currentBanner && (
+            <div className="profile-banner-empty">
+              <IconCamera />
+              <span>{t('conta.banner.hint')}</span>
+            </div>
+          )}
+          <div className="profile-banner-overlay">
+            <IconCamera />
+            <span>{t('conta.banner.change')}</span>
+          </div>
+        </div>
+        <input ref={bannerInputRef} type="file" accept="image/jpeg,image/png,image/webp"
+          style={{ display: 'none' }} onChange={handleBannerChange} />
+
+        {/* Banner action bar */}
+        {bannerPending && (
+          <div className="conta-photo-bar">
+            <span className="conta-photo-bar-label">
+              {uploadBannerMut.isPending ? t('conta.banner.saving') : `${t('conta.banner.selected')} ${bannerPending.name}`}
+            </span>
+            <div className="conta-photo-bar-actions">
+              <button className="conta-btn-cancel" onClick={() => { if (bannerPreview) URL.revokeObjectURL(bannerPreview); setBannerPending(null); setBannerPreview(null) }} disabled={uploadBannerMut.isPending}>{t('common.cancel')}</button>
+              <button className="conta-btn-save" onClick={() => uploadBannerMut.mutate(bannerPending!)} disabled={uploadBannerMut.isPending}>
+                {uploadBannerMut.isPending ? t('common.saving') : t('conta.banner.save')}
+              </button>
+            </div>
+          </div>
+        )}
+        {!bannerPending && (currentBanner || user?.bannerImageUrl) && (
+          <button className="profile-remove-banner-btn" onClick={() => removeBannerMut.mutate()} disabled={removeBannerMut.isPending}>
+            {removeBannerMut.isPending ? '…' : t('conta.banner.remove')}
+          </button>
+        )}
+        {bannerError && <p className="conta-error" style={{ marginTop: 4 }}>{bannerError}</p>}
+
+        {/* Avatar + info row */}
         <div className="profile-hero">
           {/* Avatar */}
           <div className="profile-avatar-wrap">
@@ -209,11 +286,7 @@ export default function ContaPage() {
               )}
             </div>
             {user?.profileImageUrl && !pendingFile && (
-              <button
-                className="profile-remove-photo"
-                onClick={() => removeMutation.mutate()}
-                disabled={removeMutation.isPending}
-              >
+              <button className="profile-remove-photo" onClick={() => removeMutation.mutate()} disabled={removeMutation.isPending}>
                 {removeMutation.isPending ? t('conta.avatar.removing') : t('conta.avatar.remove')}
               </button>
             )}
@@ -237,7 +310,7 @@ export default function ContaPage() {
           </div>
         </div>
 
-        {/* Photo pending bar */}
+        {/* Avatar photo pending bar */}
         {pendingFile && (
           <div className="conta-photo-bar">
             <span className="conta-photo-bar-label">
@@ -245,7 +318,7 @@ export default function ContaPage() {
             </span>
             <div className="conta-photo-bar-actions">
               <button className="conta-btn-cancel" onClick={cancelPhotoUpload} disabled={uploadMutation.isPending}>{t('common.cancel')}</button>
-              <button className="conta-btn-save"   onClick={() => uploadMutation.mutate(pendingFile!)} disabled={uploadMutation.isPending}>
+              <button className="conta-btn-save" onClick={() => uploadMutation.mutate(pendingFile!)} disabled={uploadMutation.isPending}>
                 {uploadMutation.isPending ? t('common.saving') : t('conta.avatar.save')}
               </button>
             </div>

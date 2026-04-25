@@ -5472,3 +5472,95 @@ a.sidebar-item:hover:not(.active) {
   .profile-social-grid { grid-template-columns: repeat(2, 1fr); }
   .sidebar-user-menu { left: 8px; right: 8px; }
 }
+
+/* ════════════════════════════════════════════════════════════════
+   PROFILE BANNER
+   ════════════════════════════════════════════════════════════════ */
+
+.profile-banner {
+  width: 100%;
+  height: 140px;
+  border-radius: 14px;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--accent) 30%, var(--raised)),
+    color-mix(in srgb, var(--accent) 12%, var(--raised))
+  );
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  margin-bottom: 6px;
+  border: 1px solid var(--line-md);
+  transition: border-color 0.15s;
+}
+.profile-banner:hover { border-color: color-mix(in srgb, var(--accent) 50%, transparent); }
+
+.profile-banner-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--text-3);
+  font-size: 12.5px;
+  pointer-events: none;
+}
+.profile-banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 500;
+  opacity: 0;
+  transition: opacity 0.18s;
+  pointer-events: none;
+}
+.profile-banner:hover .profile-banner-overlay { opacity: 1; }
+/* Keep empty-state icon hidden when there's an overlay that appears */
+.profile-banner:hover .profile-banner-empty { opacity: 0; }
+
+.profile-remove-banner-btn {
+  font-size: 11px;
+  color: var(--text-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0 8px;
+  text-decoration: underline;
+  transition: color 0.15s;
+}
+.profile-remove-banner-btn:hover { color: #ef4444; }
+.profile-remove-banner-btn:disabled { opacity: 0.5; cursor: default; }
+
+/* ── Modal banner & bio ─────────────────────────────────────── */
+
+.upm-banner {
+  width: calc(100% + 48px);    /* bleed past modal padding */
+  margin: -28px -24px 0;       /* pull to top + sides */
+  height: 110px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 20px 20px 0 0;
+  flex-shrink: 0;
+}
+
+/* When banner exists, tighten avatar top margin */
+.upm-header--has-banner { margin-top: -36px; }
+
+.upm-bio {
+  font-size: 12.5px;
+  color: var(--text-3);
+  text-align: center;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 280px;
+}

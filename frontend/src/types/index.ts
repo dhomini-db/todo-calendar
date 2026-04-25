@@ -107,6 +107,7 @@ export interface UserProfile {
   bio?: string | null
   createdAt: string
   profileImageUrl?: string | null
+  bannerImageUrl?: string | null
 }
 
 export interface UpdateProfileRequest {
@@ -165,6 +166,7 @@ export interface PublicProfile {
   followersCount: number
   followingCount: number
   profileImageUrl?: string | null
+  bannerImageUrl?: string | null
 }
 
 // ── Autenticação ───────────────────────────────────────────────
@@ -175,6 +177,7 @@ export interface AuthUser {
   email: string
   bio?: string | null
   profileImageUrl?: string | null
+  bannerImageUrl?: string | null
 }
 
 export interface AuthResponse {

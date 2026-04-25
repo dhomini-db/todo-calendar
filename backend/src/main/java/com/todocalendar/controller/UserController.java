@@ -77,4 +77,25 @@ public class UserController {
             @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(userService.removeAvatar(currentUser));
     }
+
+    /**
+     * POST /api/users/me/banner
+     * Faz upload do banner de perfil (JPG, PNG ou WebP — máx 2 MB).
+     */
+    @PostMapping(value = "/me/banner", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UserProfileResponse> uploadBanner(
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(userService.uploadBanner(currentUser, file));
+    }
+
+    /**
+     * DELETE /api/users/me/banner
+     * Remove o banner de perfil do usuário autenticado.
+     */
+    @DeleteMapping("/me/banner")
+    public ResponseEntity<UserProfileResponse> removeBanner(
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(userService.removeBanner(currentUser));
+    }
 }

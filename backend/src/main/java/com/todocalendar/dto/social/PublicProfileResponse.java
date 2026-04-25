@@ -11,5 +11,6 @@ public record PublicProfileResponse(
         boolean isFollowing,
         long    followersCount,
         long    followingCount,
-        String  profileImageUrl
+        String  profileImageUrl,
+        String  bannerImageUrl
 ) {}

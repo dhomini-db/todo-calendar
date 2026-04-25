@@ -65,6 +65,11 @@ public class User implements UserDetails {
     @Column(name = "bio", length = 160)
     private String bio;
 
+    // ── Banner de perfil ────────────────────────────────────────
+
+    @Column(name = "banner_image_url", columnDefinition = "TEXT")
+    private String bannerImageUrl;
+
     // ── UserDetails ────────────────────────────────────────────
     // Sem roles por ora: todos os usuários têm o mesmo nível de acesso.
 
