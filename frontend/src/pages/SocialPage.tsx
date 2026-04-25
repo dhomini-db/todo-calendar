@@ -6,145 +6,218 @@ import { useAuth } from '../contexts/AuthContext'
 import UserProfileModal from '../components/UserProfileModal'
 import type { UserRanking } from '../types'
 
-function Medal({ rank }: { rank: number }) {
-  if (rank === 1) return <span className="rank-medal">🥇</span>
-  if (rank === 2) return <span className="rank-medal">🥈</span>
-  if (rank === 3) return <span className="rank-medal">🥉</span>
-  return <span className="rank-num">#{rank}</span>
-}
-
-function IconFlame() {
+/* ── Icons ─────────────────────────────────────────────────────── */
+function IconFlame({ size = 14 }: { size?: number }) {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
       <path d="M8.5 14.5A2.5 2.5 0 0 0 11 17c1.387 0 2.5-1.343 2.5-3 0-1.657-1.5-3-1.5-5 0 0 3 1.343 3 4.5 0 2.485-2.015 4.5-4.5 4.5S6 15.985 6 13.5C6 11.5 8 8 12 6c0 0-1 3.5 1 5.5"/>
     </svg>
   )
 }
+function IconStar({ size = 13 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="none">
+      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+    </svg>
+  )
+}
+function IconUsers({ size = 12 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+  )
+}
 
-// ── Follow button (inline, in the rank card) ───────────────────
+/* ── Avatar ─────────────────────────────────────────────────────── */
+function UserAvatar({ user, size, ring }: { user: UserRanking; size: number; ring?: string }) {
+  const bg = `hsl(${(user.id * 47) % 360}, 60%, 42%)`
+  return (
+    <div
+      className="soc-avatar"
+      style={{
+        width: size,
+        height: size,
+        fontSize: size * 0.37,
+        background: bg,
+        boxShadow: ring ? `0 0 0 3px ${ring}, 0 8px 24px rgba(0,0,0,0.4)` : undefined,
+      }}
+    >
+      {user.profileImageUrl
+        ? <img src={user.profileImageUrl} alt={user.name} className="soc-avatar-img" />
+        : user.initial}
+    </div>
+  )
+}
 
-interface FollowBtnProps { userId: number; isFollowing: boolean; disabled?: boolean }
-
-function FollowBtn({ userId, isFollowing, disabled }: FollowBtnProps) {
+/* ── Follow button ──────────────────────────────────────────────── */
+function FollowBtn({ userId, isFollowing, small }: { userId: number; isFollowing: boolean; small?: boolean }) {
   const { t } = useLanguage()
   const queryClient = useQueryClient()
-  const [optimistic, setOptimistic] = useState<boolean | null>(null)
+  const [opt, setOpt] = useState<boolean | null>(null)
+  const following = opt !== null ? opt : isFollowing
 
-  const following = optimistic !== null ? optimistic : isFollowing
-
-  const followMut = useMutation({
-    mutationFn: () => followUser(userId),
-    onMutate: () => setOptimistic(true),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['social', 'rankings'] }); setOptimistic(null) },
-    onError: () => setOptimistic(null),
-  })
-  const unfollowMut = useMutation({
-    mutationFn: () => unfollowUser(userId),
-    onMutate: () => setOptimistic(false),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['social', 'rankings'] }); setOptimistic(null) },
-    onError: () => setOptimistic(null),
-  })
+  const followMut   = useMutation({ mutationFn: () => followUser(userId),   onMutate: () => setOpt(true),  onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['social'] }); setOpt(null) }, onError: () => setOpt(null) })
+  const unfollowMut = useMutation({ mutationFn: () => unfollowUser(userId), onMutate: () => setOpt(false), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['social'] }); setOpt(null) }, onError: () => setOpt(null) })
 
   const pending = followMut.isPending || unfollowMut.isPending
-
   return (
     <button
-      className={`rank-follow-btn${following ? ' rank-follow-btn--following' : ''}`}
-      onClick={e => { e.stopPropagation(); if (following) unfollowMut.mutate(); else followMut.mutate() }}
-      disabled={disabled || pending}
-      title={following ? t('social.unfollow') : t('social.follow')}
+      className={`soc-follow-btn${following ? ' soc-follow-btn--on' : ''}${small ? ' soc-follow-btn--sm' : ''}`}
+      onClick={e => { e.stopPropagation(); following ? unfollowMut.mutate() : followMut.mutate() }}
+      disabled={pending}
     >
       {pending ? '…' : following ? t('social.following') : t('social.follow')}
     </button>
   )
 }
 
-// ── Rank card ──────────────────────────────────────────────────
+/* ── Podium ─────────────────────────────────────────────────────── */
+const GOLD   = '#f59e0b'
+const SILVER = '#94a3b8'
+const BRONZE = '#b45309'
 
-interface RankCardProps {
-  user: UserRanking
-  isMe: boolean
-  onClick: () => void
-}
+const PODIUM_CFG = [
+  { rank: 2, place: 1, avatarSize: 72,  blockH: 84,  ring: SILVER, glow: 'rgba(148,163,184,0.28)', medal: '🥈', animDelay: '0.15s' },
+  { rank: 1, place: 0, avatarSize: 96,  blockH: 116, ring: GOLD,   glow: 'rgba(245,158,11,0.40)',  medal: '🥇', animDelay: '0s'    },
+  { rank: 3, place: 2, avatarSize: 62,  blockH: 60,  ring: BRONZE, glow: 'rgba(180,83,9,0.28)',    medal: '🥉', animDelay: '0.25s' },
+]
 
-function RankCard({ user, isMe, onClick }: RankCardProps) {
-  const { t } = useLanguage()
-  const top3 = user.rank <= 3
-
+function Podium({ data, myId, onSelect }: { data: UserRanking[]; myId?: number; onSelect: (id: number) => void }) {
   return (
-    <div
-      className={`rank-card rank-card--clickable${top3 ? ' rank-card--top' : ''}${isMe ? ' rank-card--me' : ''}`}
-      onClick={onClick}
-      role="button"
-      tabIndex={0}
-      onKeyDown={e => e.key === 'Enter' && onClick()}
-    >
-      <div className="rank-card-left">
-        <div className="rank-position">
-          <Medal rank={user.rank} />
-        </div>
-        <div
-          className="rank-avatar"
-          style={{ background: `hsl(${(user.id * 47) % 360}, 55%, 45%)` }}
-        >
-          {user.profileImageUrl
-            ? <img src={user.profileImageUrl} alt={user.name} className="rank-avatar-img" />
-            : user.initial}
-        </div>
-        <div className="rank-info">
-          <p className="rank-name">
-            {user.name}
-            {isMe && <span className="rank-you-badge">{t('social.you')}</span>}
-          </p>
-          <p className="rank-best">
-            {t('social.best')}: {user.bestStreak} {t('social.days')}
-            {user.followersCount > 0 && (
-              <span className="rank-followers-count"> · {user.followersCount} {t('social.followers')}</span>
-            )}
-          </p>
-        </div>
-      </div>
-
-      <div className="rank-right">
-        <div className="rank-streak-wrap">
-          <span className="rank-streak-icon"><IconFlame /></span>
-          <div>
-            <p className="rank-streak-value">{user.currentStreak}</p>
-            <p className="rank-streak-label">{t('social.days')}</p>
-          </div>
-        </div>
-        {!isMe && (
-          <FollowBtn userId={user.id} isFollowing={user.isFollowing} />
-        )}
-      </div>
+    <div className="soc-podium">
+      {PODIUM_CFG.map(cfg => {
+        const u = data[cfg.place]
+        if (!u) return null
+        const isMe = u.id === myId
+        return (
+          <button
+            key={u.id}
+            className={`soc-pod-item soc-pod-item--${cfg.rank}${isMe ? ' soc-pod-item--me' : ''}`}
+            style={{ '--pod-delay': cfg.animDelay } as React.CSSProperties}
+            onClick={() => onSelect(u.id)}
+          >
+            {cfg.rank === 1 && <span className="soc-pod-crown">👑</span>}
+            <div className="soc-pod-avatar-wrap" style={{ filter: `drop-shadow(0 4px 16px ${cfg.glow})` }}>
+              <UserAvatar user={u} size={cfg.avatarSize} ring={cfg.ring} />
+            </div>
+            <p className="soc-pod-name">{isMe ? '✨ ' : ''}{u.name}</p>
+            <div
+              className={`soc-pod-block soc-pod-block--${cfg.rank}`}
+              style={{ height: cfg.blockH }}
+            >
+              <span className="soc-pod-medal">{cfg.medal}</span>
+              <span className="soc-pod-streak">
+                <IconFlame size={12} />
+                {u.currentStreak}
+              </span>
+            </div>
+          </button>
+        )
+      })}
     </div>
   )
 }
 
-// ── Skeleton ───────────────────────────────────────────────────
+/* ── Rank card ──────────────────────────────────────────────────── */
+const RANK_COLORS = ['rgba(245,158,11,0.12)', 'rgba(148,163,184,0.08)', 'rgba(180,83,9,0.08)']
+const RANK_BORDERS = ['rgba(245,158,11,0.30)', 'rgba(148,163,184,0.20)', 'rgba(180,83,9,0.20)']
 
-function RankSkeleton() {
+function RankCard({ user, isMe, rank, onClick }: { user: UserRanking; isMe: boolean; rank: number; onClick: () => void }) {
+  const { t } = useLanguage()
+  const top3 = rank <= 3
+  const medals = ['🥇', '🥈', '🥉']
+
+  const cardStyle = top3 ? {
+    background: `${RANK_COLORS[rank - 1]}, var(--raised)`,
+    borderColor: RANK_BORDERS[rank - 1],
+  } : undefined
+
+  const meStyle = isMe ? {
+    borderColor: 'var(--accent)',
+    background: 'color-mix(in srgb, var(--accent) 8%, var(--raised))',
+    boxShadow: '0 0 0 1px rgba(59,130,246,0.2), 0 4px 20px rgba(59,130,246,0.08)',
+  } : undefined
+
   return (
-    <div className="rank-skeleton-list">
-      {[0,1,2,3,4].map(i => (
-        <div key={i} className="rank-card">
-          <div className="rank-card-left">
-            <div className="dash-skel" style={{ width: 32, height: 32, borderRadius: '50%' }} />
-            <div className="dash-skel" style={{ width: 40, height: 40, borderRadius: '50%' }} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <div className="dash-skel" style={{ width: 120, height: 13 }} />
-              <div className="dash-skel" style={{ width: 80, height: 11 }} />
-            </div>
+    <div
+      className={`soc-rank-card${isMe ? ' soc-rank-card--me' : ''}`}
+      style={{ ...cardStyle, ...meStyle }}
+      onClick={onClick}
+      role="button" tabIndex={0}
+      onKeyDown={e => e.key === 'Enter' && onClick()}
+    >
+      {/* Position */}
+      <div className="soc-rank-pos">
+        {top3
+          ? <span className="soc-rank-medal">{medals[rank - 1]}</span>
+          : <span className="soc-rank-num">#{rank}</span>}
+      </div>
+
+      {/* Avatar */}
+      <UserAvatar user={user} size={46} />
+
+      {/* Info */}
+      <div className="soc-rank-info">
+        <div className="soc-rank-name-row">
+          <span className="soc-rank-name">{user.name}</span>
+          {isMe && <span className="soc-rank-you">Você</span>}
+        </div>
+        <div className="soc-rank-meta">
+          <span className="soc-rank-meta-item">
+            <IconStar size={11} /> {user.bestStreak} {t('social.days')}
+          </span>
+          {user.followersCount > 0 && (
+            <span className="soc-rank-meta-item">
+              <IconUsers size={11} /> {user.followersCount}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Streak */}
+      <div className="soc-rank-streak">
+        <span className="soc-rank-streak-val">{user.currentStreak}</span>
+        <span className="soc-rank-streak-sub">
+          <IconFlame size={11} /> {t('social.days')}
+        </span>
+      </div>
+
+      {/* Follow */}
+      {!isMe && (
+        <div className="soc-rank-action">
+          <FollowBtn userId={user.id} isFollowing={user.isFollowing} small />
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ── Skeleton ───────────────────────────────────────────────────── */
+function Skeleton() {
+  return (
+    <div className="soc-skeleton">
+      {Array.from({ length: 5 }, (_, i) => (
+        <div key={i} className="soc-rank-card" style={{ opacity: 1 - i * 0.12 }}>
+          <div className="dash-skel" style={{ width: 28, height: 16, borderRadius: 6 }} />
+          <div className="dash-skel" style={{ width: 46, height: 46, borderRadius: '50%', flexShrink: 0 }} />
+          <div className="soc-rank-info">
+            <div className="dash-skel" style={{ width: '55%', height: 13, marginBottom: 6 }} />
+            <div className="dash-skel" style={{ width: '35%', height: 11 }} />
           </div>
-          <div className="dash-skel" style={{ width: 48, height: 40 }} />
+          <div className="dash-skel" style={{ width: 40, height: 40, borderRadius: 10 }} />
+          <div className="dash-skel" style={{ width: 72, height: 30, borderRadius: 20 }} />
         </div>
       ))}
     </div>
   )
 }
 
-// ── Page ───────────────────────────────────────────────────────
-
+/* ── Page ───────────────────────────────────────────────────────── */
 export default function SocialPage() {
   const { t } = useLanguage()
   const { user } = useAuth()
@@ -157,63 +230,26 @@ export default function SocialPage() {
   })
 
   return (
-    <div className="inner-page">
-      <div className="inner-page-header">
-        <h1 className="page-title">{t('social.title')}</h1>
-        <p className="page-sub">{t('social.sub')}</p>
+    <div className="soc-page">
+      {/* Header */}
+      <div className="soc-header">
+        <h1 className="soc-title">{t('social.title')}</h1>
+        <p className="soc-sub">{t('social.sub')}</p>
       </div>
 
-      {/* Podium - top 3 */}
+      {/* Podium */}
       {data && data.length >= 3 && (
-        <div className="social-podium">
-          {/* 2nd */}
-          <div className="podium-item podium-item--2" onClick={() => setSelectedUserId(data[1].id)} style={{ cursor: 'pointer' }}>
-            <div className="podium-avatar" style={{ background: `hsl(${(data[1].id * 47) % 360}, 55%, 45%)` }}>
-              {data[1].profileImageUrl
-                ? <img src={data[1].profileImageUrl} alt={data[1].name} className="podium-avatar-img" />
-                : data[1].initial}
-            </div>
-            <p className="podium-name">{data[1].name}</p>
-            <div className="podium-block podium-block--2">
-              <span>🥈</span>
-              <p className="podium-streak">{data[1].currentStreak}🔥</p>
-            </div>
-          </div>
-          {/* 1st */}
-          <div className="podium-item podium-item--1" onClick={() => setSelectedUserId(data[0].id)} style={{ cursor: 'pointer' }}>
-            <div className="podium-crown">👑</div>
-            <div className="podium-avatar podium-avatar--1" style={{ background: `hsl(${(data[0].id * 47) % 360}, 55%, 45%)` }}>
-              {data[0].profileImageUrl
-                ? <img src={data[0].profileImageUrl} alt={data[0].name} className="podium-avatar-img" />
-                : data[0].initial}
-            </div>
-            <p className="podium-name">{data[0].name}</p>
-            <div className="podium-block podium-block--1">
-              <span>🥇</span>
-              <p className="podium-streak">{data[0].currentStreak}🔥</p>
-            </div>
-          </div>
-          {/* 3rd */}
-          <div className="podium-item podium-item--3" onClick={() => setSelectedUserId(data[2].id)} style={{ cursor: 'pointer' }}>
-            <div className="podium-avatar" style={{ background: `hsl(${(data[2].id * 47) % 360}, 55%, 45%)` }}>
-              {data[2].profileImageUrl
-                ? <img src={data[2].profileImageUrl} alt={data[2].name} className="podium-avatar-img" />
-                : data[2].initial}
-            </div>
-            <p className="podium-name">{data[2].name}</p>
-            <div className="podium-block podium-block--3">
-              <span>🥉</span>
-              <p className="podium-streak">{data[2].currentStreak}🔥</p>
-            </div>
-          </div>
-        </div>
+        <Podium data={data} myId={user?.userId} onSelect={id => setSelectedUserId(id)} />
       )}
 
-      {/* Full rankings list */}
-      <div className="settings-section">
-        <p className="settings-section-title">{t('social.rankings_title')}</p>
+      {/* Rankings */}
+      <div className="soc-rankings-wrap">
+        <div className="soc-rankings-header">
+          <span className="soc-rankings-label">{t('social.rankings_title')}</span>
+          <span className="soc-rankings-count">{data?.length ?? 0} usuários</span>
+        </div>
 
-        {isLoading && <RankSkeleton />}
+        {isLoading && <Skeleton />}
 
         {isError && (
           <div className="chart-empty">
@@ -222,7 +258,7 @@ export default function SocialPage() {
           </div>
         )}
 
-        {data && data.length === 0 && (
+        {data?.length === 0 && (
           <div className="chart-empty">
             <span className="chart-empty-icon">👥</span>
             <p className="chart-empty-title">{t('social.empty')}</p>
@@ -230,33 +266,28 @@ export default function SocialPage() {
         )}
 
         {data && data.length > 0 && (
-          <div className="rank-list">
-            {data.map(u => (
+          <div className="soc-rank-list">
+            {data.map((u, i) => (
               <RankCard
                 key={u.id}
                 user={u}
+                rank={i + 1}
                 isMe={u.id === user?.userId}
                 onClick={() => setSelectedUserId(u.id)}
               />
             ))}
           </div>
         )}
-      </div>
 
-      {/* Info card */}
-      <div className="settings-section">
-        <div className="social-info-card">
-          <p className="social-info-icon">💡</p>
-          <p className="social-info-text">{t('social.info')}</p>
+        {/* Info */}
+        <div className="soc-info-bar">
+          <span>💡</span>
+          <span>{t('social.info')}</span>
         </div>
       </div>
 
-      {/* User profile modal */}
       {selectedUserId !== null && (
-        <UserProfileModal
-          userId={selectedUserId}
-          onClose={() => setSelectedUserId(null)}
-        />
+        <UserProfileModal userId={selectedUserId} onClose={() => setSelectedUserId(null)} />
       )}
     </div>
   )
