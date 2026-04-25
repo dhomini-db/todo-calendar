@@ -5,7 +5,6 @@ import InstallPrompt       from './components/InstallPrompt'
 import OfflineBanner       from './components/OfflineBanner'
 import AnimatedOutlet      from './components/AnimatedOutlet'
 import SplashScreen        from './components/SplashScreen'
-import FloatingAIButton    from './components/FloatingAIButton'
 import { useAuth }         from './contexts/AuthContext'
 import { useNotificationScheduler } from './hooks/useNotifications'
 
@@ -62,8 +61,6 @@ export default function App() {
       {/* ── PWA: install banner (bottom of viewport) */}
       <InstallPrompt />
 
-      {/* ── Floating AI assistant button */}
-      <FloatingAIButton />
     </div>
   )
 }
