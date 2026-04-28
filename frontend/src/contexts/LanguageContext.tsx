@@ -17,15 +17,6 @@ const translations: Record<Lang, Record<string, string>> = {
     'nav.appearance':  'Aparência',
     'nav.settings':    'Configurações',
 
-    // ── IA ─────────────────────────────────────────────────────
-    'ai.panel_title':  'TaskFlow AI',
-    'ai.sub':          'Assistente de produtividade',
-    'ai.greeting':     '👋 Olá! Como posso ajudar sua produtividade hoje?',
-    'ai.placeholder':  'Pergunte algo...',
-    'ai.send':         'Enviar',
-    'ai.error':        'Erro ao processar sua mensagem',
-    'ai.conn_error':   'Erro de conexão com o assistente',
-
     // ── Social ─────────────────────────────────────────────────
     'social.title':          'Social',
     'social.sub':            'Ranking global de streaks',
@@ -341,15 +332,6 @@ const translations: Record<Lang, Record<string, string>> = {
     'nav.profile':     'My Profile',
     'nav.appearance':  'Appearance',
     'nav.settings':    'Settings',
-
-    // ── AI ─────────────────────────────────────────────────────
-    'ai.panel_title':  'TaskFlow AI',
-    'ai.sub':          'Productivity assistant',
-    'ai.greeting':     '👋 Hi! How can I help your productivity today?',
-    'ai.placeholder':  'Ask something...',
-    'ai.send':         'Send',
-    'ai.error':        'Error processing your message',
-    'ai.conn_error':   'Connection error with the assistant',
 
     // ── Social ─────────────────────────────────────────────────
     'social.title':          'Social',
