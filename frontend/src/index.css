@@ -887,8 +887,12 @@ body {
   display: flex;
   align-items: center;
   gap: 9px;
-  padding: 20px 16px 16px;
-  border-bottom: 1px solid var(--line);
+  margin: 12px 12px 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-md);
+  border-radius: 14px;
+  background: linear-gradient(145deg, var(--raised), var(--surface));
+  box-shadow: inset 0 1px 0 var(--line-hi), 0 5px 16px rgba(0, 0, 0, 0.08);
   flex-shrink: 0;
 }
 .sidebar-logo-icon {
@@ -3552,7 +3556,7 @@ body {
 }
 
 .sidebar-logo {
-  padding: 22px 16px 18px;
+  padding: 11px 12px;
 }
 
 /* Active item — pill with inner ring */
