@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { login } from '../api/tasks'
 import { useAuth } from '../contexts/AuthContext'
+import DemoEmailNotice from '../components/DemoEmailNotice'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -12,6 +13,7 @@ export default function LoginPage() {
   const [error,    setError]    = useState('')
   const [loading,  setLoading]  = useState(false)
   const [leaving,  setLeaving]  = useState(false)
+  const [showDemoNotice, setShowDemoNotice] = useState(true)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -38,6 +40,7 @@ export default function LoginPage() {
 
   return (
     <div className={`auth-page${leaving ? ' auth-page--leaving' : ''}`}>
+      {showDemoNotice && <DemoEmailNotice onClose={() => setShowDemoNotice(false)} />}
       <div className="auth-card">
         {/* Logo */}
         <div className="auth-logo">
