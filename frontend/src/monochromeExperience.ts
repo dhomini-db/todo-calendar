@@ -42,3 +42,5 @@ const renameThemes = () => {
 }
 new MutationObserver(renameThemes).observe(document.body, {childList:true,subtree:true})
 renameThemes()
+
+export {}
