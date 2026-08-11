@@ -59,3 +59,5 @@ import './brandAura'
 import './monochromeExperience'
 
 import './themeMigration'
+
+import './accentExperience'
