@@ -65,3 +65,5 @@ import './accentExperience'
 import './performanceMode'
 
 import './mobileSidebarFix'
+
+import './mobileTopbarFix'
