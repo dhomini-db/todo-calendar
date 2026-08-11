@@ -63,7 +63,7 @@ docker compose up --build
 | Backend    | [localhost:8081](http://localhost:8081)     |
 | PostgreSQL | localhost:5433                             |
 🌐 **Acesse o projeto (online):** [todo-calendar-eight-orpin.vercel.app](https://todo-calendar-eight-orpin.vercel.app)
-### Frontend (desenvolvimento)
+🌐 **Acesse o projeto (online):** [todo-calendar-eight-orpin.vercel.app](https://todo-calendar-eight-orpin.vercel.app)
 
 ```bash
 cd frontend
