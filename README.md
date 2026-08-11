@@ -1,4 +1,4 @@
-https://todo-calendar-eight-orpin.vercel.app# TaskFlow
+# TaskFlow
 
 > Sistema de gestão de tarefas diárias com calendário inteligente, recorrência automática e múltiplos temas visuais.
 
@@ -62,7 +62,7 @@ docker compose up --build
 | Frontend   | [localhost:3001](http://localhost:3001)     |
 | Backend    | [localhost:8081](http://localhost:8081)     |
 | PostgreSQL | localhost:5433                             |
-
+🌐 **Acesse o projeto (online):** [todo-calendar-eight-orpin.vercel.app](https://todo-calendar-eight-orpin.vercel.app)
 ### Frontend (desenvolvimento)
 
 ```bash
