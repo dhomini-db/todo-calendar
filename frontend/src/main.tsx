@@ -61,3 +61,5 @@ import './monochromeExperience'
 import './themeMigration'
 
 import './accentExperience'
+
+import './performanceMode'
