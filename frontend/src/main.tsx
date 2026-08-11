@@ -63,3 +63,5 @@ import './themeMigration'
 import './accentExperience'
 
 import './performanceMode'
+
+import './mobileSidebarFix'
