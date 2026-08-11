@@ -67,3 +67,5 @@ import './performanceMode'
 import './mobileSidebarFix'
 
 import './mobileTopbarFix'
+
+import './taskScheduleEnhancement'
