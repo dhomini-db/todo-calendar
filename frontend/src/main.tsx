@@ -17,6 +17,7 @@ import { AuthProvider }     from './contexts/AuthContext'
 import { ThemeProvider }    from './contexts/ThemeContext'
 import { LanguageProvider } from './contexts/LanguageContext'
 import './index.css'
+import './liquid-glass.css'
 
 const queryClient = new QueryClient({
   defaultOptions: {
