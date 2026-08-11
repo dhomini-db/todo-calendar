@@ -57,3 +57,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 import './brandAura'
 
 import './monochromeExperience'
+
+import './themeMigration'
