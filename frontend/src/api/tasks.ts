@@ -6,7 +6,7 @@ import type { Task, TaskRequest, DaySummary, AuthResponse, LoginRequest, Registe
  * Em Docker → Nginx proxy redireciona /api para backend:8081
  * Em produção (Vercel) → VITE_API_URL aponta para o backend hospedado
  */
-const BASE = import.meta.env.VITE_API_URL ?? '/api'
+const BASE = '/api'
 
 const api = axios.create({
   baseURL: BASE,
