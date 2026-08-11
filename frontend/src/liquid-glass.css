@@ -1,0 +1,142 @@
+/* Final cascade layer for the TaskFlow liquid-glass redesign. */
+:root {
+  --glass-bg: color-mix(in srgb,var(--surface) 76%,transparent);
+  --glass-bg-soft: color-mix(in srgb,var(--raised) 62%,transparent);
+  --glass-bg-strong: color-mix(in srgb,var(--elevated) 88%,transparent);
+  --glass-border: color-mix(in srgb,var(--line-hi) 82%,transparent);
+  --glass-highlight: color-mix(in srgb,white 16%,transparent);
+  --glass-shadow: 0 18px 52px rgba(0,0,0,.16),inset 0 1px 0 var(--glass-highlight);
+  --glass-shadow-soft: 0 9px 28px rgba(0,0,0,.10),inset 0 1px 0 var(--glass-highlight);
+}
+
+body {
+  background:
+    radial-gradient(circle at 12% 8%,color-mix(in srgb,var(--accent) 12%,transparent),transparent 32%),
+    radial-gradient(circle at 88% 92%,color-mix(in srgb,var(--accent) 8%,transparent),transparent 34%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+.auth-page, .main-content {
+  background:
+    radial-gradient(circle at 18% 12%,color-mix(in srgb,var(--accent) 10%,transparent),transparent 30%),
+    radial-gradient(circle at 82% 88%,color-mix(in srgb,var(--accent) 7%,transparent),transparent 34%),
+    color-mix(in srgb,var(--bg) 94%,transparent);
+}
+
+.sidebar, .mobile-topbar {
+  background: var(--glass-bg-strong);
+  border-color: var(--glass-border);
+  box-shadow: inset -1px 0 0 var(--glass-highlight), 8px 0 34px rgba(0,0,0,.08);
+  backdrop-filter: blur(24px) saturate(145%);
+  -webkit-backdrop-filter: blur(24px) saturate(145%);
+}
+
+.sidebar-logo, .auth-logo {
+  background: linear-gradient(145deg, color-mix(in srgb,var(--raised) 76%,transparent), color-mix(in srgb,var(--surface) 62%,transparent));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow-soft);
+  backdrop-filter: blur(16px) saturate(140%);
+}
+
+.calendar-wrap, .panel-area, .task-panel, .auth-card, .dash-card,
+.chart-card, .chart-summary-card, .graf-insight-card, .cfg-card,
+.conta-card, .template-form-wrapper, .placeholder-banner, .profile-hero,
+.soc-rankings-wrap, .flm-modal, .cropper-modal, .pwa-prompt, .demo-notice {
+  background: linear-gradient(145deg,var(--glass-bg-strong),var(--glass-bg));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(22px) saturate(145%);
+  -webkit-backdrop-filter: blur(22px) saturate(145%);
+}
+
+.calendar-wrap, .panel-area, .task-panel, .auth-card, .chart-card,
+.cfg-card, .conta-card, .profile-hero, .soc-rankings-wrap {
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+.dash-card, .chart-summary-card, .graf-insight-card, .template-card,
+.soc-rank-card, .placeholder-stat-card, .conta-action-row,
+.profile-social-grid > *, .flm-row {
+  background: linear-gradient(145deg,color-mix(in srgb,var(--raised) 68%,transparent),color-mix(in srgb,var(--surface) 48%,transparent));
+  border: 1px solid color-mix(in srgb,var(--glass-border) 78%,transparent);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow-soft);
+  backdrop-filter: blur(14px) saturate(135%);
+  -webkit-backdrop-filter: blur(14px) saturate(135%);
+}
+
+.dash-card, .chart-summary-card, .graf-insight-card, .template-card,
+.soc-rank-card, .conta-action-row, .flm-row {
+  transition: transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease;
+}
+
+.dash-card:hover, .chart-summary-card:hover, .graf-insight-card:hover,
+.template-card:hover, .soc-rank-card:hover, .conta-action-row:hover, .flm-row:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb,var(--accent) 28%,var(--glass-border));
+  box-shadow: 0 18px 42px rgba(0,0,0,.16),inset 0 1px 0 var(--glass-highlight);
+}
+
+.task-item, .add-form, .template-form, .recurrence-options, .streak-bar,
+.soc-info-bar, .conta-form, .cfg-expand, .chart-tooltip, .sidebar-user-menu {
+  background: var(--glass-bg-soft);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  box-shadow: inset 0 1px 0 var(--glass-highlight),0 8px 24px rgba(0,0,0,.08);
+  backdrop-filter: blur(16px) saturate(135%);
+}
+
+.sidebar-item, a.sidebar-item { border: 1px solid transparent; border-radius: 13px; }
+.sidebar-item:hover:not(.active), a.sidebar-item:hover:not(.active) {
+  background: var(--glass-bg-soft); border-color: var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
+}
+.sidebar-item.active, a.sidebar-item.active {
+  background: linear-gradient(135deg,color-mix(in srgb,var(--accent) 20%,transparent),color-mix(in srgb,var(--raised) 64%,transparent));
+  border-color: color-mix(in srgb,var(--accent) 42%,var(--glass-border));
+  box-shadow: 0 8px 24px color-mix(in srgb,var(--accent) 12%,transparent),inset 0 1px 0 color-mix(in srgb,white 22%,transparent);
+}
+
+.field-input, .add-input, .task-edit-input, .conta-input, .conta-textarea,
+.cfg-time-input, .type-toggle, .weekday-picker {
+  background: color-mix(in srgb,var(--raised) 62%,transparent);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 color-mix(in srgb,white 8%,transparent);
+  backdrop-filter: blur(12px);
+}
+
+.field-input:focus, .add-input:focus, .task-edit-input:focus,
+.conta-input:focus, .conta-textarea:focus, .cfg-time-input:focus {
+  background: color-mix(in srgb,var(--lift) 76%,transparent);
+  border-color: color-mix(in srgb,var(--accent) 58%,var(--glass-border));
+  box-shadow: 0 0 0 4px color-mix(in srgb,var(--accent) 13%,transparent),inset 0 1px 0 var(--glass-highlight);
+}
+
+.auth-btn, .btn-primary, .cfg-btn-accent, .conta-btn-save,
+.profile-edit-btn, .pwa-prompt-install {
+  border: 1px solid color-mix(in srgb,white 18%,transparent);
+  background: linear-gradient(135deg,color-mix(in srgb,var(--accent) 88%,white 12%),var(--accent));
+  box-shadow: 0 10px 28px color-mix(in srgb,var(--accent) 24%,transparent),inset 0 1px 0 color-mix(in srgb,white 30%,transparent);
+}
+
+.cal-day { border: 1px solid transparent; border-radius: 13px; }
+.cal-day:hover {
+  background: var(--glass-bg-soft); border-color: var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-highlight),0 7px 18px rgba(0,0,0,.07);
+}
+
+.panel-header, .panel-footer, .calendar-header, .dash-chart-header,
+.soc-rankings-header, .flm-header, .conta-photo-bar {
+  background: color-mix(in srgb,var(--glass-bg-soft) 84%,transparent);
+  border-color: var(--glass-border);
+  backdrop-filter: blur(14px);
+}
+
+@media (max-width:760px) {
+  .calendar-wrap, .panel-area, .task-panel, .chart-card, .cfg-card,
+  .conta-card, .profile-hero, .soc-rankings-wrap { border-radius: 18px; }
+  .dash-card, .chart-summary-card, .graf-insight-card,
+  .template-card, .soc-rank-card { border-radius: 14px; }
+}
