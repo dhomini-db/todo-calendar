@@ -4,62 +4,6 @@
 
 > Sistema de gestão de tarefas diárias com calendário inteligente, recorrência automática e múltiplos temas visuais.
 
-🌐 **Acesse o projeto (online):** [taskflow-dhomini.vercel.app](todo-calendar-eight-orpin.vercel.app)
-
----
-
-## Visão Geral
-
-TaskFlow é uma aplicação full-stack para organização de hábitos e tarefas diárias. Cada dia do calendário reflete visualmente o desempenho do usuário com base nas tarefas concluídas. Suporta tarefas positivas (metas), negativas (hábitos a evitar) e recorrentes (geradas automaticamente).
-
-### Funcionalidades
-
-- **Calendário interativo** com cores por desempenho diário (verde → vermelho)
-- **Painel de tarefas** por dia com score de boas escolhas
-- **Tarefas recorrentes** — crie uma vez, apareça todos os dias automaticamente
-- **Recorrência Diária ou Semanal** com seleção de dias da semana
-- **Sidebar redimensionável** com persistência no navegador
-- **4 temas visuais**: Studio Dark, Arctic, Rose Dawn e Amber Night
-- **Autenticação JWT** com registro e login por usuário
-
----
-
-## Stack Tecnológica
-
-| Camada      | Tecnologia                                         |
-|-------------|----------------------------------------------------|
-| Frontend    | React 18 + TypeScript + Vite                       |
-| Estilização | CSS Custom Properties                              |
-| Estado      | TanStack Query v5 (React Query)                    |
-| Roteamento  | React Router v6                                    |
-| Backend     | Java 21 + Spring Boot 3.2 + Spring Security        |
-| Banco       | PostgreSQL 16                                      |
-| Auth        | JWT (JJWT)                                         |
-| Infra       | Docker + Docker Compose + Nginx                    |
-| Deploy      | Vercel (frontend) + Railway (backend)              |
-
----
-
-## Executar Localmente
-
-### Pré-requisitos
-
-- [Docker](https://www.docker.com/) e Docker Compose
-- Node.js 20+ (somente para desenvolvimento frontend)
-- Java 21+ e Maven (somente para desenvolvimento backend)
-
-### Com Docker (recomendado)
-
-```bash
-# Clonar o repositório
-git clone https://github.com/dhomini-db/todo-calendar.git
-cd todo-calendar
-
-# Subir todos os serviços
-docker compose up --build
-```
-
-| Serviço    | URL                                        |
 |------------|--------------------------------------------|
 | Frontend   | [localhost:3001](http://localhost:3001)     |
 | Backend    | [localhost:8081](http://localhost:8081)     |
