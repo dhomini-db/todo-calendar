@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { register } from '../api/tasks'
 import { useAuth } from '../contexts/AuthContext'
+import DemoEmailNotice from '../components/DemoEmailNotice'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
@@ -14,6 +15,7 @@ export default function RegisterPage() {
   const [error,    setError]    = useState('')
   const [loading,  setLoading]  = useState(false)
   const [leaving,  setLeaving]  = useState(false)
+  const [showDemoNotice, setShowDemoNotice] = useState(true)
 
   function validate(): string | null {
     if (name.trim().length < 2)  return 'Nome deve ter pelo menos 2 caracteres'
@@ -45,6 +47,7 @@ export default function RegisterPage() {
 
   return (
     <div className={`auth-page${leaving ? ' auth-page--leaving' : ''}`}>
+      {showDemoNotice && <DemoEmailNotice onClose={() => setShowDemoNotice(false)} />}
       <div className="auth-card">
         <div className="auth-logo">
           <img src="/logo-icon.svg" alt="TaskFlow" className="auth-logo-img" />
