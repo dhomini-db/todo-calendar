@@ -66,7 +66,6 @@ docker compose up --build
 | PostgreSQL | localhost:5433                             |
 🌐 **Acesse o projeto (online):** [todo-calendar-eight-orpin.vercel.app](https://todo-calendar-eight-orpin.vercel.app)
 🌐 **Acesse o projeto (online):** [todo-calendar-eight-orpin.vercel.app](https://todo-calendar-eight-orpin.vercel.app)
-🌐 **Acesse o projeto (online):** [todo-calendar-eight-orpin.vercel.app](https://todo-calendar-eight-orpin.vercel.app)
 ```bash
 cd frontend
 npm install
