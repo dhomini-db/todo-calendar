@@ -19,3 +19,5 @@ document.addEventListener('pointermove', (event) => {
   card.style.setProperty('--aura-x', `${event.clientX - bounds.left}px`)
   card.style.setProperty('--aura-y', `${event.clientY - bounds.top}px`)
 })
+
+export {}
