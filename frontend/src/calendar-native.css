@@ -300,6 +300,61 @@
 [data-theme="amber-night"] .cal-day.day-red .cal-day-num,
 [data-theme="amber-night"] .cal-day.day-red .cal-day-pct { color: #fb7185; }
 
+/* Diário diário: caderno de páginas salvo localmente por data. */
+.daily-journal {
+  margin-top: 18px;
+  padding: 20px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--line-hi) 72%, transparent);
+  border-radius: 22px;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--elevated) 84%, transparent), color-mix(in srgb, var(--raised) 68%, transparent));
+  box-shadow: 0 20px 46px rgba(31,35,42,.10), inset 0 1px rgba(255,255,255,.4);
+}
+.journal-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 15px; }
+.journal-heading > div { display: grid; gap: 2px; }
+.journal-heading span { color: var(--accent); font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.journal-heading h3 { margin: 0; color: var(--text); font-size: 20px; letter-spacing: -.035em; }
+.journal-heading time { color: var(--text-3); font-size: 10px; text-transform: capitalize; }
+.journal-book { position: relative; perspective: 1300px; margin-left: 13px; }
+.journal-rings { position: absolute; z-index: 5; left: -13px; top: 14px; bottom: 14px; display: flex; flex-direction: column; justify-content: space-around; }
+.journal-rings i { width: 27px; height: 7px; border: 2px solid color-mix(in srgb, var(--text-3) 70%, transparent); border-radius: 999px; background: color-mix(in srgb, var(--raised) 88%, transparent); box-shadow: 0 2px 4px rgba(0,0,0,.12); }
+.journal-page {
+  position: relative;
+  min-height: 245px;
+  padding: 18px 20px 15px 30px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--line-hi));
+  border-radius: 9px 18px 18px 9px;
+  background:
+    linear-gradient(90deg, transparent 25px, color-mix(in srgb, var(--accent) 22%, transparent) 26px, transparent 27px),
+    repeating-linear-gradient(to bottom, transparent 0 30px, color-mix(in srgb, var(--text-3) 16%, transparent) 30px 31px),
+    color-mix(in srgb, #fff 92%, var(--accent) 8%);
+  box-shadow: 0 13px 26px rgba(31,35,42,.12), 7px 7px 0 color-mix(in srgb, var(--raised) 85%, var(--line));
+  transform-origin: left center;
+  backface-visibility: hidden;
+}
+.journal-page::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 62%, rgba(0,0,0,.045)); }
+.journal-page.turn-next { animation: journalTurnNext .66s cubic-bezier(.55,.05,.25,1) both; }
+.journal-page.turn-prev { animation: journalTurnPrev .66s cubic-bezier(.55,.05,.25,1) both; }
+.journal-page-top { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.journal-page-top strong { color: #20242b; font-size: 12px; }
+.journal-page-top span { color: #8b919a; font-size: 9px; }
+.journal-page textarea { position: relative; z-index: 1; width: 100%; min-height: 165px; padding: 5px 3px; resize: vertical; border: 0; outline: 0; background: transparent; color: #292d34; font: 500 13px/31px inherit; }
+.journal-page textarea::placeholder { color: #9ca1aa; }
+.journal-saved { position: relative; z-index: 1; display: block; color: #9ca1aa; font-size: 8px; text-align: right; }
+.journal-controls { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 17px; }
+.journal-controls button { min-width: 34px; height: 32px; padding: 0 12px; border: 1px solid var(--line-hi); border-radius: 999px; background: color-mix(in srgb, var(--surface) 74%, transparent); color: var(--text); font: 700 18px/1 inherit; cursor: pointer; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+.journal-controls button:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--accent-border); box-shadow: 0 8px 18px color-mix(in srgb, var(--accent) 14%, transparent); }
+.journal-controls button:disabled { opacity: .32; cursor: default; }
+.journal-controls .journal-add { color: var(--accent); font-size: 10px; }
+.journal-dots { display: flex; align-items: center; gap: 5px; }
+.journal-dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--line-hi); transition: width .2s ease, background .2s ease; }
+.journal-dots i.active { width: 15px; border-radius: 999px; background: var(--accent); }
+[data-theme="amber-night"] .daily-journal { background: linear-gradient(145deg, color-mix(in srgb, var(--elevated) 82%, #0b1424 18%), color-mix(in srgb, var(--raised) 82%, #07101f 18%)); box-shadow: 0 20px 46px rgba(0,0,0,.28), inset 0 1px rgba(255,255,255,.05); }
+[data-theme="amber-night"] .journal-page { border-color: rgba(96,165,250,.24); background: linear-gradient(90deg, transparent 25px, rgba(96,165,250,.19) 26px, transparent 27px), repeating-linear-gradient(to bottom, transparent 0 30px, rgba(96,165,250,.10) 30px 31px), #eef3fa; box-shadow: 0 16px 32px rgba(0,0,0,.34), 7px 7px 0 #162235; }
+@keyframes journalTurnNext { 0% { opacity: 1; transform: rotateY(0) translateX(0); } 48% { opacity: .25; transform: rotateY(-72deg) translateX(-8px); box-shadow: 18px 12px 30px rgba(0,0,0,.2); } 49% { opacity: 0; transform: rotateY(-84deg); } 50% { opacity: 0; transform: rotateY(72deg) translateX(10px); } 100% { opacity: 1; transform: rotateY(0) translateX(0); } }
+@keyframes journalTurnPrev { 0% { opacity: 1; transform: rotateY(0) translateX(0); } 48% { opacity: .25; transform: rotateY(72deg) translateX(8px); } 49% { opacity: 0; } 50% { opacity: 0; transform: rotateY(-72deg) translateX(-10px); } 100% { opacity: 1; transform: rotateY(0) translateX(0); } }
+
 @media (max-width: 560px) {
   .day-insights { grid-template-columns: 1fr; }
   .day-insight-card:first-child { display: none; }
@@ -310,10 +365,14 @@
   .calendar-week-planner { padding: 15px; overflow-x: auto; }
   .week-planner-heading p { display: none; }
   .week-planner-days { min-width: 560px; }
+  .daily-journal { padding: 16px 13px; }
+  .journal-heading time { display: none; }
+  .journal-page { min-height: 225px; padding-right: 14px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .cal-day, .task-item { transition: none !important; }
   .insight-message-transition { animation: none !important; }
   .cal-day.has-progress-ring { animation: none !important; }
+  .journal-page { animation: none !important; }
 }
