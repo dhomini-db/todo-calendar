@@ -26,6 +26,28 @@
 
 .task-panel .panel-body { padding-top: 24px; }
 
+/* Segunda camada: lista e ação principal dentro do mesmo retângulo. */
+.task-panel .panel-body {
+  margin: 22px 11px 0;
+  padding: 13px 9px 12px;
+  border: 1px solid color-mix(in srgb, var(--line-hi) 72%, transparent);
+  border-bottom: 0;
+  border-radius: 19px 19px 0 0;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--elevated) 68%, var(--raised)), color-mix(in srgb, var(--surface) 70%, var(--raised)));
+  box-shadow: -7px 0 20px rgba(31,35,42,.04), 7px 0 20px rgba(31,35,42,.04), inset 0 1px rgba(255,255,255,.36);
+}
+
+.task-panel .panel-footer {
+  margin: 0 11px 11px;
+  padding: 11px 9px 9px;
+  border: 1px solid color-mix(in srgb, var(--line-hi) 72%, transparent);
+  border-radius: 0 0 19px 19px;
+  background: color-mix(in srgb, var(--elevated) 72%, var(--raised));
+  box-shadow: 0 15px 28px rgba(31,35,42,.10), inset 0 1px rgba(255,255,255,.3);
+}
+
+.task-panel .panel-footer .add-btn { border-radius: 14px; }
+
 [data-theme="amber-night"] .task-panel .panel-header {
   background: linear-gradient(155deg, color-mix(in srgb, var(--elevated) 90%, transparent), color-mix(in srgb, var(--surface) 86%, #101827 14%));
   box-shadow: 0 18px 38px rgba(0,0,0,.34), 0 8px 24px rgba(37,99,235,.06), inset 0 -1px rgba(255,255,255,.05);
@@ -34,6 +56,18 @@
 [data-theme="amber-night"] .task-panel .panel-body,
 [data-theme="amber-night"] .task-panel .panel-footer {
   background: color-mix(in srgb, var(--raised) 82%, #07101f 18%);
+}
+
+[data-theme="amber-night"] .task-panel .panel-body {
+  border-color: color-mix(in srgb, var(--line-hi) 84%, #2563eb 16%);
+  background: linear-gradient(160deg, color-mix(in srgb, var(--elevated) 78%, #0b1424 22%), color-mix(in srgb, var(--raised) 84%, #07101f 16%));
+  box-shadow: -8px 0 24px rgba(0,0,0,.16), 8px 0 24px rgba(0,0,0,.16), inset 0 1px rgba(255,255,255,.05);
+}
+
+[data-theme="amber-night"] .task-panel .panel-footer {
+  border-color: color-mix(in srgb, var(--line-hi) 84%, #2563eb 16%);
+  background: color-mix(in srgb, var(--elevated) 75%, #07101f 25%);
+  box-shadow: 0 17px 34px rgba(0,0,0,.32), inset 0 1px rgba(255,255,255,.04);
 }
 
 .day-insight-card {
