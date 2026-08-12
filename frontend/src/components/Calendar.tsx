@@ -22,6 +22,7 @@ interface CalendarProps {
   onChangeMonth: (date: Date) => void
   selectedDayScore?: number | null
   selectedDayTotal?: number
+  knownDayScores?: Record<string, { percentage: number; total: number }>
 }
 
 /** Returns CSS class + bar colour for a day */
@@ -51,7 +52,7 @@ const WD_KEYS = [
   'cal.wd.sat',
 ]
 
-export default function Calendar({ selectedDate, onSelectDate, currentMonth, onChangeMonth, selectedDayScore, selectedDayTotal = 0 }: CalendarProps) {
+export default function Calendar({ selectedDate, onSelectDate, currentMonth, onChangeMonth, selectedDayScore, selectedDayTotal = 0, knownDayScores = {} }: CalendarProps) {
   const { lang, t } = useLanguage()
   const locale = lang === 'en' ? enUS : ptBR
 
@@ -121,7 +122,16 @@ export default function Calendar({ selectedDate, onSelectDate, currentMonth, onC
 
         {days.map(day => {
           const key        = format(day, 'yyyy-MM-dd')
-          const monthlyDay = summaryByDate[key]
+          const rememberedDay = knownDayScores[key]
+          const monthlyDay = rememberedDay
+            ? {
+                date: key,
+                total: rememberedDay.total,
+                completed: Math.round((rememberedDay.percentage / 100) * rememberedDay.total),
+                percentage: rememberedDay.percentage,
+                color: rememberedDay.percentage >= 100 ? 'GREEN' : rememberedDay.percentage >= 70 ? 'LIGHT_GREEN' : rememberedDay.percentage >= 50 ? 'YELLOW' : rememberedDay.percentage > 0 ? 'RED' : 'NONE',
+              } as DaySummary
+            : summaryByDate[key]
           const isSelected = isSameDay(day, selectedDate)
           const daySumm = isSelected && selectedDayScore != null && selectedDayTotal > 0
             ? {
