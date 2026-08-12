@@ -158,7 +158,7 @@ export default function Calendar({ selectedDate, onSelectDate, currentMonth, onC
               className={[
                 'cal-day',
                 hasTasks ? 'has-progress-ring' : '',
-                cls,
+                hasTasks ? cls : '',
                 isSelected ? 'selected' : '',
                 isTodayDay && !cls ? 'today' : '',
               ].filter(Boolean).join(' ')}
