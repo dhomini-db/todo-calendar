@@ -134,7 +134,11 @@ export default function Calendar({ selectedDate, onSelectDate, currentMonth, onC
             : monthlyDay
           const isTodayDay = isToday(day)
           const { cls, bar } = dayStyle(daySumm)
-          const hasTasks   = Boolean(daySumm && daySumm.total > 0)
+          const hasTasks = Boolean(
+            daySumm &&
+            daySumm.total > 0 &&
+            (daySumm.percentage > 0 || isSelected),
+          )
           const pct        = hasTasks ? Math.round(daySumm!.percentage) : 0
 
           return (
