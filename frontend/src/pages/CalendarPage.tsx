@@ -53,9 +53,9 @@ export default function CalendarPage() {
     <>
       <div className="calendar-area">
         <div className="calendar-ambient" aria-hidden="true">
-          <div className="calendar-vertical-wave wave-left" />
-          <div className="calendar-vertical-wave wave-center" />
-          <div className="calendar-vertical-wave wave-right" />
+          <div className="calendar-ribbons">
+            {Array.from({ length: 7 }, (_, index) => <i key={index} style={{ '--ribbon-index': index } as CSSProperties} />)}
+          </div>
           <div className="calendar-ambient-glow" />
           <div className="calendar-particles">
             {Array.from({ length: 16 }, (_, index) => <i key={index} style={{ '--particle-index': index } as CSSProperties} />)}
