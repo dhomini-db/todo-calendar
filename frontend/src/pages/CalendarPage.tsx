@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import Calendar    from '../components/Calendar'
 import TaskPanel   from '../components/TaskPanel'
 import StreakBadge from '../components/StreakBadge'
@@ -52,18 +52,21 @@ export default function CalendarPage() {
   return (
     <>
       <div className="calendar-area">
-        <h1 className="page-title">{t('cal.title')}</h1>
-        <p className="page-sub">{t('cal.sub')}</p>
-        <StreakBadge />
-        <Calendar
-          selectedDate={selectedDate}
-          onSelectDate={setSelectedDate}
-          currentMonth={currentMonth}
-          onChangeMonth={setCurrentMonth}
-          selectedDayScore={selectedPercentage}
-          selectedDayTotal={selectedTasks.length}
-          knownDayScores={knownDayScores}
-        />
+        <div className="calendar-ambient" aria-hidden="true">
+          <div className="calendar-vertical-wave wave-left" />
+          <div className="calendar-vertical-wave wave-center" />
+          <div className="calendar-vertical-wave wave-right" />
+          <div className="calendar-ambient-glow" />
+          <div className="calendar-particles">
+            {Array.from({ length: 16 }, (_, index) => <i key={index} style={{ '--particle-index': index } as CSSProperties} />)}
+          </div>
+        </div>
+        <div className="calendar-page-content">
+          <h1 className="page-title">{t('cal.title')}</h1>
+          <p className="page-sub">{t('cal.sub')}</p>
+          <StreakBadge />
+          <Calendar selectedDate={selectedDate} onSelectDate={setSelectedDate} currentMonth={currentMonth} onChangeMonth={setCurrentMonth} selectedDayScore={selectedPercentage} selectedDayTotal={selectedTasks.length} knownDayScores={knownDayScores} />
+        </div>
       </div>
       <div className="panel-area">
         <TaskPanel selectedDate={selectedDate} />
