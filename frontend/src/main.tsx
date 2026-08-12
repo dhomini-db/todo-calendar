@@ -38,3 +38,5 @@ import './taskScheduleEnhancement'
 import './authWaveRedesign'
 import './authParticles'
 import './authWaveMotion'
+
+import './calendarExperience'
