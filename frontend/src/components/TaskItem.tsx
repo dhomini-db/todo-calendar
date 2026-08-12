@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import type { Task } from '../types'
 import { useToggleTask, useDeleteTask, useUpdateTask } from '../hooks/useTasks'
 import { useLanguage } from '../contexts/LanguageContext'
+import { composeTaskTitle, parseTaskMetadata } from '../utils/taskMetadata'
 
 interface TaskItemProps {
   task: Task
@@ -12,7 +13,8 @@ export default function TaskItem({ task, date }: TaskItemProps) {
   const { t } = useLanguage()
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [editing,       setEditing]       = useState(false)
-  const [editTitle,     setEditTitle]     = useState(task.title)
+  const metadata = parseTaskMetadata(task.title)
+  const [editTitle,     setEditTitle]     = useState(metadata.title)
   const [xpType,        setXpType]        = useState<'positive' | 'negative' | null>(null)
   const xpTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -36,16 +38,17 @@ export default function TaskItem({ task, date }: TaskItemProps) {
 
   function handleEditSave() {
     const trimmed = editTitle.trim()
-    if (!trimmed || trimmed === task.title) { setEditing(false); return }
+    if (!trimmed || trimmed === metadata.title) { setEditing(false); return }
+    const storedTitle = composeTaskTitle(trimmed, metadata.startTime, metadata.endTime)
     update.mutate(
-      { id: task.id, data: { title: trimmed, description: task.description, date: task.date, type: task.type } },
+      { id: task.id, data: { title: storedTitle, description: task.description, date: task.date, type: task.type } },
       { onSuccess: () => setEditing(false) },
     )
   }
 
   function handleEditKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'Enter')  handleEditSave()
-    if (e.key === 'Escape') { setEditTitle(task.title); setEditing(false) }
+    if (e.key === 'Escape') { setEditTitle(metadata.title); setEditing(false) }
   }
 
   const typeClass = isPositive ? 'task-positive' : 'task-negative'
@@ -87,7 +90,12 @@ export default function TaskItem({ task, date }: TaskItemProps) {
           />
         ) : (
           <>
-            <p className={`task-title ${task.completed ? 'done' : ''}`}>{task.title}</p>
+            <div className="task-title-row">
+              {metadata.startTime && (
+                <span className="task-time-badge">{metadata.startTime}{metadata.endTime ? `–${metadata.endTime}` : ''}</span>
+              )}
+              <p className={`task-title ${task.completed ? 'done' : ''}`}>{metadata.title}</p>
+            </div>
             {task.description && <p className="task-desc">{task.description}</p>}
             {isPending && isRecurring && isPositive && (
               <span className="task-outcome pending">{t('cal.task.pending')}</span>
