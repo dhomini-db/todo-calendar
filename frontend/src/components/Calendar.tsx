@@ -29,7 +29,7 @@ function dayStyle(summary: DaySummary | undefined): { cls: string; bar: string }
     case 'GREEN':       return { cls: 'day-green',      bar: '#4ade80' }
     case 'LIGHT_GREEN': return { cls: 'day-lightgreen', bar: '#34d399' }
     case 'YELLOW':      return { cls: 'day-yellow',     bar: '#fbbf24' }
-    case 'RED':         return { cls: 'day-red',        bar: '#f87171' }
+    case 'RED':         return { cls: 'day-red',        bar: '#9f1239' }
     default:            return { cls: '',               bar: '' }
   }
 }
@@ -59,8 +59,15 @@ export default function Calendar({ selectedDate, onSelectDate, currentMonth, onC
   const days        = eachDayOfInterval({ start: firstDay, end: lastDay })
   const startOffset = getDay(firstDay)
   const monthLabel  = format(currentMonth, 'MMMM yyyy', { locale })
+  const recordedDays = Object.values(summary).filter(day => day.total > 0)
+  const average = recordedDays.length
+    ? Math.round(recordedDays.reduce((total, day) => total + day.percentage, 0) / recordedDays.length)
+    : 0
+  const productiveDays = recordedDays.filter(day => day.percentage >= 70).length
+  const perfectDays = recordedDays.filter(day => day.percentage === 100).length
 
   return (
+    <>
     <div className="calendar-wrap">
       {/* Header */}
       <div className="calendar-header">
@@ -99,7 +106,7 @@ export default function Calendar({ selectedDate, onSelectDate, currentMonth, onC
 
           return (
             <button
-              key={key}
+              key={`${key}-${pct}`}
               onClick={() => onSelectDate(day)}
               className={[
                 'cal-day',
@@ -137,8 +144,26 @@ export default function Calendar({ selectedDate, onSelectDate, currentMonth, onC
         <div className="legend-item"><div className="legend-dot" style={{ background: '#4ade80' }} />100%</div>
         <div className="legend-item"><div className="legend-dot" style={{ background: '#34d399' }} />70–99%</div>
         <div className="legend-item"><div className="legend-dot" style={{ background: '#fbbf24' }} />50–69%</div>
-        <div className="legend-item"><div className="legend-dot" style={{ background: '#f87171' }} />{'< 50%'}</div>
+        <div className="legend-item"><div className="legend-dot" style={{ background: '#9f1239' }} />{'< 50%'}</div>
       </div>
     </div>
+    <section className="calendar-month-overview" aria-label={lang === 'en' ? 'Month overview' : 'Visão do mês'}>
+      <div className="month-overview-heading">
+        <div>
+          <span>{lang === 'en' ? 'Month overview' : 'Visão do mês'}</span>
+          <strong>{recordedDays.length > 0 ? `${average}%` : '—'}</strong>
+        </div>
+        <p>{lang === 'en' ? 'Your progress at a glance' : 'Seu progresso em um olhar'}</p>
+      </div>
+      <div className="month-overview-progress" aria-hidden="true">
+        <span style={{ width: `${average}%` }} />
+      </div>
+      <div className="month-overview-metrics">
+        <div><strong>{recordedDays.length}</strong><span>{lang === 'en' ? 'recorded days' : 'dias registrados'}</span></div>
+        <div><strong>{productiveDays}</strong><span>{lang === 'en' ? 'productive days' : 'dias produtivos'}</span></div>
+        <div><strong>{perfectDays}</strong><span>{lang === 'en' ? 'perfect days' : 'dias perfeitos'}</span></div>
+      </div>
+    </section>
+    </>
   )
 }
