@@ -85,12 +85,6 @@ export default function Calendar({ selectedDate, onSelectDate, currentMonth, onC
   const days        = eachDayOfInterval({ start: firstDay, end: lastDay })
   const startOffset = getDay(firstDay)
   const monthLabel  = format(currentMonth, 'MMMM yyyy', { locale })
-  const planningDays = Array.from({ length: 7 }, (_, index) => {
-    const date = new Date(selectedDate)
-    date.setDate(selectedDate.getDate() + index)
-    const key = format(date, 'yyyy-MM-dd')
-    return { date, key, summary: summaryByDate[key] }
-  })
 
   return (
     <>
@@ -195,24 +189,6 @@ export default function Calendar({ selectedDate, onSelectDate, currentMonth, onC
         <div className="legend-item"><div className="legend-dot" style={{ background: '#9f1239' }} />{'< 50%'}</div>
       </div>
     </div>
-    <section className="calendar-week-planner" aria-label={lang === 'en' ? 'Next 7 days' : 'Próximos 7 dias'}>
-      <div className="week-planner-heading">
-        <div><span>{lang === 'en' ? 'Planning' : 'Planejamento'}</span><strong>{lang === 'en' ? 'Next 7 days' : 'Próximos 7 dias'}</strong></div>
-        <p>{lang === 'en' ? 'Select a day to organize it' : 'Selecione um dia para organizá-lo'}</p>
-      </div>
-      <div className="week-planner-days">
-        {planningDays.map(({ date, key, summary: day }) => {
-          const pct = day?.total ? Math.round(day.percentage) : null
-          const style = dayStyle(day)
-          return <button key={key} type="button" className={`week-planner-day ${style.cls} ${isSameDay(date, selectedDate) ? 'active' : ''}`} onClick={() => { onSelectDate(date); if (date.getMonth() !== currentMonth.getMonth()) onChangeMonth(date) }}>
-            <span>{format(date, 'EEE', { locale }).replace('.', '')}</span>
-            <strong>{format(date, 'd')}</strong>
-            <small>{pct == null ? (lang === 'en' ? 'Free' : 'Livre') : `${day!.total} ${day!.total === 1 ? (lang === 'en' ? 'task' : 'tarefa') : (lang === 'en' ? 'tasks' : 'tarefas')}`}</small>
-            {pct != null && <em>{pct}%</em>}
-          </button>
-        })}
-      </div>
-    </section>
     <DailyJournal selectedDate={selectedDate} />
     </>
   )
