@@ -1,6 +1,6 @@
 .day-insights {
   display: grid;
-  grid-template-columns: minmax(86px, .7fr) minmax(0, 1.8fr);
+  grid-template-columns: minmax(104px, .9fr) minmax(0, 1.7fr);
   gap: 8px;
   margin-top: 12px;
 }
@@ -110,8 +110,10 @@
 
 .day-insight-card strong { color: var(--text); font-size: 16px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .day-insight-card > span { color: var(--muted); font-size: 12px; line-height: 1.25; }
-.day-insight-card:first-child strong { font-size: 27px; line-height: 1.05; letter-spacing: -.045em; }
+.day-insight-card:first-child strong { overflow: visible; text-overflow: clip; font-size: 26px; line-height: 1.05; letter-spacing: -.045em; }
 .day-insight-card:first-child > span { font-size: 11.5px; margin-top: 4px; }
+.day-insight-next strong { font-size: 19px; font-weight: 800; letter-spacing: -.025em; }
+.day-insight-next > span { margin-top: 4px; font-weight: 400; }
 
 .schedule-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .schedule-fields label { display: grid; gap: 5px; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
