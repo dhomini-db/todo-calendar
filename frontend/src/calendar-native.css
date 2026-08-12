@@ -65,6 +65,22 @@
   letter-spacing: .02em;
 }
 
+/* Identidade do TaskFlow: vermelho no modo claro, azul no noturno. */
+[data-theme="rose-dawn"] .task-item.task-positive,
+[data-theme="banana-cream"] .task-item.task-positive,
+[data-theme="blue-mirage"] .task-item.task-positive,
+[data-theme="pistachio"] .task-item.task-positive {
+  border-left-color: rgba(211, 47, 74, .48);
+}
+
+[data-theme="amber-night"] .task-item.task-positive,
+[data-theme="arctic"] .task-item.task-positive,
+[data-theme="tyrian-purple"] .task-item.task-positive,
+[data-theme="moss-velvet"] .task-item.task-positive,
+[data-theme="midnight-espresso"] .task-item.task-positive {
+  border-left-color: rgba(59, 130, 246, .58);
+}
+
 .cal-day.has-progress-ring::before {
   content: '';
   position: absolute;
