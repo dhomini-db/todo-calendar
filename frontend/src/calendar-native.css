@@ -258,7 +258,9 @@
 .cal-day.day-red { background: linear-gradient(145deg, rgba(159,18,57,.25), rgba(190,24,93,.10)); border-color: rgba(159,18,57,.48); }
 .cal-day.day-red .cal-day-num, .cal-day.day-red .cal-day-pct { color: #9f1239; }
 
-.cal-day.selected.has-progress-ring { background: inherit !important; outline: 2px solid color-mix(in srgb, var(--accent) 70%, white 12%); outline-offset: 2px; }
+.cal-day.selected.has-progress-ring { outline: 2px solid color-mix(in srgb, var(--day-progress-color) 78%, white 14%); outline-offset: 2px; }
+.cal-day.selected.has-progress-ring .cal-day-num,
+.cal-day.selected.has-progress-ring .cal-day-pct { color: color-mix(in srgb, var(--day-progress-color) 78%, #111 22%) !important; }
 .cal-day.selected.day-green { background: linear-gradient(145deg, rgba(34,197,94,.29), rgba(74,222,128,.14)) !important; }
 .cal-day.selected.day-lightgreen { background: linear-gradient(145deg, rgba(16,185,129,.27), rgba(52,211,153,.12)) !important; }
 .cal-day.selected.day-yellow { background: linear-gradient(145deg, rgba(245,158,11,.28), rgba(251,191,36,.13)) !important; }
