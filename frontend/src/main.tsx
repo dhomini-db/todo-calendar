@@ -18,6 +18,7 @@ import { ThemeProvider } from './contexts/ThemeContext'
 import { LanguageProvider } from './contexts/LanguageContext'
 import './index.css'
 import './liquid-glass.css'
+import './calendar-native.css'
 const queryClient=new QueryClient({defaultOptions:{queries:{staleTime:30_000,retry:1}}})
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><ThemeProvider><LanguageProvider><AuthProvider><QueryClientProvider client={queryClient}><BrowserRouter><Routes>
 <Route path="/login" element={<LoginPage/>}/><Route path="/register" element={<RegisterPage/>}/><Route path="/" element={<App/>}>
