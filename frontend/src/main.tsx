@@ -71,3 +71,5 @@ import './mobileTopbarFix'
 import './taskScheduleEnhancement'
 
 import './authWaveRedesign'
+
+import './authParticles'
