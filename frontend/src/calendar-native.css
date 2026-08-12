@@ -248,6 +248,52 @@
   opacity: .72;
 }
 
+/* Resultados do mês com contraste suficiente no calendário. */
+.cal-day.has-progress-ring { animation: calendarScoreIn .38s cubic-bezier(.22,.8,.3,1) both; }
+.cal-day.has-progress-ring .cal-day-pct { font-size: 9.5px; font-weight: 800; opacity: .95; }
+
+.cal-day.day-green { background: linear-gradient(145deg, rgba(34,197,94,.24), rgba(74,222,128,.11)); border-color: rgba(22,163,74,.42); }
+.cal-day.day-lightgreen { background: linear-gradient(145deg, rgba(16,185,129,.21), rgba(52,211,153,.09)); border-color: rgba(5,150,105,.38); }
+.cal-day.day-yellow { background: linear-gradient(145deg, rgba(245,158,11,.23), rgba(251,191,36,.10)); border-color: rgba(217,119,6,.40); }
+.cal-day.day-red { background: linear-gradient(145deg, rgba(159,18,57,.25), rgba(190,24,93,.10)); border-color: rgba(159,18,57,.48); }
+.cal-day.day-red .cal-day-num, .cal-day.day-red .cal-day-pct { color: #9f1239; }
+
+.cal-day.selected.has-progress-ring { background: inherit !important; outline: 2px solid color-mix(in srgb, var(--accent) 70%, white 12%); outline-offset: 2px; }
+.cal-day.selected.day-green { background: linear-gradient(145deg, rgba(34,197,94,.29), rgba(74,222,128,.14)) !important; }
+.cal-day.selected.day-lightgreen { background: linear-gradient(145deg, rgba(16,185,129,.27), rgba(52,211,153,.12)) !important; }
+.cal-day.selected.day-yellow { background: linear-gradient(145deg, rgba(245,158,11,.28), rgba(251,191,36,.13)) !important; }
+.cal-day.selected.day-red { background: linear-gradient(145deg, rgba(159,18,57,.30), rgba(190,24,93,.13)) !important; }
+
+@keyframes calendarScoreIn {
+  from { opacity: .35; transform: scale(.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.calendar-month-overview {
+  margin-top: 18px;
+  padding: 18px 20px;
+  border: 1px solid color-mix(in srgb, var(--line-hi) 68%, transparent);
+  border-radius: 22px;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--elevated) 80%, transparent), color-mix(in srgb, var(--raised) 64%, transparent));
+  box-shadow: 0 18px 42px rgba(31,35,42,.09), inset 0 1px rgba(255,255,255,.34);
+}
+
+.month-overview-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.month-overview-heading > div { display: flex; align-items: baseline; gap: 10px; }
+.month-overview-heading span { color: var(--text-2); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.month-overview-heading strong { color: var(--text); font-size: 25px; letter-spacing: -.04em; }
+.month-overview-heading p { color: var(--text-3); font-size: 11px; }
+.month-overview-progress { height: 6px; margin: 14px 0 16px; overflow: hidden; border-radius: 999px; background: var(--line); }
+.month-overview-progress span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #9f1239 0%, #f59e0b 48%, #22c55e 100%); transition: width .55s cubic-bezier(.22,.8,.3,1); }
+.month-overview-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.month-overview-metrics > div { display: flex; align-items: baseline; gap: 7px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 13px; background: color-mix(in srgb, var(--surface) 66%, transparent); }
+.month-overview-metrics strong { color: var(--text); font-size: 18px; }
+.month-overview-metrics span { color: var(--text-3); font-size: 10px; }
+
+[data-theme="amber-night"] .calendar-month-overview { background: linear-gradient(145deg, color-mix(in srgb, var(--elevated) 82%, #0b1424 18%), color-mix(in srgb, var(--raised) 82%, #07101f 18%)); box-shadow: 0 20px 46px rgba(0,0,0,.28), inset 0 1px rgba(255,255,255,.05); }
+[data-theme="amber-night"] .cal-day.day-red .cal-day-num,
+[data-theme="amber-night"] .cal-day.day-red .cal-day-pct { color: #fb7185; }
+
 @media (max-width: 560px) {
   .day-insights { grid-template-columns: 1fr; }
   .day-insight-card:first-child { display: none; }
@@ -255,9 +301,14 @@
   .task-title-row { gap: 6px; }
   .task-time-badge { padding: 2px 5px; font-size: 8px; }
   .task-list-heading { padding-inline: 3px; }
+  .calendar-month-overview { padding: 15px; }
+  .month-overview-heading p { display: none; }
+  .month-overview-metrics { gap: 6px; }
+  .month-overview-metrics > div { align-items: flex-start; flex-direction: column; gap: 1px; padding: 8px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .cal-day, .task-item { transition: none !important; }
   .insight-message-transition { animation: none !important; }
+  .cal-day.has-progress-ring { animation: none !important; }
 }
