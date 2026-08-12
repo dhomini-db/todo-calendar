@@ -187,17 +187,19 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
             <span>{plannedMinutes > 0 ? 'tempo planejado' : 'progresso do dia'}</span>
           </div>
           <div className={`day-insight-card day-insight-next ${nextTask ? 'has-next' : 'is-complete'}`} onPointerMove={moveInsightAura}>
-            {nextTask ? (
-              <>
-                <span>Próxima atividade</span>
-                <strong>{nextMetadata?.startTime ? `${nextMetadata.startTime} · ` : ''}{nextMetadata?.title}</strong>
-              </>
-            ) : (
-              <>
-                <strong>Bom trabalho!</strong>
-                <span>Tudo concluído</span>
-              </>
-            )}
+            <div className="insight-message-transition" key={nextTask?.id ?? 'all-complete'}>
+              {nextTask ? (
+                <>
+                  <span>Próxima atividade</span>
+                  <strong>{nextMetadata?.startTime ? `${nextMetadata.startTime} · ` : ''}{nextMetadata?.title}</strong>
+                </>
+              ) : (
+                <>
+                  <strong>Bom trabalho!</strong>
+                  <span>Tudo concluído</span>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
