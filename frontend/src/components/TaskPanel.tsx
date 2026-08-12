@@ -87,6 +87,7 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
   const interactedTasks = tasks.filter(t => t.interacted)
   const pct             = calcScore(tasks)
   const goodCount       = positiveTasks.filter(t => t.interacted && t.completed).length
+  const pendingCount    = tasks.filter(t => !t.completed).length
   const nextTask        = orderedTasks.find(t => !t.completed)
   const nextMetadata    = nextTask ? parseTaskMetadata(nextTask.title) : null
   const plannedMinutes  = tasks.reduce((total, task) => {
@@ -202,6 +203,17 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
 
         {!isLoading && tasks.length === 0 && (
           <p className="panel-empty">{t('cal.panel.empty')}</p>
+        )}
+
+        {!isLoading && tasks.length > 0 && (
+          <div className="task-list-heading">
+            <span>{lang === 'en' ? 'Today’s activities' : 'Atividades do dia'}</span>
+            <small>
+              {pendingCount === 0
+                ? (lang === 'en' ? 'All done' : 'Tudo concluído')
+                : `${pendingCount} ${lang === 'en' ? 'pending' : pendingCount === 1 ? 'pendente' : 'pendentes'}`}
+            </small>
+          </div>
         )}
 
         {positiveTasks.map(task => (
