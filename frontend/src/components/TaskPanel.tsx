@@ -1,6 +1,6 @@
 import { format } from 'date-fns'
 import { ptBR, enUS } from 'date-fns/locale'
-import { useState } from 'react'
+import { useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { useTasksByDate, useCreateTask, useCreateRecurringTask } from '../hooks/useTasks'
 import { useLanguage } from '../contexts/LanguageContext'
 import type { TaskType, RecurrenceType } from '../types'
@@ -87,9 +87,17 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
   const interactedTasks = tasks.filter(t => t.interacted)
   const pct             = calcScore(tasks)
   const goodCount       = positiveTasks.filter(t => t.interacted && t.completed).length
-  const completedCount  = tasks.filter(t => t.completed).length
   const nextTask        = orderedTasks.find(t => !t.completed)
   const nextMetadata    = nextTask ? parseTaskMetadata(nextTask.title) : null
+  const plannedMinutes  = tasks.reduce((total, task) => {
+    const { startTime: start, endTime: end } = parseTaskMetadata(task.title)
+    if (!start || !end) return total
+    const duration = timeToMinutes(end) - timeToMinutes(start)
+    return total + Math.max(0, duration)
+  }, 0)
+  const plannedLabel = plannedMinutes > 0
+    ? `${Math.floor(plannedMinutes / 60)}h${plannedMinutes % 60 ? String(plannedMinutes % 60).padStart(2, '0') : ''}`
+    : `${pct}%`
 
   // Date header — locale-aware
   const dayName   = format(selectedDate, 'EEEE', { locale })
@@ -101,6 +109,13 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
     setDaysOfWeek(prev =>
       prev.includes(val) ? prev.filter(d => d !== val) : [...prev, val].sort(),
     )
+  }
+
+  function moveInsightAura(event: ReactPointerEvent<HTMLDivElement>) {
+    const card = event.currentTarget
+    const bounds = card.getBoundingClientRect()
+    card.style.setProperty('--aura-x', `${event.clientX - bounds.left}px`)
+    card.style.setProperty('--aura-y', `${event.clientY - bounds.top}px`)
   }
 
   function handleSubmit() {
@@ -166,11 +181,11 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
           <p className="panel-score-label">{pct}% {t('cal.panel.score')}</p>
         )}
         <div className="day-insights" aria-label="Resumo do dia">
-          <div className="day-insight-card">
-            <strong>{completedCount}/{tasks.length}</strong>
-            <span>concluídas</span>
+          <div className="day-insight-card" onPointerMove={moveInsightAura}>
+            <strong>{plannedLabel}</strong>
+            <span>{plannedMinutes > 0 ? 'tempo planejado' : 'progresso do dia'}</span>
           </div>
-          <div className="day-insight-card day-insight-next">
+          <div className="day-insight-card day-insight-next" onPointerMove={moveInsightAura}>
             <span>{nextTask ? 'Próxima atividade' : 'Tudo concluído'}</span>
             <strong>{nextMetadata?.startTime ? `${nextMetadata.startTime} · ` : ''}{nextMetadata?.title ?? 'Bom trabalho!'}</strong>
           </div>
