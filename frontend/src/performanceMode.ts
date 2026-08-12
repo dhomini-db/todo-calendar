@@ -2,8 +2,8 @@ const performanceStyle = document.createElement('style')
 performanceStyle.textContent = `
 body{background-attachment:scroll!important}
 .sidebar,.mobile-topbar,.calendar-wrap,.panel-area,.task-panel,.auth-card,.chart-card,.cfg-card,.conta-card,.profile-hero,.soc-rankings-wrap{
-  backdrop-filter:blur(12px) saturate(120%)!important;
-  -webkit-backdrop-filter:blur(12px) saturate(120%)!important;
+  backdrop-filter:!important;
+  -webkit-backdrop-filter:!important;
   transform:translateZ(0);
 }
 .dash-card,.chart-summary-card,.graf-insight-card,.template-card,.soc-rank-card,.placeholder-stat-card,.conta-action-row,.profile-social-grid>*,.flm-row,.task-item,.add-form,.template-form,.recurrence-options,.streak-bar,.soc-info-bar,.conta-form,.cfg-expand,.chart-tooltip,.sidebar-user-menu{
@@ -43,3 +43,5 @@ document.addEventListener('visibilitychange', syncPageVisibility, {passive:true}
 syncPageVisibility()
 
 export {}
+
+performanceStyle.textContent += `\n.dash-card,.chart-card,.chart-summary-card,.graf-insight-card,.template-card,.soc-rank-card{content-visibility:auto;contain-intrinsic-size:160px}.route-loading{min-height:100vh;background:var(--bg)}`
