@@ -3,7 +3,7 @@ import Calendar    from '../components/Calendar'
 import TaskPanel   from '../components/TaskPanel'
 import StreakBadge from '../components/StreakBadge'
 import { useLanguage } from '../contexts/LanguageContext'
-import { useTasksByDate } from '../hooks/useTasks'
+import { useMonthSummary, useTasksByDate } from '../hooks/useTasks'
 import { format } from 'date-fns'
 
 export default function CalendarPage() {
@@ -16,6 +16,7 @@ export default function CalendarPage() {
     catch { return {} }
   })
   const selectedDateKey = format(selectedDate, 'yyyy-MM-dd')
+  const { data: monthSummary = {} } = useMonthSummary(currentMonth.getFullYear(), currentMonth.getMonth() + 1)
   const { data: selectedTasks = [] } = useTasksByDate(selectedDateKey)
   const positiveTasks = selectedTasks.filter(task => task.type === 'POSITIVE')
   const checkedNegatives = selectedTasks.filter(task => task.type === 'NEGATIVE' && task.interacted && task.completed)
@@ -32,6 +33,21 @@ export default function CalendarPage() {
       return next
     })
   }, [selectedDateKey, selectedPercentage, selectedTasks.length])
+
+  useEffect(() => {
+    const monthlyScores: Record<string, { percentage: number; total: number }> = {}
+    Object.entries(monthSummary).forEach(([key, day]) => {
+      if (day.total > 0 && day.percentage > 0) {
+        monthlyScores[key] = { percentage: day.percentage, total: day.total }
+      }
+    })
+    if (Object.keys(monthlyScores).length === 0) return
+    setKnownDayScores(current => {
+      const next = { ...current, ...monthlyScores }
+      localStorage.setItem('taskflow-calendar-scores', JSON.stringify(next))
+      return next
+    })
+  }, [monthSummary])
 
   return (
     <>
