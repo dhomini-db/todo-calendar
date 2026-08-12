@@ -5,6 +5,37 @@
   margin-top: 12px;
 }
 
+/* Cabeçalho elevado sobre a área de atividades. */
+.task-panel { overflow: hidden; }
+
+.task-panel .panel-header {
+  position: relative;
+  z-index: 2;
+  margin-bottom: -11px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid color-mix(in srgb, var(--line-hi) 76%, transparent);
+  border-radius: 0 0 22px 22px;
+  background: linear-gradient(155deg, color-mix(in srgb, var(--elevated) 94%, transparent), color-mix(in srgb, var(--surface) 82%, transparent));
+  box-shadow: 0 16px 32px rgba(31,35,42,.12), inset 0 -1px rgba(255,255,255,.4);
+}
+
+.task-panel .panel-body,
+.task-panel .panel-footer {
+  background: color-mix(in srgb, var(--raised) 62%, var(--surface));
+}
+
+.task-panel .panel-body { padding-top: 24px; }
+
+[data-theme="amber-night"] .task-panel .panel-header {
+  background: linear-gradient(155deg, color-mix(in srgb, var(--elevated) 90%, transparent), color-mix(in srgb, var(--surface) 86%, #101827 14%));
+  box-shadow: 0 18px 38px rgba(0,0,0,.34), 0 8px 24px rgba(37,99,235,.06), inset 0 -1px rgba(255,255,255,.05);
+}
+
+[data-theme="amber-night"] .task-panel .panel-body,
+[data-theme="amber-night"] .task-panel .panel-footer {
+  background: color-mix(in srgb, var(--raised) 82%, #07101f 18%);
+}
+
 .day-insight-card {
   --aura-x: 50%;
   --aura-y: 50%;
