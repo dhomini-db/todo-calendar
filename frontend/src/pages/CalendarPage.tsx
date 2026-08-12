@@ -3,12 +3,22 @@ import Calendar    from '../components/Calendar'
 import TaskPanel   from '../components/TaskPanel'
 import StreakBadge from '../components/StreakBadge'
 import { useLanguage } from '../contexts/LanguageContext'
+import { useTasksByDate } from '../hooks/useTasks'
+import { format } from 'date-fns'
 
 export default function CalendarPage() {
   const today = new Date()
   const [selectedDate, setSelectedDate] = useState(today)
   const [currentMonth, setCurrentMonth] = useState(today)
   const { t } = useLanguage()
+  const selectedDateKey = format(selectedDate, 'yyyy-MM-dd')
+  const { data: selectedTasks = [] } = useTasksByDate(selectedDateKey)
+  const positiveTasks = selectedTasks.filter(task => task.type === 'POSITIVE')
+  const checkedNegatives = selectedTasks.filter(task => task.type === 'NEGATIVE' && task.interacted && task.completed)
+  const scoreBase = positiveTasks.length + checkedNegatives.length
+  const selectedPercentage = scoreBase > 0
+    ? Math.round((positiveTasks.filter(task => task.interacted && task.completed).length / scoreBase) * 100)
+    : null
 
   return (
     <>
@@ -21,6 +31,8 @@ export default function CalendarPage() {
           onSelectDate={setSelectedDate}
           currentMonth={currentMonth}
           onChangeMonth={setCurrentMonth}
+          selectedDayScore={selectedPercentage}
+          selectedDayTotal={selectedTasks.length}
         />
       </div>
       <div className="panel-area">
