@@ -186,7 +186,7 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
             <strong>{plannedLabel}</strong>
             <span>{plannedMinutes > 0 ? 'tempo planejado' : 'progresso do dia'}</span>
           </div>
-          <div className="day-insight-card day-insight-next" onPointerMove={moveInsightAura}>
+          <div className={`day-insight-card day-insight-next ${nextTask ? 'has-next' : 'is-complete'}`} onPointerMove={moveInsightAura}>
             {nextTask ? (
               <>
                 <span>Próxima atividade</span>
