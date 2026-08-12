@@ -1,0 +1,66 @@
+.day-insights {
+  display: grid;
+  grid-template-columns: minmax(86px, .7fr) minmax(0, 1.8fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.day-insight-card {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--line-hi) 82%, transparent);
+  border-radius: 14px;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--raised) 88%, transparent), color-mix(in srgb, var(--surface) 72%, transparent));
+  box-shadow: inset 0 1px rgba(255,255,255,.07), 0 8px 24px rgba(0,0,0,.06);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.day-insight-card strong { color: var(--text); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.day-insight-card > span { color: var(--muted); font-size: 10px; }
+.day-insight-card:first-child strong { font-size: 20px; letter-spacing: -.04em; }
+
+.schedule-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.schedule-fields label { display: grid; gap: 5px; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+.schedule-fields .add-input { min-width: 0; color-scheme: dark; }
+[data-theme="light"] .schedule-fields .add-input { color-scheme: light; }
+
+.task-title-row { min-width: 0; display: flex; align-items: center; gap: 8px; }
+.task-title-row .task-title { min-width: 0; }
+.task-time-badge {
+  flex: 0 0 auto;
+  padding: 3px 6px;
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+  color: var(--accent);
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: .02em;
+}
+
+.cal-day.has-progress-ring::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(var(--day-progress-color) var(--day-progress), transparent 0);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: .72;
+}
+
+@media (max-width: 560px) {
+  .day-insights { grid-template-columns: 1fr; }
+  .day-insight-card:first-child { display: none; }
+  .schedule-fields { grid-template-columns: 1fr; }
+  .task-title-row { align-items: flex-start; flex-direction: column; gap: 3px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cal-day, .task-item { transition: none !important; }
+}
