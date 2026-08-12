@@ -14,6 +14,7 @@ import { useMonthSummary } from '../hooks/useTasks'
 import { useLanguage } from '../contexts/LanguageContext'
 import type { DaySummary } from '../types'
 import type { CSSProperties } from 'react'
+import DailyJournal from './DailyJournal'
 
 interface CalendarProps {
   selectedDate: Date
@@ -212,6 +213,7 @@ export default function Calendar({ selectedDate, onSelectDate, currentMonth, onC
         })}
       </div>
     </section>
+    <DailyJournal selectedDate={selectedDate} />
     </>
   )
 }
