@@ -101,9 +101,15 @@ export default function TaskItem({ task, date }: TaskItemProps) {
               <span className="task-outcome pending">{t('cal.task.pending')}</span>
             )}
             {!isPending && (
-              <span className={`task-outcome ${isPositive ? 'good' : 'bad'}`}>
-                {isPositive ? t('cal.task.done') : t('cal.task.habit_done')}
-              </span>
+              isPositive ? (
+                <span className="task-completed-mark" aria-label={t('cal.task.done')} title={t('cal.task.done')}>
+                  <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="2 6 5 9 10 3" />
+                  </svg>
+                </span>
+              ) : (
+                <span className="task-outcome bad">{t('cal.task.habit_done')}</span>
+              )
             )}
           </>
         )}
