@@ -69,3 +69,5 @@ import './mobileSidebarFix'
 import './mobileTopbarFix'
 
 import './taskScheduleEnhancement'
+
+import './authWaveRedesign'
