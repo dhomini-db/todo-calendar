@@ -13,6 +13,7 @@ import { ptBR, enUS } from 'date-fns/locale'
 import { useMonthSummary } from '../hooks/useTasks'
 import { useLanguage } from '../contexts/LanguageContext'
 import type { DaySummary } from '../types'
+import type { CSSProperties } from 'react'
 
 interface CalendarProps {
   selectedDate: Date
@@ -102,10 +103,15 @@ export default function Calendar({ selectedDate, onSelectDate, currentMonth, onC
               onClick={() => onSelectDate(day)}
               className={[
                 'cal-day',
+                hasTasks ? 'has-progress-ring' : '',
                 cls,
                 isSelected ? 'selected' : '',
                 isTodayDay && !cls ? 'today' : '',
               ].filter(Boolean).join(' ')}
+              style={hasTasks ? {
+                '--day-progress': `${pct * 3.6}deg`,
+                '--day-progress-color': bar,
+              } as CSSProperties : undefined}
               title={hasTasks ? `${daySumm!.completed}/${daySumm!.total} · ${pct}%` : undefined}
             >
               <span className="cal-day-num">{format(day, 'd')}</span>
