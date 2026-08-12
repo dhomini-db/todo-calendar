@@ -87,19 +87,6 @@
   white-space: nowrap;
 }
 
-.task-completed-mark {
-  width: 18px;
-  height: 18px;
-  margin-top: 3px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid color-mix(in srgb, var(--green) 24%, transparent);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--green) 10%, transparent);
-  color: var(--green);
-}
-
 .task-item.done {
   padding-top: 7px;
   padding-bottom: 7px;
@@ -113,13 +100,14 @@
   min-height: 22px;
 }
 
-.task-item.done .task-completed-mark {
-  flex: 0 0 auto;
-  margin-top: 0;
-}
-
 .task-item.done .task-title-row { flex: 1; }
 .task-item.done .task-desc { display: none; }
+
+.task-checkbox.positive.checked {
+  background: var(--green);
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 10%, transparent);
+}
 
 /* Identidade do TaskFlow: vermelho no modo claro, azul no noturno. */
 [data-theme="rose-dawn"] .task-item.task-positive,
