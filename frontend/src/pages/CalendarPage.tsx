@@ -56,7 +56,12 @@ export default function CalendarPage() {
           <div className="calendar-liquid-texture" />
           <div className="calendar-ambient-glow" />
           <div className="calendar-particles">
-            {Array.from({ length: 16 }, (_, index) => <i key={index} style={{ '--particle-index': index } as CSSProperties} />)}
+            {Array.from({ length: 34 }, (_, index) => <i key={index} style={{
+              '--particle-index': index,
+              '--particle-x': `${4 + ((index * 37) % 92)}%`,
+              '--particle-y': `${2 + ((index * 53) % 96)}%`,
+              '--particle-size': `${3 + (index % 5)}px`,
+            } as CSSProperties} />)}
           </div>
         </div>
         <div className="calendar-page-content">
