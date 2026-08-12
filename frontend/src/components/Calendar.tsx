@@ -20,6 +20,8 @@ interface CalendarProps {
   onSelectDate: (date: Date) => void
   currentMonth: Date
   onChangeMonth: (date: Date) => void
+  selectedDayScore?: number | null
+  selectedDayTotal?: number
 }
 
 /** Returns CSS class + bar colour for a day */
@@ -49,7 +51,7 @@ const WD_KEYS = [
   'cal.wd.sat',
 ]
 
-export default function Calendar({ selectedDate, onSelectDate, currentMonth, onChangeMonth }: CalendarProps) {
+export default function Calendar({ selectedDate, onSelectDate, currentMonth, onChangeMonth, selectedDayScore, selectedDayTotal = 0 }: CalendarProps) {
   const { lang, t } = useLanguage()
   const locale = lang === 'en' ? enUS : ptBR
 
@@ -119,8 +121,17 @@ export default function Calendar({ selectedDate, onSelectDate, currentMonth, onC
 
         {days.map(day => {
           const key        = format(day, 'yyyy-MM-dd')
-          const daySumm    = summaryByDate[key]
+          const monthlyDay = summaryByDate[key]
           const isSelected = isSameDay(day, selectedDate)
+          const daySumm = isSelected && selectedDayScore != null && selectedDayTotal > 0
+            ? {
+                date: key,
+                total: selectedDayTotal,
+                completed: Math.round((selectedDayScore / 100) * selectedDayTotal),
+                percentage: selectedDayScore,
+                color: selectedDayScore >= 100 ? 'GREEN' : selectedDayScore >= 70 ? 'LIGHT_GREEN' : selectedDayScore >= 50 ? 'YELLOW' : 'RED',
+              } as DaySummary
+            : monthlyDay
           const isTodayDay = isToday(day)
           const { cls, bar } = dayStyle(daySumm)
           const hasTasks   = Boolean(daySumm && daySumm.total > 0)
