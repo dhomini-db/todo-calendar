@@ -6,6 +6,11 @@
 }
 
 .day-insight-card {
+  --aura-x: 50%;
+  --aura-y: 50%;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   min-width: 0;
   padding: 10px 12px;
   border: 1px solid color-mix(in srgb, var(--line-hi) 82%, transparent);
@@ -15,7 +20,27 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
 }
+
+.day-insight-card::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -1px;
+  background: radial-gradient(110px circle at var(--aura-x) var(--aura-y), color-mix(in srgb, var(--accent) 22%, transparent), transparent 72%);
+  opacity: 0;
+  transition: opacity .2s ease;
+  pointer-events: none;
+}
+
+.day-insight-card:hover {
+  border-color: color-mix(in srgb, var(--accent) 38%, var(--line-hi));
+  box-shadow: inset 0 1px rgba(255,255,255,.12), 0 12px 30px color-mix(in srgb, var(--accent) 12%, transparent);
+  transform: translateY(-1px);
+}
+
+.day-insight-card:hover::before { opacity: 1; }
 
 .day-insight-card strong { color: var(--text); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .day-insight-card > span { color: var(--muted); font-size: 10px; }
