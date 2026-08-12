@@ -5,6 +5,7 @@ import { useTasksByDate, useCreateTask, useCreateRecurringTask } from '../hooks/
 import { useLanguage } from '../contexts/LanguageContext'
 import type { TaskType, RecurrenceType } from '../types'
 import TaskItem from './TaskItem'
+import { composeTaskTitle, parseTaskMetadata, timeToMinutes } from '../utils/taskMetadata'
 
 interface TaskPanelProps {
   selectedDate: Date
@@ -74,13 +75,21 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
   const [isRecurring,    setIsRecurring]    = useState(false)
   const [recurrenceType, setRecurrenceType] = useState<RecurrenceType>('DAILY')
   const [daysOfWeek,     setDaysOfWeek]     = useState<string[]>([])
+  const [startTime,      setStartTime]      = useState('')
+  const [endTime,        setEndTime]        = useState('')
 
-  const positiveTasks   = tasks.filter(t => t.type === 'POSITIVE')
-  const negativeTasks   = tasks.filter(t => t.type === 'NEGATIVE')
+  const orderedTasks = [...tasks].sort((a, b) =>
+    timeToMinutes(parseTaskMetadata(a.title).startTime) - timeToMinutes(parseTaskMetadata(b.title).startTime),
+  )
+  const positiveTasks   = orderedTasks.filter(t => t.type === 'POSITIVE')
+  const negativeTasks   = orderedTasks.filter(t => t.type === 'NEGATIVE')
 
   const interactedTasks = tasks.filter(t => t.interacted)
   const pct             = calcScore(tasks)
   const goodCount       = positiveTasks.filter(t => t.interacted && t.completed).length
+  const completedCount  = tasks.filter(t => t.completed).length
+  const nextTask        = orderedTasks.find(t => !t.completed)
+  const nextMetadata    = nextTask ? parseTaskMetadata(nextTask.title) : null
 
   // Date header — locale-aware
   const dayName   = format(selectedDate, 'EEEE', { locale })
@@ -96,11 +105,12 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
 
   function handleSubmit() {
     if (!title.trim()) return
+    const storedTitle = composeTaskTitle(title, startTime, endTime)
 
     if (isRecurring) {
       createRecurring.mutate(
         {
-          title:         title.trim(),
+          title:         storedTitle,
           description:   description.trim() || undefined,
           type:          taskType,
           recurrenceType,
@@ -110,7 +120,7 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
       )
     } else {
       createTask.mutate(
-        { title: title.trim(), description: description.trim() || undefined, date: dateStr, type: taskType },
+        { title: storedTitle, description: description.trim() || undefined, date: dateStr, type: taskType },
         { onSuccess: resetForm },
       )
     }
@@ -124,6 +134,8 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
     setIsRecurring(false)
     setRecurrenceType('DAILY')
     setDaysOfWeek([])
+    setStartTime('')
+    setEndTime('')
   }
 
   const isPending = createTask.isPending || createRecurring.isPending
@@ -153,6 +165,16 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
         {interactedTasks.length > 0 && (
           <p className="panel-score-label">{pct}% {t('cal.panel.score')}</p>
         )}
+        <div className="day-insights" aria-label="Resumo do dia">
+          <div className="day-insight-card">
+            <strong>{completedCount}/{tasks.length}</strong>
+            <span>concluídas</span>
+          </div>
+          <div className="day-insight-card day-insight-next">
+            <span>{nextTask ? 'Próxima atividade' : 'Tudo concluído'}</span>
+            <strong>{nextMetadata?.startTime ? `${nextMetadata.startTime} · ` : ''}{nextMetadata?.title ?? 'Bom trabalho!'}</strong>
+          </div>
+        </div>
       </div>
 
       {/* Task list */}
@@ -228,6 +250,17 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
               onChange={e => setDescription(e.target.value)}
               aria-label={t('cal.panel.desc_ph')}
             />
+
+            <div className="schedule-fields">
+              <label>
+                <span>Início</span>
+                <input className="add-input" type="time" value={startTime} onChange={e => setStartTime(e.target.value)} />
+              </label>
+              <label>
+                <span>Fim</span>
+                <input className="add-input" type="time" value={endTime} min={startTime || undefined} onChange={e => setEndTime(e.target.value)} />
+              </label>
+            </div>
 
             {/* Recurrence toggle */}
             <label className="recurrence-toggle-row">
