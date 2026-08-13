@@ -851,6 +851,37 @@ body {
   box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
+.password-field { position: relative; }
+.password-field .field-input { padding-right: 46px; }
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 9px;
+  width: 32px;
+  height: 32px;
+  padding: 6px;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: 10px;
+  color: var(--text-2);
+  background: transparent;
+  cursor: pointer;
+  transition: color .15s, background .15s, transform .15s;
+}
+.password-toggle:hover { color: var(--accent); background: var(--accent-glow); }
+.password-toggle:active { transform: translateY(-50%) scale(.92); }
+.password-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.password-toggle svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.password-strength { display: flex; align-items: center; gap: 9px; margin-top: 3px; font-size: 11px; font-weight: 600; color: var(--text-2); }
+.password-strength-bars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; width: 76px; }
+.password-strength-bars i { height: 4px; border-radius: 99px; background: var(--line-md); transition: background .2s, box-shadow .2s; }
+.password-strength--weak .password-strength-bars i:first-child { background: #ef4444; box-shadow: 0 0 9px rgba(239,68,68,.28); }
+.password-strength--weak span { color: #dc2626; }
+.password-strength--medium .password-strength-bars i:nth-child(-n+2) { background: #f59e0b; box-shadow: 0 0 9px rgba(245,158,11,.25); }
+.password-strength--medium span { color: #d97706; }
+.password-strength--strong .password-strength-bars i { background: #22c55e; box-shadow: 0 0 9px rgba(34,197,94,.25); }
+.password-strength--strong span { color: #16a34a; }
+
 .auth-btn {
   margin-top: 6px;
   background: var(--accent);
