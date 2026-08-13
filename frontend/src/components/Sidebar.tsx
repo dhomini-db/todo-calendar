@@ -156,7 +156,8 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
 
   /* ── Resize logic ─────────────────────────────────────────── */
   const [width, setWidth] = useState<number>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY)
+    let saved: string | null = null
+    try { saved = localStorage.getItem(STORAGE_KEY) } catch { /* storage blocked */ }
     if (saved) {
       const n = parseInt(saved, 10)
       if (!isNaN(n)) return Math.max(SIDEBAR_MIN, Math.min(SIDEBAR_MAX, n))
@@ -185,7 +186,7 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       document.body.style.cursor = ''
       document.body.style.userSelect = ''
       handleRef.current?.classList.remove('dragging')
-      localStorage.setItem(STORAGE_KEY, String(currentW.current))
+      try { localStorage.setItem(STORAGE_KEY, String(currentW.current)) } catch { /* storage blocked */ }
     }
     window.addEventListener('mousemove', onMove)
     window.addEventListener('mouseup',   onUp)
