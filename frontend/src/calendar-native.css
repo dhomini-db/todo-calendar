@@ -358,6 +358,8 @@
 .journal-color input { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .journal-size-wrap { position: relative; width: 72px; height: 66px; flex: 0 0 72px; }
 .journal-size { position: relative; display: grid; place-items: center; width: 42px; height: 42px; margin: 2px auto 0; border: 1px solid color-mix(in srgb,var(--line-hi) 70%,transparent); border-radius: 50%; background: color-mix(in srgb,var(--surface) 72%,transparent); cursor: pointer; }
+.journal-size em { bottom: -20px; }
+.journal-tool.tool-shape-highlight em { bottom: -1px; line-height: 1.02; white-space: normal; }
 .journal-size > span { display: grid; place-items: center; width: 21px; height: 21px; }
 .journal-size > span i { display: block; border-radius: 50%; background: var(--text-2); }
 .journal-size.active { border-color: var(--accent-border); box-shadow: 0 0 0 3px color-mix(in srgb,var(--accent) 10%,transparent); }
