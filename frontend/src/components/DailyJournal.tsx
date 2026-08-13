@@ -166,12 +166,6 @@ export default function DailyJournal({ selectedDate }: { selectedDate: Date }) {
         <time>{format(selectedDate, lang === 'en' ? 'MMMM d, yyyy' : "d 'de' MMMM 'de' yyyy", { locale })}</time>
       </header>
 
-      <div className="journal-toolbar" role="toolbar" aria-label={lang === 'en' ? 'Journal tools' : 'Ferramentas do diário'}>
-        {(['write', 'draw', 'highlight', 'erase'] as Tool[]).map(item => <button key={item} type="button" className={`journal-tool tool-shape-${item} ${tool === item ? 'active' : ''}`} onClick={() => setTool(item)} title={labels[item]} aria-label={labels[item]}><span className="tool-tip" style={item === 'draw' || item === 'highlight' ? { background: inkColor } : undefined} /><span className="tool-body" /><em>{labels[item]}</em></button>)}
-        <label className="journal-color" title={labels.color} aria-label={labels.color}><span style={{ background: inkColor }} /><input type="color" value={inkColor} onChange={event => setInkColor(event.target.value)} /></label>
-        <button type="button" className="journal-clear" onClick={() => { const canvas = canvasRef.current; canvas?.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height); persistMedia({ ...pageMedia, drawing: undefined }) }} title={labels.clear} aria-label={labels.clear}>×</button>
-      </div>
-
       <div className="journal-book">
         <div className="journal-rings" aria-hidden="true">{Array.from({ length: 7 }, (_, i) => <i key={i} />)}</div>
         <div className={`journal-page ${turn ? `turn-${turn}` : ''}`}>
@@ -181,6 +175,12 @@ export default function DailyJournal({ selectedDate }: { selectedDate: Date }) {
           <canvas ref={canvasRef} className={`journal-canvas tool-${tool}`} onPointerDown={beginStroke} onPointerMove={drawStroke} onPointerUp={endStroke} onPointerCancel={endStroke} />
           <span className="journal-saved">{lang === 'en' ? 'Saved automatically' : 'Salvo automaticamente'}</span>
         </div>
+      </div>
+
+      <div className="journal-toolbar" role="toolbar" aria-label={lang === 'en' ? 'Journal tools' : 'Ferramentas do diário'}>
+        {(['write', 'draw', 'highlight', 'erase'] as Tool[]).map(item => <button key={item} type="button" className={`journal-tool tool-shape-${item} ${tool === item ? 'active' : ''}`} onClick={() => setTool(item)} title={labels[item]} aria-label={labels[item]}><span className="tool-tip" style={item === 'draw' || item === 'highlight' ? { background: inkColor } : undefined} /><span className="tool-body" /><em>{labels[item]}</em></button>)}
+        <label className="journal-color" title={labels.color} aria-label={labels.color}><span style={{ background: inkColor }} /><input type="color" value={inkColor} onChange={event => setInkColor(event.target.value)} /></label>
+        <button type="button" className="journal-clear" onClick={() => { const canvas = canvasRef.current; canvas?.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height); persistMedia({ ...pageMedia, drawing: undefined }) }} title={labels.clear} aria-label={labels.clear}>×</button>
       </div>
 
       <footer className="journal-controls">
