@@ -3416,6 +3416,18 @@ a.sidebar-item.active::before {
     box-shadow: 4px 0 32px rgba(0,0,0,0.32);
   }
 
+  .sidebar[data-mobile-open="false"] {
+    transform: translate3d(-105%, 0, 0) !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  .sidebar[data-mobile-open="true"] {
+    transform: translate3d(0, 0, 0) !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+
   .sidebar-logo-button {
     cursor: pointer;
     touch-action: manipulation;
