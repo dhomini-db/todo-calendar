@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react'
+import { safeGet, safeSet } from '../utils/safeStorage'
 
 export type ThemeId =
   | 'amber-night'
@@ -44,11 +45,11 @@ const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<ThemeId>(
-    () => (localStorage.getItem('theme') as ThemeId) ?? 'amber-night',
+    () => (safeGet(localStorage, 'theme') as ThemeId) ?? 'rose-dawn',
   )
 
   const setTheme = useCallback((id: ThemeId) => {
-    localStorage.setItem('theme', id)
+    safeSet(localStorage, 'theme', id)
     document.documentElement.setAttribute('data-theme', id)
     setThemeState(id)
   }, [])
