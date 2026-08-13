@@ -11,7 +11,7 @@ waveStyle.textContent=`
 .auth-card{z-index:2}
 @keyframes authWaveDrift{from{transform:translate3d(-1.2%,0,0) scaleX(1.015)}to{transform:translate3d(1.2%,-1%,0) scaleX(.995)}}
 @keyframes authWaveDriftReverse{from{transform:translate3d(1%,.8%,0) scaleX(1)}to{transform:translate3d(-1.1%,-.5%,0) scaleX(1.018)}}
-@media(max-width:600px){.auth-wave-scene{inset:-2% -36%}.auth-wave-svg{width:172%;margin-left:-36%}.auth-wave-back,.auth-wave-mid,.auth-wave-front{animation:none}.auth-wave-line{stroke-width:1.5;opacity:.16}}
+@media(max-width:760px),(hover:none) and (pointer:coarse){.auth-wave-scene{inset:0;overflow:hidden}.auth-wave-svg{width:120%;height:100%;margin:0 -10%;transform:none!important}.auth-wave-back,.auth-wave-mid,.auth-wave-front{animation:none!important;transform:none!important;will-change:auto!important}.auth-wave-glow{display:none}.auth-wave-line{stroke-width:1.5;opacity:.13}}
 @media(prefers-reduced-motion:reduce){.auth-wave-back,.auth-wave-mid,.auth-wave-front{animation:none}}
 `
 document.head.appendChild(waveStyle)
