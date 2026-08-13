@@ -1,7 +1,6 @@
 import { useEffect, useState, type CSSProperties } from 'react'
 import Calendar    from '../components/Calendar'
 import TaskPanel   from '../components/TaskPanel'
-import StreakBadge from '../components/StreakBadge'
 import { useLanguage } from '../contexts/LanguageContext'
 import { useMonthSummary, useTasksByDate } from '../hooks/useTasks'
 import { format } from 'date-fns'
@@ -67,7 +66,6 @@ export default function CalendarPage() {
           </div>
           <h1 className="page-title">{t('cal.title')}</h1>
           <p className="page-sub">{t('cal.sub')}</p>
-          <StreakBadge />
           <Calendar selectedDate={selectedDate} onSelectDate={setSelectedDate} currentMonth={currentMonth} onChangeMonth={setCurrentMonth} selectedDayScore={selectedPercentage} selectedDayTotal={selectedTasks.length} knownDayScores={knownDayScores} />
         </div>
       </div>
