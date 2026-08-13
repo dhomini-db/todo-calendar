@@ -234,7 +234,9 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
           onClick={onMobileClose}
           aria-label="Fechar menu"
         >
-          ×
+          <span aria-hidden="true" />
+          <span aria-hidden="true" />
+          <span aria-hidden="true" />
         </button>
 
         {/* Logo */}
