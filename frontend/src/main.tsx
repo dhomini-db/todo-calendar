@@ -17,6 +17,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { LanguageProvider } from './contexts/LanguageContext'
 import './index.css'
+import './mobileSafeMode'
 
 // O PWA foi desativado para estabilidade mobile. Remove registros antigos
 // silenciosamente, sem navegar ou recarregar a página atual.
@@ -42,6 +43,8 @@ import './performanceMode'
 
 
 
-import './authWaveRedesign'
-import './authParticles'
-import './authWaveMotion'
+if (!document.documentElement.classList.contains('mobile-safe-mode')) {
+  void import('./authWaveRedesign')
+  void import('./authParticles')
+  void import('./authWaveMotion')
+}
