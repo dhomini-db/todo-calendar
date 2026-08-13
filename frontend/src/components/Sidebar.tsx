@@ -226,7 +226,17 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       <aside
         className={`sidebar${mobileOpen ? ' sidebar--open' : ''}`}
         style={{ width }}
+        aria-hidden={!mobileOpen && undefined}
       >
+        <button
+          type="button"
+          className="sidebar-mobile-close"
+          onClick={onMobileClose}
+          aria-label="Fechar menu"
+        >
+          ×
+        </button>
+
         {/* Logo */}
         <div className="sidebar-logo">
           <img src="/logo-icon.svg" alt="TaskFlow" className="sidebar-logo-img" />
