@@ -25,10 +25,23 @@ body{background-attachment:scroll!important}
 }
 @media(max-width:760px){
   .sidebar,.mobile-topbar,.calendar-wrap,.panel-area,.task-panel,.auth-card,.chart-card,.cfg-card,.conta-card{
-    backdrop-filter:blur(8px) saturate(110%)!important;
-    -webkit-backdrop-filter:blur(8px) saturate(110%)!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
   }
-  .auth-page::before,.auth-page::after{animation:none!important}
+  html,body,#root,.app-shell{min-height:100%;height:100%;background:var(--bg)}
+  .app-shell{height:100dvh;min-height:100svh}
+  .auth-page::before,.auth-page::after,
+  .auth-wave-back,.auth-wave-mid,.auth-wave-front,
+  .auth-particle,.calendar-liquid-texture,.calendar-particles i,
+  .journal-images figure.animated{animation:none!important}
+  .auth-particles-layer,.calendar-particles{display:none!important}
+  .auth-wave-glow,.calendar-ambient-glow{filter:none!important;opacity:.28!important}
+  .calendar-liquid-texture{filter:none!important;mix-blend-mode:normal!important;transform:none!important;will-change:auto!important;opacity:.16!important}
+  .auth-wave-svg,.auth-wave-scene{transform:none!important;will-change:auto!important}
+  .sidebar,.sidebar-backdrop,.mobile-topbar,.main-content,.auth-card,.calendar-wrap,.task-panel,.daily-journal{
+    will-change:auto!important;backface-visibility:hidden;-webkit-backface-visibility:hidden
+  }
+  .page-enter,.page-exit,.splash,.splash--out{animation:none!important}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
