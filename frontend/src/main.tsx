@@ -17,6 +17,9 @@ import { AuthProvider } from './contexts/AuthContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { LanguageProvider } from './contexts/LanguageContext'
 import './index.css'
+
+// A configuração PWA já atualiza versões antigas. Não apague caches durante
+// cada inicialização: em celulares/instalações isso pode interromper o boot.
 import './liquid-glass.css'
 import './calendar-native.css'
 const queryClient=new QueryClient({defaultOptions:{queries:{staleTime:30_000,retry:1}}})
