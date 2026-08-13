@@ -3413,22 +3413,36 @@ a.sidebar-item.active::before {
   }
 
   .sidebar-mobile-close {
-    display: grid;
+    display: flex;
     position: absolute;
     top: max(14px, env(safe-area-inset-top, 0px));
     right: 14px;
     z-index: 30;
-    width: 40px;
-    height: 40px;
-    place-items: center;
-    border: 1px solid var(--line-md);
-    border-radius: 13px;
+    width: 42px;
+    height: 42px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
     color: var(--text);
-    background: var(--raised);
-    box-shadow: var(--shadow-sm);
-    font: 400 28px/1 system-ui, sans-serif;
+    background: transparent;
+    box-shadow: none;
     cursor: pointer;
     touch-action: manipulation;
+    pointer-events: auto;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .sidebar-mobile-close span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+    pointer-events: none;
   }
 
   /* Resize handle invisible on mobile */
