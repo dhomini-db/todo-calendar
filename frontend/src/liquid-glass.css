@@ -384,3 +384,35 @@ a.sidebar-item.active .sidebar-item-icon svg {
   border-radius: 8px;
   background: color-mix(in srgb,var(--raised) 54%,transparent);
 }
+
+/* Estabilidade em telas touch: evita composição excessiva e flicker de GPU. */
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+  .sidebar,
+  .mobile-topbar,
+  .calendar-wrap,
+  .panel-area,
+  .task-panel,
+  .daily-journal,
+  .auth-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .sidebar,
+  .sidebar-backdrop,
+  .main-content,
+  .calendar-page,
+  .auth-page {
+    transform: none !important;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  .sidebar-item:hover:not(.active),
+  a.sidebar-item:hover:not(.active),
+  .sidebar-item.active,
+  a.sidebar-item.active { transform: none; }
+
+  .sidebar-item::after,
+  a.sidebar-item::after { display: none; }
+}
