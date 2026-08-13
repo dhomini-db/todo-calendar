@@ -14,13 +14,22 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
+let authRedirectPending = false
+
 // Interceptor: redireciona para login se o token expirar
 api.interceptors.response.use(
   res => res,
   err => {
-    if (err.response?.status === 403 || err.response?.status === 401) {
-      localStorage.removeItem('user')
-      window.location.href = '/login'
+    if ((err.response?.status === 403 || err.response?.status === 401) && !authRedirectPending) {
+      authRedirectPending = true
+      try { localStorage.removeItem('user') } catch { /* storage blocked */ }
+
+      // Navegação SPA: não recarrega o documento inteiro. O evento é emitido
+      // apenas uma vez mesmo quando várias requisições falham juntas.
+      if (window.location.pathname !== '/login') {
+        window.history.replaceState(null, '', '/login')
+        window.dispatchEvent(new PopStateEvent('popstate'))
+      }
     }
     return Promise.reject(err)
   },
