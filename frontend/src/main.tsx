@@ -19,15 +19,7 @@ import { LanguageProvider } from './contexts/LanguageContext'
 import './index.css'
 import './mobileSafeMode'
 
-// O PWA foi desativado para estabilidade mobile. Remove registros antigos
-// silenciosamente, sem navegar ou recarregar a página atual.
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    void navigator.serviceWorker.getRegistrations()
-      .then(registrations => Promise.all(registrations.map(registration => registration.unregister())))
-      .catch(() => undefined)
-  }, { once: true })
-}
+// PWA desativado: nenhuma operação com service worker durante a inicialização.
 import './liquid-glass.css'
 import './calendar-native.css'
 const queryClient=new QueryClient({defaultOptions:{queries:{staleTime:30_000,retry:1}}})
