@@ -3415,15 +3415,15 @@ a.sidebar-item.active::before {
   .sidebar-mobile-close {
     display: flex;
     position: absolute;
-    top: max(14px, env(safe-area-inset-top, 0px));
-    right: 14px;
-    z-index: 30;
-    width: 42px;
-    height: 42px;
+    top: max(16px, env(safe-area-inset-top, 0px));
+    right: 22px;
+    z-index: 100;
+    width: 48px;
+    height: 48px;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    gap: 5px;
+    gap: 4px;
     padding: 0;
     border: 0;
     border-radius: 0;
@@ -3438,10 +3438,10 @@ a.sidebar-item.active::before {
 
   .sidebar-mobile-close span {
     display: block;
-    width: 24px;
-    height: 2px;
+    width: 21px;
+    height: 1.5px;
     border-radius: 999px;
-    background: currentColor;
+    background: color-mix(in srgb, currentColor 78%, transparent);
     pointer-events: none;
   }
 
