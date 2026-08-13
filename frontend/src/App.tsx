@@ -26,10 +26,10 @@ export default function App() {
 
   // Show splash once per browser session (sessionStorage resets on tab close)
   const [splashDone, setSplashDone] = useState(
-    () => !!sessionStorage.getItem(SPLASH_KEY)
+    () => { try { return !!sessionStorage.getItem(SPLASH_KEY) } catch { return true } }
   )
   const handleSplashDone = useCallback(() => {
-    sessionStorage.setItem(SPLASH_KEY, '1')
+    try { sessionStorage.setItem(SPLASH_KEY, '1') } catch { /* storage blocked */ }
     setSplashDone(true)
   }, [])
 
