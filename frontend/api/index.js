@@ -3,7 +3,67 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
 const json = (res, status, body) => res.status(status).json(body)
-const now = () => new Date().toISOString()
+const IS_PROD = process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production'
+const COOKIE_NAME = 'taskflow_session'
+const TOKEN_TTL_SECONDS = 2 * 60 * 60
+const MAX_JSON_BYTES = 32 * 1024
+const loginAttempts = new Map()
+
+function securityHeaders(res) {
+  res.setHeader('Cache-Control', 'no-store')
+  res.setHeader('X-Content-Type-Options', 'nosniff')
+  res.setHeader('X-Frame-Options', 'DENY')
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+}
+function cookie(req, name) {
+  const raw = req.headers.cookie || ''
+  const item = raw.split(';').map(v => v.trim()).find(v => v.startsWith(`${name}=`))
+  return item ? decodeURIComponent(item.slice(name.length + 1)) : null
+}
+function setSessionCookie(res, token) {
+  res.setHeader('Set-Cookie', `${COOKIE_NAME}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${TOKEN_TTL_SECONDS}${IS_PROD ? '; Secure' : ''}`)
+}
+function clearSessionCookie(res) {
+  res.setHeader('Set-Cookie', `${COOKIE_NAME}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0${IS_PROD ? '; Secure' : ''}`)
+}
+function text(value, max, field) {
+  if (typeof value !== 'string') throw new ClientError(`${field} inválido`)
+  const clean = value.trim()
+  if (!clean || clean.length > max) throw new ClientError(`${field} inválido`)
+  return clean
+}
+function optionalText(value, max, field) {
+  if (value == null || value === '') return null
+  return text(value, max, field)
+}
+function validEmail(value) {
+  const email = text(value, 254, 'E-mail').toLowerCase()
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new ClientError('E-mail inválido')
+  return email
+}
+function validPassword(value) {
+  if (typeof value !== 'string' || value.length < 10 || value.length > 128) throw new ClientError('A senha deve ter entre 10 e 128 caracteres')
+  return value
+}
+function validDate(value) {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(Date.parse(`${value}T00:00:00Z`))) throw new ClientError('Data inválida')
+  return value
+}
+function validType(value) {
+  if (value == null) return 'POSITIVE'
+  if (!['POSITIVE', 'NEGATIVE'].includes(value)) throw new ClientError('Tipo inválido')
+  return value
+}
+class ClientError extends Error { constructor(message, status = 400) { super(message); this.status = status } }
+function clientIp(req) { return String(req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim() }
+function rateLimited(req, key, limit, windowMs) {
+  const now = Date.now(), id = `${key}:${clientIp(req)}`, entry = loginAttempts.get(id)
+  if (!entry || entry.reset <= now) { loginAttempts.set(id, { count: 1, reset: now + windowMs }); return false }
+  entry.count += 1
+  return entry.count > limit
+}
+function clearRateLimit(req, key) { loginAttempts.delete(`${key}:${clientIp(req)}`) }
 
 let initialized = false
 async function db() {
@@ -22,12 +82,17 @@ async function db() {
   return sql
 }
 
-function tokenFor(user) { return jwt.sign({ sub: String(user.id) }, process.env.JWT_SECRET, { expiresIn: '30d' }) }
+function jwtSecret() {
+  const value = process.env.JWT_SECRET
+  if (!value || value.length < 32) throw new Error('JWT_SECRET deve possuir ao menos 32 caracteres')
+  return value
+}
+function tokenFor(user) { return jwt.sign({ sub: String(user.id) }, jwtSecret(), { expiresIn: TOKEN_TTL_SECONDS, issuer: 'taskflow', audience: 'taskflow-web' }) }
 async function currentUser(req, sql) {
-  const raw = req.headers.authorization || ''
-  if (!raw.startsWith('Bearer ')) return null
+  const raw = cookie(req, COOKIE_NAME)
+  if (!raw) return null
   try {
-    const decoded = jwt.verify(raw.slice(7), process.env.JWT_SECRET)
+    const decoded = jwt.verify(raw, jwtSecret(), { issuer: 'taskflow', audience: 'taskflow-web' })
     const rows = await sql.query('SELECT * FROM users WHERE id = $1', [decoded.sub])
     return rows[0] || null
   } catch { return null }
@@ -59,29 +124,42 @@ async function streakData(sql,userId){
 
 export default async function handler(req, res) {
   try {
+    securityHeaders(res)
+    const contentLength = Number(req.headers['content-length'] || 0)
+    if (contentLength > MAX_JSON_BYTES) return json(res, 413, { message:'Requisição muito grande' })
+    if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
+      const origin = req.headers.origin
+      const expected = `https://${req.headers.host}`
+      if (IS_PROD && origin && origin !== expected) return json(res, 403, { message:'Origem não permitida' })
+    }
     const sql = await db()
     const path = new URL(req.url, 'http://localhost').pathname.replace(/^\/api/, '') || '/'
     const method = req.method
 
     if (path === '/auth/register' && method === 'POST') {
-      const b = await body(req); if (!b.name || !b.email || !b.password || b.password.length < 6) return json(res, 400, { message:'Dados inválidos' })
-      const exists = await sql.query('SELECT id FROM users WHERE lower(email)=lower($1)', [b.email]); if (exists.length) return json(res,409,{message:'E-mail já cadastrado'})
-      const password = await bcrypt.hash(b.password, 12); const rows = await sql.query('INSERT INTO users(name,email,password) VALUES($1,$2,$3) RETURNING *',[b.name,b.email,password]); const u=rows[0]
-      return json(res,201,{ token:tokenFor(u), userId:Number(u.id), name:u.name, email:u.email, profileImageUrl:null })
+      if (rateLimited(req, 'register', 5, 15 * 60 * 1000)) return json(res,429,{message:'Muitas tentativas. Aguarde alguns minutos.'})
+      const b = await body(req), name=text(b.name,80,'Nome'), email=validEmail(b.email), plain=validPassword(b.password)
+      const exists = await sql.query('SELECT id FROM users WHERE lower(email)=lower($1)', [email]); if (exists.length) return json(res,409,{message:'Não foi possível criar a conta com esses dados'})
+      const password = await bcrypt.hash(plain, 12); const rows = await sql.query('INSERT INTO users(name,email,password) VALUES($1,$2,$3) RETURNING *',[name,email,password]); const u=rows[0]
+      setSessionCookie(res, tokenFor(u)); clearRateLimit(req, 'register')
+      return json(res,201,{ userId:Number(u.id), name:u.name, email:u.email, profileImageUrl:null })
     }
     if (path === '/auth/login' && method === 'POST') {
-      const b=await body(req); const rows=await sql.query('SELECT * FROM users WHERE lower(email)=lower($1)',[b.email||'']); const u=rows[0]
+      if (rateLimited(req, 'login', 10, 15 * 60 * 1000)) return json(res,429,{message:'Muitas tentativas. Aguarde alguns minutos.'})
+      const b=await body(req), email=validEmail(b.email); const rows=await sql.query('SELECT * FROM users WHERE lower(email)=lower($1)',[email]); const u=rows[0]
       if (!u || !(await bcrypt.compare(b.password||'',u.password))) return json(res,401,{message:'E-mail ou senha inválidos'})
-      return json(res,200,{token:tokenFor(u),userId:Number(u.id),name:u.name,email:u.email,profileImageUrl:u.profile_image_url})
+      setSessionCookie(res, tokenFor(u)); clearRateLimit(req, 'login')
+      return json(res,200,{userId:Number(u.id),name:u.name,email:u.email,profileImageUrl:u.profile_image_url})
     }
+    if (path === '/auth/logout' && method === 'POST') { clearSessionCookie(res); return res.status(204).end() }
     const user = await requireUser(req,res,sql); if (!user) return
     const id = Number(user.id)
 
     if (path === '/users/me') {
       if (method === 'GET') return json(res,200,publicUser(user))
-      if (method === 'PUT') { const b=await body(req); const rows=await sql.query('UPDATE users SET name=$1,email=$2,bio=$3 WHERE id=$4 RETURNING *',[b.name||user.name,b.email||user.email,b.bio??null,id]); return json(res,200,publicUser(rows[0])) }
+      if (method === 'PUT') { const b=await body(req), name=text(b.name||user.name,80,'Nome'), email=validEmail(b.email||user.email), bio=optionalText(b.bio,500,'Biografia'); const rows=await sql.query('UPDATE users SET name=$1,email=$2,bio=$3 WHERE id=$4 RETURNING *',[name,email,bio,id]); return json(res,200,publicUser(rows[0])) }
     }
-    if (path === '/users/me/password' && method === 'PUT') { const b=await body(req); if (!(await bcrypt.compare(b.currentPassword||'',user.password))) return json(res,400,{message:'Senha atual incorreta'}); await sql.query('UPDATE users SET password=$1 WHERE id=$2',[await bcrypt.hash(b.newPassword||'',12),id]); return json(res,200,{message:'Senha alterada'}) }
+    if (path === '/users/me/password' && method === 'PUT') { const b=await body(req), next=validPassword(b.newPassword); if (!(await bcrypt.compare(b.currentPassword||'',user.password))) return json(res,400,{message:'Senha atual incorreta'}); if(next!==b.confirmNewPassword)return json(res,400,{message:'A confirmação não coincide'}); await sql.query('UPDATE users SET password=$1 WHERE id=$2',[await bcrypt.hash(next,12),id]); setSessionCookie(res,tokenFor(user)); return json(res,200,{message:'Senha alterada'}) }
 
     if(path==='/streak'&&method==='GET') return json(res,200,await streakData(sql,id))
     if(path==='/stats/dashboard'&&method==='GET'){
@@ -101,12 +179,12 @@ export default async function handler(req, res) {
     const follow=path.match(/^\/social\/follow\/(\d+)$/);if(follow&&(method==='POST'||method==='DELETE')){const uid=Number(follow[1]);if(method==='POST'&&uid!==id)await sql.query('INSERT INTO follows(follower_id,following_id) SELECT $1,$2 WHERE EXISTS(SELECT 1 FROM users WHERE id=$2) ON CONFLICT DO NOTHING',[id,uid]);else if(method==='DELETE')await sql.query('DELETE FROM follows WHERE follower_id=$1 AND following_id=$2',[id,uid]);return res.status(204).end()}
     const followList=path.match(/^\/social\/(followers|following)\/(\d+)$/);if(followList&&method==='GET'){const uid=Number(followList[2]),followers=followList[1]==='followers',rows=await sql.query(`SELECT u.*,EXISTS(SELECT 1 FROM follows me WHERE me.follower_id=$1 AND me.following_id=u.id) is_following FROM follows f JOIN users u ON u.id=${followers?'f.follower_id':'f.following_id'} WHERE ${followers?'f.following_id':'f.follower_id'}=$2 ORDER BY u.name`,[id,uid]);return json(res,200,rows.map(u=>({id:Number(u.id),name:u.name,initial:(u.name||'?').trim()[0].toUpperCase(),profileImageUrl:u.profile_image_url,bio:u.bio,isFollowing:u.is_following})))}
 
-    if (path === '/tasks' && method === 'GET') { const date=req.query.date; if (!date) return json(res,400,{message:'Data obrigatória'}); await generateRecurring(sql,id,date); const rows=await sql.query('SELECT * FROM tasks WHERE user_id=$1 AND date=$2 AND skipped=false ORDER BY id',[id,date]); return json(res,200,rows.map(taskOut)) }
-    if (path === '/tasks' && method === 'POST') { const b=await body(req); const rows=await sql.query('INSERT INTO tasks(user_id,title,description,date,type,interacted) VALUES($1,$2,$3,$4,$5,true) RETURNING *',[id,b.title,b.description??null,b.date,b.type||'POSITIVE']); return json(res,201,taskOut(rows[0])) }
+    if (path === '/tasks' && method === 'GET') { const date=validDate(req.query.date); await generateRecurring(sql,id,date); const rows=await sql.query('SELECT * FROM tasks WHERE user_id=$1 AND date=$2 AND skipped=false ORDER BY id',[id,date]); return json(res,200,rows.map(taskOut)) }
+    if (path === '/tasks' && method === 'POST') { const b=await body(req), title=text(b.title,160,'Título'), description=optionalText(b.description,2000,'Descrição'), date=validDate(b.date), type=validType(b.type); const rows=await sql.query('INSERT INTO tasks(user_id,title,description,date,type,interacted) VALUES($1,$2,$3,$4,$5,true) RETURNING *',[id,title,description,date,type]); return json(res,201,taskOut(rows[0])) }
     const taskMatch=path.match(/^\/tasks\/(\d+)(\/toggle)?$/)
     if (taskMatch) { const taskId=Number(taskMatch[1]); const rows=await sql.query('SELECT * FROM tasks WHERE id=$1 AND user_id=$2',[taskId,id]); if(!rows[0]) return json(res,404,{message:'Tarefa não encontrada'}); let out
       if(method==='PATCH'&&taskMatch[2]) out=(await sql.query('UPDATE tasks SET completed=NOT completed,interacted=true,updated_at=NOW() WHERE id=$1 RETURNING *',[taskId]))[0]
-      else if(method==='PUT'){const b=await body(req); out=(await sql.query('UPDATE tasks SET title=$1,description=$2,date=$3,type=$4,interacted=true,updated_at=NOW() WHERE id=$5 RETURNING *',[b.title,b.description??null,b.date,b.type||'POSITIVE',taskId]))[0]}
+      else if(method==='PUT'){const b=await body(req); out=(await sql.query('UPDATE tasks SET title=$1,description=$2,date=$3,type=$4,interacted=true,updated_at=NOW() WHERE id=$5 AND user_id=$6 RETURNING *',[text(b.title,160,'Título'),optionalText(b.description,2000,'Descrição'),validDate(b.date),validType(b.type),taskId,id]))[0]}
       else if(method==='DELETE'){ if(rows[0].source_template_id) await sql.query('UPDATE tasks SET skipped=true WHERE id=$1',[taskId]); else await sql.query('DELETE FROM tasks WHERE id=$1',[taskId]); return res.status(204).end() }
       else return json(res,405,{message:'Método não permitido'}); return json(res,200,taskOut(out)) }
     if (path === '/tasks/summary' && method === 'GET') { const y=Number(req.query.year),m=Number(req.query.month); const start=`${y}-${String(m).padStart(2,'0')}-01`; const end=new Date(Date.UTC(y,m,0)).toISOString().slice(0,10); const rows=await sql.query('SELECT date, count(*) FILTER (WHERE interacted) total, count(*) FILTER (WHERE interacted AND completed) completed FROM tasks WHERE user_id=$1 AND date BETWEEN $2 AND $3 AND skipped=false GROUP BY date',[id,start,end]); const out={}; for(const r of rows){const total=Number(r.total),completed=Number(r.completed),percentage=total?Math.round(completed*100/total):0; out[String(r.date).slice(0,10)]={date:String(r.date).slice(0,10),total,completed,percentage,color:percentage>=80?'GREEN':percentage>=60?'LIGHT_GREEN':percentage>=40?'YELLOW':'RED'}} return json(res,200,out) }
@@ -119,5 +197,5 @@ export default async function handler(req, res) {
       else if(method==='PUT'){const b=await body(req); out=(await sql.query('UPDATE task_templates SET title=$1,description=$2,type=$3,recurrence_type=$4,days_of_week=$5,updated_at=NOW() WHERE id=$6 RETURNING *',[b.title,b.description??null,b.type,b.recurrenceType,b.daysOfWeek??null,templateId]))[0]}
       else if(method==='DELETE'){await sql.query('DELETE FROM task_templates WHERE id=$1',[templateId]);return res.status(204).end()} else return json(res,405,{message:'Método não permitido'}); return json(res,200,templateOut(out))}
     return json(res,404,{message:'Rota não encontrada'})
-  } catch (error) { console.error(error); return json(res,500,{message:'Erro interno do servidor'}) }
+  } catch (error) { if (error instanceof ClientError) return json(res,error.status,{message:error.message}); console.error(error); return json(res,500,{message:'Erro interno do servidor'}) }
 }
