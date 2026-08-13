@@ -335,15 +335,15 @@
 .journal-heading span { color: var(--accent); font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
 .journal-heading h3 { margin: 0; color: var(--text); font-size: 20px; letter-spacing: -.035em; }
 .journal-heading time { color: var(--text-3); font-size: 10px; text-transform: capitalize; }
-.journal-toolbar { position: relative; z-index: 8; display: flex; align-items: flex-end; justify-content: center; gap: 5px; margin: 20px auto 0; padding: 12px 16px 10px; width: max-content; min-width: 440px; max-width: calc(100% - 18px); overflow: visible; border: 1px solid color-mix(in srgb, var(--line-hi) 62%, transparent); border-radius: 25px; background: color-mix(in srgb, var(--surface) 58%, transparent); box-shadow: 0 14px 34px rgba(31,35,42,.12), inset 0 1px rgba(255,255,255,.52); backdrop-filter: blur(18px) saturate(135%); -webkit-backdrop-filter: blur(18px) saturate(135%); }
+.journal-toolbar { position: relative; z-index: 8; display: flex; align-items: flex-end; justify-content: center; gap: 7px; margin: 20px auto 0; padding: 12px 20px 12px; width: max-content; min-width: 500px; max-width: calc(100% - 18px); overflow: visible; border: 1px solid color-mix(in srgb, var(--line-hi) 62%, transparent); border-radius: 27px; background: color-mix(in srgb, var(--surface) 58%, transparent); box-shadow: 0 14px 34px rgba(31,35,42,.12), inset 0 1px rgba(255,255,255,.52); backdrop-filter: blur(18px) saturate(135%); -webkit-backdrop-filter: blur(18px) saturate(135%); }
 .journal-toolbar::-webkit-scrollbar { display: none; }
-.journal-tool { position: relative; display: grid; place-items: end center; width: 64px; height: 65px; padding: 0 0 13px; flex: 0 0 64px; border: 0; border-radius: 12px; background: transparent; cursor: pointer; transition: transform .2s ease, filter .2s ease, background .2s ease; }
+.journal-tool { position: relative; display: grid; place-items: end center; width: 72px; height: 76px; padding: 0 0 22px; flex: 0 0 72px; border: 0; border-radius: 12px; background: transparent; cursor: pointer; transition: transform .2s ease, filter .2s ease, background .2s ease; }
 .journal-tool:hover, .journal-tool.active { transform: translateY(-4px); filter: drop-shadow(0 7px 7px rgba(0,0,0,.18)); }
-.journal-tool .tool-body { position: absolute; bottom: 13px; width: 18px; height: 37px; overflow: hidden; border-radius: 3px 3px 6px 6px; background: linear-gradient(90deg,#111316,#3c4045 48%,#0b0d0f); box-shadow: inset 2px 0 rgba(255,255,255,.13), inset -2px 0 rgba(0,0,0,.25); }
+.journal-tool .tool-body { position: absolute; bottom: 25px; width: 18px; height: 37px; overflow: hidden; border-radius: 3px 3px 6px 6px; background: linear-gradient(90deg,#111316,#3c4045 48%,#0b0d0f); box-shadow: inset 2px 0 rgba(255,255,255,.13), inset -2px 0 rgba(0,0,0,.25); }
 .journal-tool .tool-body i { position: absolute; left: 0; right: 0; bottom: 7px; height: 5px; box-shadow: 0 1px rgba(255,255,255,.18), 0 -1px rgba(0,0,0,.22); }
-.journal-tool .tool-neck { position: absolute; z-index: 1; bottom: 49px; width: 13px; height: 7px; border-radius: 2px 2px 0 0; background: linear-gradient(90deg,#101215,#4b4f54,#0d0f11); }
-.journal-tool .tool-tip { position: absolute; z-index: 2; bottom: 55px; width: 13px; height: 11px; clip-path: polygon(18% 100%,50% 0,82% 100%); background: #34373b; filter: saturate(1.15); }
-.journal-tool em, .journal-color em, .journal-size em, .journal-clear em { position: absolute; left: 50%; bottom: 0; display: block; width: 64px; overflow: hidden; color: var(--text-3); font: 700 7px/1 inherit; font-style: normal; text-align: center; text-overflow: ellipsis; transform: translateX(-50%); white-space: nowrap; }
+.journal-tool .tool-neck { position: absolute; z-index: 1; bottom: 61px; width: 13px; height: 7px; border-radius: 2px 2px 0 0; background: linear-gradient(90deg,#101215,#4b4f54,#0d0f11); }
+.journal-tool .tool-tip { position: absolute; z-index: 2; bottom: 67px; width: 13px; height: 11px; clip-path: polygon(18% 100%,50% 0,82% 100%); background: #34373b; filter: saturate(1.15); }
+.journal-tool em, .journal-color em, .journal-size em, .journal-clear em { position: absolute; left: 50%; bottom: 2px; display: block; width: 72px; overflow: visible; color: var(--text-3); font: 700 8px/1.15 inherit; font-style: normal; text-align: center; transform: translateX(-50%); white-space: nowrap; }
 .journal-tool.active .tool-body { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 60%, transparent), inset 1px 0 rgba(255,255,255,.15); }
 .tool-shape-write .tool-body { width: 17px; border-radius: 8px 8px 4px 4px; background: linear-gradient(90deg,#c5c9ce,#f5f6f7,#aeb3b9); }
 .tool-shape-write .tool-tip { background: #7b8188; }
@@ -352,12 +352,12 @@
 .tool-shape-highlight .tool-tip { width: 19px; height: 9px; clip-path: polygon(0 100%,25% 0,100% 0,100% 100%); }
 .tool-shape-erase .tool-body { width: 19px; border-radius: 7px 7px 4px 4px; background: linear-gradient(90deg,#e9a8b5,#ffd4db,#d78b9b) top/100% 15px no-repeat, linear-gradient(90deg,#17191c,#35383c,#101214); }
 .tool-shape-erase .tool-tip, .tool-shape-erase .tool-neck, .tool-shape-erase .tool-body i { display: none; }
-.journal-color { position: relative; width: 64px; height: 54px; margin: 0; flex: 0 0 64px; border: 0; background: transparent; cursor: pointer; }
-.journal-color::before { content: ''; position: absolute; left: 50%; top: 0; width: 39px; height: 39px; border: 3px solid transparent; border-radius: 50%; background: conic-gradient(#ef4444,#f59e0b,#facc15,#22c55e,#06b6d4,#3b82f6,#a855f7,#ef4444) border-box; box-shadow: 0 5px 12px rgba(0,0,0,.12); transform: translateX(-50%); }
-.journal-color > span { position: absolute; z-index: 1; left: 50%; top: 7px; width: 25px; height: 25px; border: 2px solid color-mix(in srgb,#fff 80%,transparent); border-radius: 50%; transform: translateX(-50%); }
+.journal-color { position: relative; width: 72px; height: 66px; margin: 0; flex: 0 0 72px; border: 0; background: transparent; cursor: pointer; }
+.journal-color::before { content: ''; position: absolute; left: 50%; top: 2px; width: 42px; height: 42px; border: 3px solid transparent; border-radius: 50%; background: conic-gradient(#ef4444,#f59e0b,#facc15,#22c55e,#06b6d4,#3b82f6,#a855f7,#ef4444) border-box; box-shadow: 0 5px 12px rgba(0,0,0,.12); transform: translateX(-50%); }
+.journal-color > span { position: absolute; z-index: 1; left: 50%; top: 10px; width: 26px; height: 26px; border: 2px solid color-mix(in srgb,#fff 80%,transparent); border-radius: 50%; transform: translateX(-50%); }
 .journal-color input { position: absolute; width: 1px; height: 1px; opacity: 0; }
-.journal-size-wrap { position: relative; width: 64px; height: 54px; flex: 0 0 64px; }
-.journal-size { position: relative; display: grid; place-items: center; width: 39px; height: 39px; margin: 0 auto; border: 1px solid color-mix(in srgb,var(--line-hi) 70%,transparent); border-radius: 50%; background: color-mix(in srgb,var(--surface) 72%,transparent); cursor: pointer; }
+.journal-size-wrap { position: relative; width: 72px; height: 66px; flex: 0 0 72px; }
+.journal-size { position: relative; display: grid; place-items: center; width: 42px; height: 42px; margin: 2px auto 0; border: 1px solid color-mix(in srgb,var(--line-hi) 70%,transparent); border-radius: 50%; background: color-mix(in srgb,var(--surface) 72%,transparent); cursor: pointer; }
 .journal-size > span { display: grid; place-items: center; width: 21px; height: 21px; }
 .journal-size > span i { display: block; border-radius: 50%; background: var(--text-2); }
 .journal-size.active { border-color: var(--accent-border); box-shadow: 0 0 0 3px color-mix(in srgb,var(--accent) 10%,transparent); }
@@ -365,7 +365,7 @@
 .journal-size-popover small { grid-column: 1/-1; color: var(--text-2); font-size: 9px; font-weight: 700; }
 .journal-size-popover input { width: 145px; accent-color: var(--accent); }
 .journal-size-popover b { color: var(--accent); font-size: 10px; }
-.journal-toolbar .journal-clear { position: relative; width: 64px; height: 54px; padding: 0 0 15px; flex: 0 0 64px; border: 0; background: transparent; color: var(--text-3); cursor: pointer; }
+.journal-toolbar .journal-clear { position: relative; width: 72px; height: 66px; padding: 2px 0 22px; flex: 0 0 72px; border: 0; background: transparent; color: var(--text-3); cursor: pointer; }
 .journal-toolbar .journal-clear > span { display: grid; place-items: center; width: 34px; height: 34px; margin: 0 auto; border-radius: 50%; background: color-mix(in srgb,var(--text) 8%,transparent); font: 500 19px/1 inherit; }
 .journal-book { position: relative; perspective: 1300px; margin-left: 13px; }
 .journal-rings { position: absolute; z-index: 5; left: -13px; top: 14px; bottom: 14px; display: flex; flex-direction: column; justify-content: space-around; }
@@ -440,9 +440,9 @@
   .week-planner-days { min-width: 560px; }
   .daily-journal { padding: 16px 13px; }
   .journal-heading time { display: none; }
-  .journal-toolbar { justify-content: flex-start; gap: 2px; min-width: 0; padding-inline: 8px; overflow-x: auto; overflow-y: visible; }
-  .journal-tool, .journal-color, .journal-size-wrap, .journal-toolbar .journal-clear { width: 56px; flex-basis: 56px; }
-  .journal-tool em, .journal-color em, .journal-size em, .journal-clear em { width: 56px; font-size: 6px; }
+  .journal-toolbar { justify-content: flex-start; gap: 3px; min-width: 0; padding-inline: 8px; overflow-x: auto; overflow-y: visible; }
+  .journal-tool, .journal-color, .journal-size-wrap, .journal-toolbar .journal-clear { width: 64px; flex-basis: 64px; }
+  .journal-tool em, .journal-color em, .journal-size em, .journal-clear em { width: 64px; font-size: 7px; }
   .journal-images figure { width: 88%; }
   .journal-page { min-height: 225px; padding-right: 14px; }
   .journal-canvas { right: 14px; width: calc(100% - 44px); }
