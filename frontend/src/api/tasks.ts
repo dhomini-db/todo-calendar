@@ -10,16 +10,8 @@ const BASE = '/api'
 
 const api = axios.create({
   baseURL: BASE,
+  withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
-})
-
-// Interceptor: anexa o token JWT em toda requisição autenticada
-api.interceptors.request.use(config => {
-  const token = localStorage.getItem('token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
 })
 
 // Interceptor: redireciona para login se o token expirar
@@ -27,7 +19,6 @@ api.interceptors.response.use(
   res => res,
   err => {
     if (err.response?.status === 403 || err.response?.status === 401) {
-      localStorage.removeItem('token')
       localStorage.removeItem('user')
       window.location.href = '/login'
     }
