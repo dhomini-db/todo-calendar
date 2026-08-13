@@ -7,11 +7,10 @@ export default defineConfig({
     react(),
 
     VitePWA({
-      /* ── Strategy ──────────────────────────────────────────────
-         selfDestroying: unregisters the old SW and clears all
-         caches on next load, forcing fresh content from network.
-      ─────────────────────────────────────────────────────────── */
-      selfDestroying: true,
+      /* Service worker persistente. O modo selfDestroying fazia o SW
+         cancelar o próprio registro e navegar todas as abas, causando
+         ciclos de recarga em alguns navegadores móveis. */
+      selfDestroying: false,
       registerType: 'autoUpdate',
 
       /* ── Extra static assets to include in precache ─────────── */
