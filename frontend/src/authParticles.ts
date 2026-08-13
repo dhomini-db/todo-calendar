@@ -7,7 +7,7 @@ style.textContent=`
 .auth-particle.ring{background:transparent;border:1.3px solid var(--particle-color,var(--text-2))}
 .auth-particle.glow{box-shadow:0 0 calc(var(--size)*2.2) color-mix(in srgb,var(--particle-color,var(--text-2)) 38%,transparent)}
 @keyframes particleRise{0%{transform:translate3d(0,20px,0) scale(.7);opacity:0}12%{opacity:.68}55%{transform:translate3d(var(--drift,24px),-52vh,0) scale(1)}88%{opacity:.52}100%{transform:translate3d(calc(var(--drift,24px)*-0.45),-112vh,0) scale(.82);opacity:0}}
-@media(max-width:600px){.auth-particle:nth-child(n+13){display:none}.auth-particles-layer{inset:-4% -14%}.auth-particle{animation-duration:calc(var(--duration)*1.15)}}
+@media(max-width:760px),(hover:none) and (pointer:coarse){.auth-particles-layer{display:none!important}.auth-particle{animation:none!important}}
 @media(prefers-reduced-motion:reduce){.auth-particles-layer{display:none}}
 `
 document.head.appendChild(style)
