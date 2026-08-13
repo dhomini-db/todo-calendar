@@ -216,8 +216,7 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
     navigate('/login', { replace: true })
   }
 
-  function handleMobileClose(event: React.PointerEvent<HTMLElement>) {
-    event.preventDefault()
+  function handleMobileClose(event: React.SyntheticEvent<HTMLElement>) {
     event.stopPropagation()
     onMobileClose?.()
   }
@@ -232,13 +231,15 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       <aside
         className={`sidebar${mobileOpen ? ' sidebar--open' : ''}`}
         style={{ width }}
+        data-mobile-open={mobileOpen ? 'true' : 'false'}
         aria-hidden={!mobileOpen && undefined}
       >
         {/* Logo */}
         <button
           type="button"
           className="sidebar-logo sidebar-logo-button"
-          onPointerDown={mobileOpen ? handleMobileClose : undefined}
+          onClick={mobileOpen ? handleMobileClose : undefined}
+          onTouchEnd={mobileOpen ? handleMobileClose : undefined}
           aria-label={mobileOpen ? 'Fechar menu' : 'TaskFlow'}
         >
           <img src="/logo-icon.svg" alt="TaskFlow" className="sidebar-logo-img" />
