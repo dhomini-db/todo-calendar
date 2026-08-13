@@ -292,7 +292,12 @@ a.sidebar-item.active .sidebar-item-icon {
   box-shadow: inset 0 1px 0 color-mix(in srgb,white 28%,transparent);
 }
 
-.sidebar > * { position: relative; z-index: 1; }
+.sidebar-logo,
+.sidebar-nav,
+.sidebar-footer { position: relative; z-index: 1; }
+
+/* O puxador precisa continuar absoluto; se virar item flex ele comprime a navegação. */
+.sidebar .sidebar-resize-handle { position: absolute; z-index: 20; }
 
 .sidebar-logo::after {
   content: '';
