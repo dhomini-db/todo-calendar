@@ -4,9 +4,9 @@ if (isMobileSafeMode) {
   document.documentElement.classList.add('mobile-safe-mode')
   const style = document.createElement('style')
   style.textContent = `
-    .mobile-safe-mode *,
-    .mobile-safe-mode *::before,
-    .mobile-safe-mode *::after {
+    .mobile-safe-mode *:not(.sidebar),
+    .mobile-safe-mode *:not(.sidebar)::before,
+    .mobile-safe-mode *:not(.sidebar)::after {
       animation: none !important;
       transition: none !important;
       backdrop-filter: none !important;
