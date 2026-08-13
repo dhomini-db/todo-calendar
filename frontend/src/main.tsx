@@ -18,8 +18,15 @@ import { ThemeProvider } from './contexts/ThemeContext'
 import { LanguageProvider } from './contexts/LanguageContext'
 import './index.css'
 
-// A configuração PWA já atualiza versões antigas. Não apague caches durante
-// cada inicialização: em celulares/instalações isso pode interromper o boot.
+// O PWA foi desativado para estabilidade mobile. Remove registros antigos
+// silenciosamente, sem navegar ou recarregar a página atual.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    void navigator.serviceWorker.getRegistrations()
+      .then(registrations => Promise.all(registrations.map(registration => registration.unregister())))
+      .catch(() => undefined)
+  }, { once: true })
+}
 import './liquid-glass.css'
 import './calendar-native.css'
 const queryClient=new QueryClient({defaultOptions:{queries:{staleTime:30_000,retry:1}}})
