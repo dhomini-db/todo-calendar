@@ -15,6 +15,7 @@ export default function LoginPage() {
   const [loading,  setLoading]  = useState(false)
   const [leaving,  setLeaving]  = useState(false)
   const [showDemoNotice, setShowDemoNotice] = useState(() => {
+    if (window.matchMedia('(max-width: 768px), (hover: none) and (pointer: coarse)').matches) return false
     try { return sessionStorage.getItem('taskflow-demo-notice-seen') !== '1' } catch { return true }
   })
 
