@@ -4,7 +4,8 @@ import { enUS, ptBR } from 'date-fns/locale'
 import { useLanguage } from '../contexts/LanguageContext'
 
 type JournalStore = Record<string, string[]>
-type JournalMedia = { drawing?: string; images?: string[] }
+type JournalImage = { src: string; flipped?: boolean; animated?: boolean; position?: 'left' | 'center' | 'right' }
+type JournalMedia = { drawing?: string; images?: Array<string | JournalImage> }
 type MediaStore = Record<string, JournalMedia>
 type TurnDirection = 'next' | 'prev'
 type Tool = 'write' | 'highlight' | 'draw' | 'erase'
@@ -44,14 +45,16 @@ export default function DailyJournal({ selectedDate }: { selectedDate: Date }) {
   const [page, setPage] = useState(0)
   const [turn, setTurn] = useState<TurnDirection | null>(null)
   const [tool, setTool] = useState<Tool>('write')
+  const [inkColor, setInkColor] = useState('#ef4444')
+  const [selectedImage, setSelectedImage] = useState<number | null>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
   const drawingRef = useRef(false)
   const pages = useMemo(() => journal[dateKey] ?? [''], [journal, dateKey])
   const mediaKey = `${dateKey}:${page}`
   const pageMedia = media[mediaKey] ?? {}
+  const pageImages = (pageMedia.images ?? []).map(image => typeof image === 'string' ? { src: image, position: 'center' as const } : image)
 
-  useEffect(() => { setPage(0); setTurn(null); setTool('write') }, [dateKey])
+  useEffect(() => { setPage(0); setTurn(null); setTool('write'); setSelectedImage(null) }, [dateKey])
 
   const persist = (nextPages: string[]) => {
     setJournal(current => {
@@ -116,35 +119,42 @@ export default function DailyJournal({ selectedDate }: { selectedDate: Date }) {
     const ratio = event.currentTarget.width / event.currentTarget.getBoundingClientRect().width
     ctx.lineCap = 'round'; ctx.lineJoin = 'round'
     ctx.globalCompositeOperation = tool === 'erase' ? 'destination-out' : 'source-over'
-    ctx.strokeStyle = tool === 'highlight' ? 'rgba(250, 204, 21, .34)' : 'rgba(31, 41, 55, .88)'
+    ctx.globalAlpha = tool === 'highlight' ? .34 : 1
+    ctx.strokeStyle = inkColor
     ctx.lineWidth = (tool === 'highlight' ? 18 : tool === 'erase' ? 22 : 3) * ratio
     ctx.lineTo(point.x, point.y); ctx.stroke()
   }
 
-  const endStroke = () => { if (drawingRef.current) { drawingRef.current = false; saveDrawing() } }
+  const endStroke = () => { if (drawingRef.current) { drawingRef.current = false; const ctx = canvasRef.current?.getContext('2d'); if (ctx) ctx.globalAlpha = 1; saveDrawing() } }
 
   const addImages = async (files: File[]) => {
-    const valid = files.filter(file => file.type.startsWith('image/')).slice(0, Math.max(0, 4 - (pageMedia.images?.length ?? 0)))
+    const valid = files.filter(file => file.type.startsWith('image/')).slice(0, Math.max(0, 4 - pageImages.length))
     if (!valid.length) return
     const images = await Promise.all(valid.map(compactImage))
-    persistMedia({ ...pageMedia, images: [...(pageMedia.images ?? []), ...images] })
+    persistMedia({ ...pageMedia, images: [...pageImages, ...images.map(src => ({ src, position: 'center' as const }))] })
+    setSelectedImage(pageImages.length)
+  }
+
+  const updateImage = (index: number, change: Partial<JournalImage>) => {
+    const images = pageImages.map((image, item) => item === index ? { ...image, ...change } : image)
+    persistMedia({ ...pageMedia, images })
   }
 
   const changePage = (nextPage: number, direction: TurnDirection) => {
     if (turn || nextPage < 0 || nextPage >= pages.length) return
     setTurn(direction)
-    window.setTimeout(() => { setPage(nextPage); setTurn(null); setTool('write') }, 330)
+    window.setTimeout(() => { setPage(nextPage); setTurn(null); setTool('write'); setSelectedImage(null) }, 330)
   }
 
   const addPage = () => {
     const nextPages = [...pages, '']
     persist(nextPages); setTurn('next')
-    window.setTimeout(() => { setPage(nextPages.length - 1); setTurn(null); setTool('write') }, 330)
+    window.setTimeout(() => { setPage(nextPages.length - 1); setTurn(null); setTool('write'); setSelectedImage(null) }, 330)
   }
 
   const labels = lang === 'en'
-    ? { write: 'Write', highlight: 'Highlighter', draw: 'Draw', erase: 'Eraser', image: 'Add image', clear: 'Clear drawing' }
-    : { write: 'Escrever', highlight: 'Marca-texto', draw: 'Desenhar', erase: 'Borracha', image: 'Adicionar imagem', clear: 'Limpar desenho' }
+    ? { write: 'Write', highlight: 'Highlighter', draw: 'Pen', erase: 'Eraser', color: 'Change color', clear: 'Clear drawing' }
+    : { write: 'Escrever', highlight: 'Marca-texto', draw: 'Caneta', erase: 'Borracha', color: 'Mudar cor', clear: 'Limpar desenho' }
 
   return (
     <section className="daily-journal" aria-label={lang === 'en' ? 'Daily journal' : 'Diário do dia'} onPaste={event => {
@@ -157,10 +167,9 @@ export default function DailyJournal({ selectedDate }: { selectedDate: Date }) {
       </header>
 
       <div className="journal-toolbar" role="toolbar" aria-label={lang === 'en' ? 'Journal tools' : 'Ferramentas do diário'}>
-        {(['write', 'highlight', 'draw', 'erase'] as Tool[]).map(item => <button key={item} type="button" className={tool === item ? 'active' : ''} onClick={() => setTool(item)} title={labels[item]} aria-label={labels[item]}><span aria-hidden="true">{item === 'write' ? 'T' : item === 'highlight' ? '▰' : item === 'draw' ? '✎' : '⌫'}</span><em>{labels[item]}</em></button>)}
-        <button type="button" onClick={() => inputRef.current?.click()} title={labels.image}><span aria-hidden="true">▧</span><em>{labels.image}</em></button>
-        <button type="button" className="journal-clear" onClick={() => { const canvas = canvasRef.current; canvas?.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height); persistMedia({ ...pageMedia, drawing: undefined }) }} title={labels.clear}><span aria-hidden="true">×</span><em>{labels.clear}</em></button>
-        <input ref={inputRef} type="file" accept="image/*" multiple hidden onChange={event => { void addImages(Array.from(event.target.files ?? [])); event.target.value = '' }} />
+        {(['write', 'draw', 'highlight', 'erase'] as Tool[]).map(item => <button key={item} type="button" className={`journal-tool tool-shape-${item} ${tool === item ? 'active' : ''}`} onClick={() => setTool(item)} title={labels[item]} aria-label={labels[item]}><span className="tool-tip" style={item === 'draw' || item === 'highlight' ? { background: inkColor } : undefined} /><span className="tool-body" /><em>{labels[item]}</em></button>)}
+        <label className="journal-color" title={labels.color} aria-label={labels.color}><span style={{ background: inkColor }} /><input type="color" value={inkColor} onChange={event => setInkColor(event.target.value)} /></label>
+        <button type="button" className="journal-clear" onClick={() => { const canvas = canvasRef.current; canvas?.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height); persistMedia({ ...pageMedia, drawing: undefined }) }} title={labels.clear} aria-label={labels.clear}>×</button>
       </div>
 
       <div className="journal-book">
@@ -168,7 +177,7 @@ export default function DailyJournal({ selectedDate }: { selectedDate: Date }) {
         <div className={`journal-page ${turn ? `turn-${turn}` : ''}`}>
           <div className="journal-page-top"><strong>{lang === 'en' ? 'Thoughts & ideas' : 'Pensamentos & ideias'}</strong><span>{lang === 'en' ? `Page ${page + 1} of ${pages.length}` : `Página ${page + 1} de ${pages.length}`}</span></div>
           <textarea value={pages[page] ?? ''} onChange={event => { const next = [...pages]; next[page] = event.target.value; persist(next) }} placeholder={lang === 'en' ? 'How was your day? Write down a thought, lesson or idea…' : 'Como foi o seu dia? Anote um pensamento, aprendizado ou ideia…'} aria-label={lang === 'en' ? 'Journal notes' : 'Anotações do diário'} />
-          {(pageMedia.images?.length ?? 0) > 0 && <div className="journal-images">{pageMedia.images?.map((src, index) => <figure key={`${src.slice(-18)}-${index}`}><img src={src} alt={lang === 'en' ? `Journal attachment ${index + 1}` : `Imagem anexada ${index + 1}`} /><button type="button" onClick={() => persistMedia({ ...pageMedia, images: pageMedia.images?.filter((_, item) => item !== index) })} aria-label={lang === 'en' ? 'Remove image' : 'Remover imagem'}>×</button></figure>)}</div>}
+          {pageImages.length > 0 && <div className="journal-images">{pageImages.map((image, index) => <figure key={`${image.src.slice(-18)}-${index}`} className={`${selectedImage === index ? 'selected' : ''} position-${image.position ?? 'center'} ${image.animated ? 'animated' : ''}`} onClick={() => { setSelectedImage(index); setTool('write') }}><img src={image.src} className={image.flipped ? 'flipped' : ''} alt={lang === 'en' ? `Journal attachment ${index + 1}` : `Imagem anexada ${index + 1}`} />{selectedImage === index && <div className="journal-image-tools" role="toolbar" aria-label={lang === 'en' ? 'Image editing' : 'Edição da imagem'}><button type="button" onClick={event => { event.stopPropagation(); updateImage(index, { flipped: !image.flipped }) }}><span>↔</span>{lang === 'en' ? 'Flip' : 'Inverter'}</button><button type="button" className={image.animated ? 'active' : ''} onClick={event => { event.stopPropagation(); updateImage(index, { animated: !image.animated }) }}><span>✣</span>{lang === 'en' ? 'Animate' : 'Animar'}</button><button type="button" onClick={event => { event.stopPropagation(); const order = ['left', 'center', 'right'] as const; updateImage(index, { position: order[(order.indexOf(image.position ?? 'center') + 1) % order.length] }) }}><span>☷</span>{lang === 'en' ? 'Position' : 'Posição'}</button><button type="button" className="remove" onClick={event => { event.stopPropagation(); persistMedia({ ...pageMedia, images: pageImages.filter((_, item) => item !== index) }); setSelectedImage(null) }} aria-label={lang === 'en' ? 'Remove image' : 'Remover imagem'}>×</button></div>}</figure>)}</div>}
           <canvas ref={canvasRef} className={`journal-canvas tool-${tool}`} onPointerDown={beginStroke} onPointerMove={drawStroke} onPointerUp={endStroke} onPointerCancel={endStroke} />
           <span className="journal-saved">{lang === 'en' ? 'Saved automatically' : 'Salvo automaticamente'}</span>
         </div>
