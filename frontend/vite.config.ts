@@ -1,147 +1,15 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { VitePWA } from 'vite-plugin-pwa'
 
+// PWA temporariamente desativado. O aplicativo funciona como site normal,
+// evitando qualquer service worker capaz de interferir na navegação mobile.
 export default defineConfig({
-  plugins: [
-    react(),
-
-    VitePWA({
-      /* Service worker persistente. O modo selfDestroying fazia o SW
-         cancelar o próprio registro e navegar todas as abas, causando
-         ciclos de recarga em alguns navegadores móveis. */
-      selfDestroying: false,
-      registerType: 'autoUpdate',
-
-      /* ── Extra static assets to include in precache ─────────── */
-      includeAssets: [
-        'favicon.svg',
-        'logo-icon.svg',
-        'logo-full.svg',
-        'logo-mono.svg',
-        'icons/*.png',
-      ],
-
-      /* ── Web App Manifest ───────────────────────────────────── */
-      manifest: {
-        name:             'TaskFlow',
-        short_name:       'TaskFlow',
-        description:      'Gerencie seus hábitos diários com inteligência. Acompanhe tarefas, streaks e desempenho.',
-        theme_color:      '#111111',
-        background_color: '#0d0d0d',
-        display:          'standalone',
-        start_url:        '/',
-        scope:            '/',
-        orientation:      'portrait-primary',
-        lang:             'pt-BR',
-        categories:       ['productivity', 'lifestyle'],
-        icons: [
-          {
-            // Small icon — browser tab, taskbar
-            src:   'icons/icon-64.png',
-            sizes: '64x64',
-            type:  'image/png',
-          },
-          {
-            // Standard PWA icon — Android home screen, Chrome splash
-            src:   'icons/icon-192.png',
-            sizes: '192x192',
-            type:  'image/png',
-          },
-          {
-            // High-res icon — store listings, splash screens
-            src:   'icons/icon-512.png',
-            sizes: '512x512',
-            type:  'image/png',
-          },
-          {
-            // Android adaptive icon — full-bleed with 12% safe-zone padding
-            // OS applies its own mask shape (circle, squircle, etc.)
-            src:     'icons/maskable-512.png',
-            sizes:   '512x512',
-            type:    'image/png',
-            purpose: 'maskable',
-          },
-          {
-            // SVG fallback — crisp at any resolution (modern browsers)
-            src:     'logo-icon.svg',
-            sizes:   'any',
-            type:    'image/svg+xml',
-            purpose: 'any',
-          },
-        ],
-      },
-
-      /* ── Workbox service-worker config ──────────────────────── */
-      workbox: {
-        // Precache all build assets (hashed filenames are safe forever)
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
-
-        // When offline, serve index.html for all navigation requests
-        navigateFallback: 'index.html',
-
-        // Don't intercept /api/ routes with the navigation fallback
-        navigateFallbackDenylist: [/^\/api\//],
-
-        // Force new SW to take control immediately (no waiting)
-        skipWaiting: true,
-        clientsClaim: true,
-
-        // Renamed caches to bust stale PWA cache from old builds
-        // ── Runtime caching rules ─────────────────────────────
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'gfonts-styles-v2',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 365 * 24 * 60 * 60,
-              },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-          {
-            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'gfonts-files-v2',
-              expiration: {
-                maxEntries: 20,
-                maxAgeSeconds: 365 * 24 * 60 * 60,
-              },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-          {
-            urlPattern: /\/api\/.*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache-v2',
-              networkTimeoutSeconds: 8,
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 5 * 60,
-              },
-              cacheableResponse: { statuses: [200] },
-            },
-          },
-        ],
-      },
-
-      // Enable the plugin in dev mode so we can test installation locally
-      devOptions: {
-        enabled: false,
-      },
-    }),
-  ],
-
+  plugins: [react()],
   server: {
     port: 5173,
     proxy: {
       '/api': {
-        target:       'http://localhost:8081',
+        target: 'http://localhost:8081',
         changeOrigin: true,
       },
     },
