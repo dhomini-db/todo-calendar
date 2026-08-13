@@ -3376,8 +3376,12 @@ a.sidebar-item.active::before {
   display: none;
 }
 
-.sidebar-mobile-close {
-  display: none;
+.sidebar-logo-button {
+  width: auto;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: default;
 }
 
 @media (max-width: 768px) {
@@ -3412,37 +3416,11 @@ a.sidebar-item.active::before {
     box-shadow: 4px 0 32px rgba(0,0,0,0.32);
   }
 
-  .sidebar-mobile-close {
-    display: flex;
-    position: absolute;
-    top: max(16px, env(safe-area-inset-top, 0px));
-    right: 22px;
-    z-index: 100;
-    width: 48px;
-    height: 48px;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 4px;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    color: var(--text);
-    background: transparent;
-    box-shadow: none;
+  .sidebar-logo-button {
     cursor: pointer;
     touch-action: manipulation;
     pointer-events: auto;
     -webkit-tap-highlight-color: transparent;
-  }
-
-  .sidebar-mobile-close span {
-    display: block;
-    width: 21px;
-    height: 1.5px;
-    border-radius: 999px;
-    background: color-mix(in srgb, currentColor 78%, transparent);
-    pointer-events: none;
   }
 
   /* Resize handle invisible on mobile */
