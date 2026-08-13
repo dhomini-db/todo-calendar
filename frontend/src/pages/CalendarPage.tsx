@@ -52,19 +52,19 @@ export default function CalendarPage() {
   return (
     <>
       <div className="calendar-area">
-        <div className="calendar-ambient" aria-hidden="true">
-          <div className="calendar-liquid-texture" />
-          <div className="calendar-ambient-glow" />
-          <div className="calendar-particles">
-            {Array.from({ length: 34 }, (_, index) => <i key={index} style={{
-              '--particle-index': index,
-              '--particle-x': `${4 + ((index * 37) % 92)}%`,
-              '--particle-y': `${2 + ((index * 53) % 96)}%`,
-              '--particle-size': `${3 + (index % 5)}px`,
-            } as CSSProperties} />)}
-          </div>
-        </div>
         <div className="calendar-page-content">
+          <div className="calendar-ambient" aria-hidden="true">
+            <div className="calendar-liquid-texture" />
+            <div className="calendar-ambient-glow" />
+            <div className="calendar-particles">
+              {Array.from({ length: 34 }, (_, index) => <i key={index} style={{
+                '--particle-index': index,
+                '--particle-x': `${4 + ((index * 37) % 92)}%`,
+                '--particle-y': `${2 + ((index * 53) % 96)}%`,
+                '--particle-size': `${3 + (index % 5)}px`,
+              } as CSSProperties} />)}
+            </div>
+          </div>
           <h1 className="page-title">{t('cal.title')}</h1>
           <p className="page-sub">{t('cal.sub')}</p>
           <StreakBadge />
