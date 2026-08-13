@@ -216,7 +216,7 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
     navigate('/login', { replace: true })
   }
 
-  function handleMobileClose(event: React.PointerEvent<HTMLButtonElement>) {
+  function handleMobileClose(event: React.PointerEvent<HTMLElement>) {
     event.preventDefault()
     event.stopPropagation()
     onMobileClose?.()
@@ -234,22 +234,16 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         style={{ width }}
         aria-hidden={!mobileOpen && undefined}
       >
+        {/* Logo */}
         <button
           type="button"
-          className="sidebar-mobile-close"
-          onPointerDown={handleMobileClose}
-          aria-label="Fechar menu"
+          className="sidebar-logo sidebar-logo-button"
+          onPointerDown={mobileOpen ? handleMobileClose : undefined}
+          aria-label={mobileOpen ? 'Fechar menu' : 'TaskFlow'}
         >
-          <span aria-hidden="true" />
-          <span aria-hidden="true" />
-          <span aria-hidden="true" />
-        </button>
-
-        {/* Logo */}
-        <div className="sidebar-logo">
           <img src="/logo-icon.svg" alt="TaskFlow" className="sidebar-logo-img" />
           <span className="sidebar-logo-text">TaskFlow</span>
-        </div>
+        </button>
 
         {/* Nav */}
         <nav className="sidebar-nav">
