@@ -3376,6 +3376,10 @@ a.sidebar-item.active::before {
   display: none;
 }
 
+.sidebar-mobile-close {
+  display: none;
+}
+
 @media (max-width: 768px) {
   /* ── App shell becomes column ── */
   .app-shell {
@@ -3406,6 +3410,25 @@ a.sidebar-item.active::before {
   .sidebar--open {
     transform: translateX(0);
     box-shadow: 4px 0 32px rgba(0,0,0,0.32);
+  }
+
+  .sidebar-mobile-close {
+    display: grid;
+    position: absolute;
+    top: max(14px, env(safe-area-inset-top, 0px));
+    right: 14px;
+    z-index: 30;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    border: 1px solid var(--line-md);
+    border-radius: 13px;
+    color: var(--text);
+    background: var(--raised);
+    box-shadow: var(--shadow-sm);
+    font: 400 28px/1 system-ui, sans-serif;
+    cursor: pointer;
+    touch-action: manipulation;
   }
 
   /* Resize handle invisible on mobile */
