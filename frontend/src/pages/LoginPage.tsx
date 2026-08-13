@@ -14,7 +14,14 @@ export default function LoginPage() {
   const [error,    setError]    = useState('')
   const [loading,  setLoading]  = useState(false)
   const [leaving,  setLeaving]  = useState(false)
-  const [showDemoNotice, setShowDemoNotice] = useState(true)
+  const [showDemoNotice, setShowDemoNotice] = useState(() => {
+    try { return sessionStorage.getItem('taskflow-demo-notice-seen') !== '1' } catch { return true }
+  })
+
+  function closeDemoNotice() {
+    try { sessionStorage.setItem('taskflow-demo-notice-seen', '1') } catch { /* storage blocked */ }
+    setShowDemoNotice(false)
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -41,7 +48,7 @@ export default function LoginPage() {
 
   return (
     <div className={`auth-page${leaving ? ' auth-page--leaving' : ''}`}>
-      {showDemoNotice && <DemoEmailNotice onClose={() => setShowDemoNotice(false)} />}
+      {showDemoNotice && <DemoEmailNotice onClose={closeDemoNotice} />}
       <div className="auth-card">
         {/* Logo */}
         <div className="auth-logo">
