@@ -17,7 +17,14 @@ export default function RegisterPage() {
   const [error,    setError]    = useState('')
   const [loading,  setLoading]  = useState(false)
   const [leaving,  setLeaving]  = useState(false)
-  const [showDemoNotice, setShowDemoNotice] = useState(true)
+  const [showDemoNotice, setShowDemoNotice] = useState(() => {
+    try { return sessionStorage.getItem('taskflow-demo-notice-seen') !== '1' } catch { return true }
+  })
+
+  function closeDemoNotice() {
+    try { sessionStorage.setItem('taskflow-demo-notice-seen', '1') } catch { /* storage blocked */ }
+    setShowDemoNotice(false)
+  }
 
   const strengthScore = [
     password.length >= 10,
@@ -62,7 +69,7 @@ export default function RegisterPage() {
 
   return (
     <div className={`auth-page${leaving ? ' auth-page--leaving' : ''}`}>
-      {showDemoNotice && <DemoEmailNotice onClose={() => setShowDemoNotice(false)} />}
+      {showDemoNotice && <DemoEmailNotice onClose={closeDemoNotice} />}
       <div className="auth-card">
         <div className="auth-logo">
           <img src="/logo-icon.svg" alt="TaskFlow" className="auth-logo-img" />
