@@ -932,7 +932,7 @@ body {
    APP SHELL
 ═══════════════════════════════════════════════════════════════ */
 
-.app-shell   { display: flex; height: 100vh; overflow: hidden; }
+.app-shell   { display: flex; height: 100vh; height: 100dvh; overflow: hidden; }
 
 /* ───────────────────────────────────────────────
    SIDEBAR — Notion-inspired nav, Apple spacing
