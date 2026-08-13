@@ -1,7 +1,11 @@
 const allowedThemes = new Set(['rose-dawn', 'amber-night'])
-const savedTheme = localStorage.getItem('theme')
-if (!savedTheme || !allowedThemes.has(savedTheme)) {
-  localStorage.setItem('theme', 'rose-dawn')
+try {
+  const savedTheme = localStorage.getItem('theme')
+  if (!savedTheme || !allowedThemes.has(savedTheme)) {
+    localStorage.setItem('theme', 'rose-dawn')
+    document.documentElement.setAttribute('data-theme', 'rose-dawn')
+  }
+} catch {
   document.documentElement.setAttribute('data-theme', 'rose-dawn')
 }
 
