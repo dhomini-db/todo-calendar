@@ -216,6 +216,12 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
     navigate('/login', { replace: true })
   }
 
+  function handleMobileClose(event: React.PointerEvent<HTMLButtonElement>) {
+    event.preventDefault()
+    event.stopPropagation()
+    onMobileClose?.()
+  }
+
   return (
     <>
       {/* Mobile backdrop */}
@@ -231,7 +237,7 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         <button
           type="button"
           className="sidebar-mobile-close"
-          onClick={onMobileClose}
+          onPointerDown={handleMobileClose}
           aria-label="Fechar menu"
         >
           <span aria-hidden="true" />
