@@ -89,7 +89,8 @@ function jwtSecret() {
 }
 function tokenFor(user) { return jwt.sign({ sub: String(user.id) }, jwtSecret(), { expiresIn: TOKEN_TTL_SECONDS, issuer: 'taskflow', audience: 'taskflow-web' }) }
 async function currentUser(req, sql) {
-  const raw = cookie(req, COOKIE_NAME)
+  const auth = req.headers.authorization || ''
+  const raw = cookie(req, COOKIE_NAME) || (auth.startsWith('Bearer ') ? auth.slice(7) : null)
   if (!raw) return null
   try {
     const decoded = jwt.verify(raw, jwtSecret(), { issuer: 'taskflow', audience: 'taskflow-web' })
@@ -141,15 +142,15 @@ export default async function handler(req, res) {
       const b = await body(req), name=text(b.name,80,'Nome'), email=validEmail(b.email), plain=validPassword(b.password)
       const exists = await sql.query('SELECT id FROM users WHERE lower(email)=lower($1)', [email]); if (exists.length) return json(res,409,{message:'Não foi possível criar a conta com esses dados'})
       const password = await bcrypt.hash(plain, 12); const rows = await sql.query('INSERT INTO users(name,email,password) VALUES($1,$2,$3) RETURNING *',[name,email,password]); const u=rows[0]
-      setSessionCookie(res, tokenFor(u)); clearRateLimit(req, 'register')
-      return json(res,201,{ userId:Number(u.id), name:u.name, email:u.email, profileImageUrl:null })
+      const token=tokenFor(u); setSessionCookie(res, token); clearRateLimit(req, 'register')
+      return json(res,201,{ token, userId:Number(u.id), name:u.name, email:u.email, profileImageUrl:null })
     }
     if (path === '/auth/login' && method === 'POST') {
       if (rateLimited(req, 'login', 10, 15 * 60 * 1000)) return json(res,429,{message:'Muitas tentativas. Aguarde alguns minutos.'})
       const b=await body(req), email=validEmail(b.email); const rows=await sql.query('SELECT * FROM users WHERE lower(email)=lower($1)',[email]); const u=rows[0]
       if (!u || !(await bcrypt.compare(b.password||'',u.password))) return json(res,401,{message:'E-mail ou senha inválidos'})
-      setSessionCookie(res, tokenFor(u)); clearRateLimit(req, 'login')
-      return json(res,200,{userId:Number(u.id),name:u.name,email:u.email,profileImageUrl:u.profile_image_url})
+      const token=tokenFor(u); setSessionCookie(res, token); clearRateLimit(req, 'login')
+      return json(res,200,{token,userId:Number(u.id),name:u.name,email:u.email,profileImageUrl:u.profile_image_url})
     }
     if (path === '/auth/logout' && method === 'POST') { clearSessionCookie(res); return res.status(204).end() }
     const user = await requireUser(req,res,sql); if (!user) return
