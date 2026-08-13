@@ -649,8 +649,12 @@ const LanguageContext = createContext<LanguageContextValue | null>(null)
 
 const STORAGE_KEY = 'app-lang'
 
+function readStoredLanguage(): string | null {
+  try { return localStorage.getItem(STORAGE_KEY) } catch { return null }
+}
+
 function loadLang(): Lang {
-  const saved = localStorage.getItem(STORAGE_KEY)
+  const saved = readStoredLanguage()
   return saved === 'en' ? 'en' : 'pt'
 }
 
@@ -659,7 +663,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const setLang = useCallback((l: Lang) => {
     setLangState(l)
-    localStorage.setItem(STORAGE_KEY, l)
+    try { localStorage.setItem(STORAGE_KEY, l) } catch { /* storage blocked */ }
   }, [])
 
   const t = useCallback((key: string): string => {
