@@ -60,6 +60,19 @@ export const toggleTask = (id: number): Promise<Task> =>
 export const deleteTask = (id: number): Promise<void> =>
   api.delete(`/tasks/${id}`).then(() => undefined)
 
+export interface JournalEntryPayload {
+  found: boolean
+  pages: string[]
+  media: Record<string, unknown>
+  updatedAt: string | null
+}
+
+export const getJournalEntry = (date: string): Promise<JournalEntryPayload> =>
+  api.get<JournalEntryPayload>('/journal', { params: { date } }).then(r => r.data)
+
+export const saveJournalEntry = (date: string, pages: string[], media: Record<string, unknown>): Promise<void> =>
+  api.put('/journal', { date, pages, media }).then(() => undefined)
+
 // ── Resumo Mensal ──────────────────────────────────────────────
 
 export const getMonthlySummary = (
