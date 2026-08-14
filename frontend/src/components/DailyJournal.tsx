@@ -102,6 +102,12 @@ export default function DailyJournal({ selectedDate }: { selectedDate: Date }) {
     })
   }
 
+  const commitMedia = () => {
+    const current = mediaRef.current
+    try { localStorage.setItem(MEDIA_KEY, JSON.stringify(current)) } catch { /* storage full */ }
+    scheduleRemoteSave(dateKey, journalRef.current[dateKey] ?? [''], current)
+  }
+
   useEffect(() => {
     let cancelled = false
     remoteReadyRef.current = false
@@ -204,9 +210,18 @@ export default function DailyJournal({ selectedDate }: { selectedDate: Date }) {
     setSelectedImage(pageImages.length)
   }
 
-  const updateImage = (index: number, change: Partial<JournalImage>) => {
-    const images = pageImages.map((image, item) => item === index ? { ...image, ...change } : image)
-    persistMedia({ ...pageMedia, images })
+  const updateImage = (index: number, change: Partial<JournalImage>, save = true) => {
+    setMedia(current => {
+      const currentPage = current[mediaKey] ?? {}
+      const images = (currentPage.images ?? []).map(image => typeof image === 'string' ? { src: image, x: 16, y: 18, width: 68 } : image)
+      const next = { ...current, [mediaKey]: { ...currentPage, images: images.map((image, item) => item === index ? { ...image, ...change } : image) } }
+      mediaRef.current = next
+      if (save) {
+        try { localStorage.setItem(MEDIA_KEY, JSON.stringify(next)) } catch { /* storage full */ }
+        scheduleRemoteSave(dateKey, journalRef.current[dateKey] ?? [''], next)
+      }
+      return next
+    })
   }
 
   const beginImageGesture = (event: React.PointerEvent<HTMLElement>, index: number, mode: 'move' | 'resize') => {
@@ -228,13 +243,13 @@ export default function DailyJournal({ selectedDate }: { selectedDate: Date }) {
     const dx = (event.clientX - gesture.startX) / gesture.containerWidth * 100
     const dy = (event.clientY - gesture.startY) / gesture.containerHeight * 100
     if (gesture.mode === 'resize') {
-      updateImage(gesture.index, { width: Math.max(20, Math.min(92, gesture.width + dx)) })
+      updateImage(gesture.index, { width: Math.max(20, Math.min(92, gesture.width + dx)) }, false)
     } else {
       const currentWidth = pageImages[gesture.index]?.width ?? gesture.width
       updateImage(gesture.index, {
         x: Math.max(0, Math.min(100 - currentWidth, gesture.x + dx)),
         y: Math.max(0, Math.min(82, gesture.y + dy)),
-      })
+      }, false)
     }
   }
 
@@ -243,6 +258,7 @@ export default function DailyJournal({ selectedDate }: { selectedDate: Date }) {
     event.preventDefault()
     event.stopPropagation()
     imageGestureRef.current = null
+    commitMedia()
   }
 
   const changePage = (nextPage: number, direction: TurnDirection) => {
