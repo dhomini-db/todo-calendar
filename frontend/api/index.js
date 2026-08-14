@@ -7,6 +7,7 @@ const IS_PROD = process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV 
 const COOKIE_NAME = 'taskflow_session'
 const TOKEN_TTL_SECONDS = 2 * 60 * 60
 const MAX_JSON_BYTES = 32 * 1024
+const MAX_JOURNAL_BYTES = 3.5 * 1024 * 1024
 const loginAttempts = new Map()
 
 function securityHeaders(res) {
@@ -77,6 +78,7 @@ async function db() {
     await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS best_streak INTEGER NOT NULL DEFAULT 0`
     await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS last_completed_date DATE`
     await sql`CREATE TABLE IF NOT EXISTS follows (follower_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE, following_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), PRIMARY KEY(follower_id, following_id), CHECK(follower_id <> following_id))`
+    await sql`CREATE TABLE IF NOT EXISTS journal_entries (id BIGSERIAL PRIMARY KEY, user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE, entry_date DATE NOT NULL, pages JSONB NOT NULL DEFAULT '[""]'::jsonb, media JSONB NOT NULL DEFAULT '{}'::jsonb, updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), UNIQUE(user_id, entry_date))`
     initialized = true
   }
   return sql
@@ -126,15 +128,17 @@ async function streakData(sql,userId){
 export default async function handler(req, res) {
   try {
     securityHeaders(res)
+    const requestPath = new URL(req.url, 'http://localhost').pathname.replace(/^\/api/, '') || '/'
     const contentLength = Number(req.headers['content-length'] || 0)
-    if (contentLength > MAX_JSON_BYTES) return json(res, 413, { message:'Requisição muito grande' })
+    const requestLimit = requestPath === '/journal' ? MAX_JOURNAL_BYTES : MAX_JSON_BYTES
+    if (contentLength > requestLimit) return json(res, 413, { message:'Requisição muito grande' })
     if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
       const origin = req.headers.origin
       const expected = `https://${req.headers.host}`
       if (IS_PROD && origin && origin !== expected) return json(res, 403, { message:'Origem não permitida' })
     }
     const sql = await db()
-    const path = new URL(req.url, 'http://localhost').pathname.replace(/^\/api/, '') || '/'
+    const path = requestPath
     const method = req.method
 
     if (path === '/auth/register' && method === 'POST') {
@@ -163,6 +167,21 @@ export default async function handler(req, res) {
     if (path === '/users/me/password' && method === 'PUT') { const b=await body(req), next=validPassword(b.newPassword); if (!(await bcrypt.compare(b.currentPassword||'',user.password))) return json(res,400,{message:'Senha atual incorreta'}); if(next!==b.confirmNewPassword)return json(res,400,{message:'A confirmação não coincide'}); await sql.query('UPDATE users SET password=$1 WHERE id=$2',[await bcrypt.hash(next,12),id]); setSessionCookie(res,tokenFor(user)); return json(res,200,{message:'Senha alterada'}) }
 
     if(path==='/streak'&&method==='GET') return json(res,200,await streakData(sql,id))
+    if(path==='/journal'&&method==='GET'){
+      const date=validDate(req.query.date)
+      const rows=await sql.query('SELECT pages,media,updated_at FROM journal_entries WHERE user_id=$1 AND entry_date=$2',[id,date])
+      if(!rows[0]) return json(res,200,{found:false,pages:[''],media:{},updatedAt:null})
+      return json(res,200,{found:true,pages:rows[0].pages,media:rows[0].media,updatedAt:rows[0].updated_at})
+    }
+    if(path==='/journal'&&method==='PUT'){
+      const b=await body(req),date=validDate(b.date)
+      if(!Array.isArray(b.pages)||!b.pages.length||b.pages.length>30||b.pages.some(page=>typeof page!=='string'||page.length>20000)) throw new ClientError('Páginas do diário inválidas')
+      if(!b.media||typeof b.media!=='object'||Array.isArray(b.media)) throw new ClientError('Mídia do diário inválida')
+      const pagesJson=JSON.stringify(b.pages),mediaJson=JSON.stringify(b.media)
+      if(Buffer.byteLength(pagesJson)+Buffer.byteLength(mediaJson)>MAX_JOURNAL_BYTES) throw new ClientError('O diário ultrapassou o limite de armazenamento',413)
+      const rows=await sql.query(`INSERT INTO journal_entries(user_id,entry_date,pages,media) VALUES($1,$2,$3::jsonb,$4::jsonb) ON CONFLICT(user_id,entry_date) DO UPDATE SET pages=EXCLUDED.pages,media=EXCLUDED.media,updated_at=NOW() RETURNING updated_at`,[id,date,pagesJson,mediaJson])
+      return json(res,200,{saved:true,updatedAt:rows[0].updated_at})
+    }
     if(path==='/stats/dashboard'&&method==='GET'){
       const today=new Date(),end=isoDate(today),from=new Date(today);from.setUTCDate(today.getUTCDate()-29);const monthStart=end.slice(0,8)+'01',rows=await daily(sql,id,isoDate(from),end),by=new Map(rows.map(r=>[String(r.date).slice(0,10),pct(r)])),last30Days=[]
       for(let i=0;i<30;i++){const d=new Date(from);d.setUTCDate(from.getUTCDate()+i);const ds=isoDate(d);last30Days.push({date:ds,label:ds.slice(8,10)+'/'+ds.slice(5,7),percentage:by.get(ds)??null})}
