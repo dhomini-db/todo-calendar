@@ -4,7 +4,7 @@ import { enUS, ptBR } from 'date-fns/locale'
 import { useLanguage } from '../contexts/LanguageContext'
 
 type JournalStore = Record<string, string[]>
-type JournalImage = { src: string; flipped?: boolean; animated?: boolean; position?: 'left' | 'center' | 'right' }
+type JournalImage = { src: string; flipped?: boolean; x?: number; y?: number; width?: number }
 type JournalMedia = { drawing?: string; images?: Array<string | JournalImage> }
 type MediaStore = Record<string, JournalMedia>
 type TurnDirection = 'next' | 'prev'
@@ -51,10 +51,11 @@ export default function DailyJournal({ selectedDate }: { selectedDate: Date }) {
   const [selectedImage, setSelectedImage] = useState<number | null>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const drawingRef = useRef(false)
+  const imageGestureRef = useRef<{ index: number; mode: 'move' | 'resize'; startX: number; startY: number; x: number; y: number; width: number; containerWidth: number; containerHeight: number } | null>(null)
   const pages = useMemo(() => journal[dateKey] ?? [''], [journal, dateKey])
   const mediaKey = `${dateKey}:${page}`
   const pageMedia = media[mediaKey] ?? {}
-  const pageImages = (pageMedia.images ?? []).map(image => typeof image === 'string' ? { src: image, position: 'center' as const } : image)
+  const pageImages = (pageMedia.images ?? []).map(image => typeof image === 'string' ? { src: image, x: 16, y: 18, width: 68 } : { x: 16, y: 18, width: 68, ...image })
 
   useEffect(() => { setPage(0); setTurn(null); setTool('write'); setSelectedImage(null) }, [dateKey])
 
@@ -133,13 +134,49 @@ export default function DailyJournal({ selectedDate }: { selectedDate: Date }) {
     const valid = files.filter(file => file.type.startsWith('image/')).slice(0, Math.max(0, 4 - pageImages.length))
     if (!valid.length) return
     const images = await Promise.all(valid.map(compactImage))
-    persistMedia({ ...pageMedia, images: [...pageImages, ...images.map(src => ({ src, position: 'center' as const }))] })
+    persistMedia({ ...pageMedia, images: [...pageImages, ...images.map((src, index) => ({ src, x: 12 + index * 4, y: 18 + index * 4, width: 68 }))] })
     setSelectedImage(pageImages.length)
   }
 
   const updateImage = (index: number, change: Partial<JournalImage>) => {
     const images = pageImages.map((image, item) => item === index ? { ...image, ...change } : image)
     persistMedia({ ...pageMedia, images })
+  }
+
+  const beginImageGesture = (event: React.PointerEvent<HTMLElement>, index: number, mode: 'move' | 'resize') => {
+    event.preventDefault()
+    event.stopPropagation()
+    const container = event.currentTarget.closest('.journal-images') as HTMLElement | null
+    if (!container) return
+    const bounds = container.getBoundingClientRect()
+    const image = pageImages[index]
+    imageGestureRef.current = { index, mode, startX: event.clientX, startY: event.clientY, x: image.x ?? 16, y: image.y ?? 18, width: image.width ?? 68, containerWidth: bounds.width, containerHeight: bounds.height }
+    event.currentTarget.setPointerCapture(event.pointerId)
+    setSelectedImage(index)
+  }
+
+  const moveImageGesture = (event: React.PointerEvent<HTMLElement>) => {
+    const gesture = imageGestureRef.current
+    if (!gesture) return
+    event.preventDefault()
+    const dx = (event.clientX - gesture.startX) / gesture.containerWidth * 100
+    const dy = (event.clientY - gesture.startY) / gesture.containerHeight * 100
+    if (gesture.mode === 'resize') {
+      updateImage(gesture.index, { width: Math.max(20, Math.min(92, gesture.width + dx)) })
+    } else {
+      const currentWidth = pageImages[gesture.index]?.width ?? gesture.width
+      updateImage(gesture.index, {
+        x: Math.max(0, Math.min(100 - currentWidth, gesture.x + dx)),
+        y: Math.max(0, Math.min(82, gesture.y + dy)),
+      })
+    }
+  }
+
+  const endImageGesture = (event: React.PointerEvent<HTMLElement>) => {
+    if (!imageGestureRef.current) return
+    event.preventDefault()
+    event.stopPropagation()
+    imageGestureRef.current = null
   }
 
   const changePage = (nextPage: number, direction: TurnDirection) => {
@@ -173,7 +210,7 @@ export default function DailyJournal({ selectedDate }: { selectedDate: Date }) {
         <div className={`journal-page ${turn ? `turn-${turn}` : ''}`}>
           <div className="journal-page-top"><strong>{lang === 'en' ? 'Thoughts & ideas' : 'Pensamentos & ideias'}</strong><span>{lang === 'en' ? `Page ${page + 1} of ${pages.length}` : `Página ${page + 1} de ${pages.length}`}</span></div>
           <textarea value={pages[page] ?? ''} onFocus={() => setTool('write')} onPointerDown={() => setTool('write')} onChange={event => { const next = [...pages]; next[page] = event.target.value; persist(next) }} placeholder={lang === 'en' ? 'How was your day? Write down a thought, lesson or idea…' : 'Como foi o seu dia? Anote um pensamento, aprendizado ou ideia…'} aria-label={lang === 'en' ? 'Journal notes' : 'Anotações do diário'} />
-          {pageImages.length > 0 && <div className="journal-images">{pageImages.map((image, index) => <figure key={`${image.src.slice(-18)}-${index}`} className={`${selectedImage === index ? 'selected' : ''} position-${image.position ?? 'center'} ${image.animated ? 'animated' : ''}`} onClick={() => { setSelectedImage(index); setTool('write') }}><img src={image.src} className={image.flipped ? 'flipped' : ''} alt={lang === 'en' ? `Journal attachment ${index + 1}` : `Imagem anexada ${index + 1}`} />{selectedImage === index && <div className="journal-image-tools" role="toolbar" aria-label={lang === 'en' ? 'Image editing' : 'Edição da imagem'}><button type="button" onClick={event => { event.stopPropagation(); updateImage(index, { flipped: !image.flipped }) }}><span>↔</span>{lang === 'en' ? 'Flip' : 'Inverter'}</button><button type="button" className={image.animated ? 'active' : ''} onClick={event => { event.stopPropagation(); updateImage(index, { animated: !image.animated }) }}><span>✣</span>{lang === 'en' ? 'Animate' : 'Animar'}</button><button type="button" onClick={event => { event.stopPropagation(); const order = ['left', 'center', 'right'] as const; updateImage(index, { position: order[(order.indexOf(image.position ?? 'center') + 1) % order.length] }) }}><span>☷</span>{lang === 'en' ? 'Position' : 'Posição'}</button><button type="button" className="remove" onClick={event => { event.stopPropagation(); persistMedia({ ...pageMedia, images: pageImages.filter((_, item) => item !== index) }); setSelectedImage(null) }} aria-label={lang === 'en' ? 'Remove image' : 'Remover imagem'}>×</button></div>}</figure>)}</div>}
+          {pageImages.length > 0 && <div className="journal-images">{pageImages.map((image, index) => <figure key={`${image.src.slice(-18)}-${index}`} className={selectedImage === index ? 'selected' : ''} style={{ left: `${image.x ?? 16}%`, top: `${image.y ?? 18}%`, width: `${image.width ?? 68}%` }} onPointerDown={event => beginImageGesture(event, index, 'move')} onPointerMove={moveImageGesture} onPointerUp={endImageGesture} onPointerCancel={endImageGesture} onClick={() => { setSelectedImage(index); setTool('write') }}><img src={image.src} className={image.flipped ? 'flipped' : ''} draggable={false} alt={lang === 'en' ? `Journal attachment ${index + 1}` : `Imagem anexada ${index + 1}`} />{selectedImage === index && <><i className="journal-resize-handle handle-nw" onPointerDown={event => beginImageGesture(event, index, 'resize')} /><i className="journal-resize-handle handle-ne" onPointerDown={event => beginImageGesture(event, index, 'resize')} /><i className="journal-resize-handle handle-sw" onPointerDown={event => beginImageGesture(event, index, 'resize')} /><i className="journal-resize-handle handle-se" onPointerDown={event => beginImageGesture(event, index, 'resize')} /><div className="journal-image-tools" role="toolbar" aria-label={lang === 'en' ? 'Image editing' : 'Edição da imagem'} onPointerDown={event => event.stopPropagation()}><button type="button" onClick={event => { event.stopPropagation(); updateImage(index, { flipped: !image.flipped }) }}><span>↔</span>{lang === 'en' ? 'Flip' : 'Inverter'}</button><button type="button" className="remove" onClick={event => { event.stopPropagation(); persistMedia({ ...pageMedia, images: pageImages.filter((_, item) => item !== index) }); setSelectedImage(null) }} aria-label={lang === 'en' ? 'Remove image' : 'Remover imagem'}>×</button></div></>}</figure>)}</div>}
           <canvas ref={canvasRef} className={`journal-canvas tool-${tool}`} onPointerDown={beginStroke} onPointerMove={drawStroke} onPointerUp={endStroke} onPointerCancel={endStroke} />
           <span className="journal-saved">{lang === 'en' ? 'Saved automatically' : 'Salvo automaticamente'}</span>
         </div>
