@@ -45,13 +45,14 @@ body{background-attachment:scroll!important}
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
 
-/* Brave/Chromium: preserve the liquid-glass composition with a static, GPU-light surface. */
-.brave-performance .calendar-liquid-texture{
+/* Universal calendar background: the same stable, GPU-light composition on every browser. */
+.calendar-liquid-texture{
   animation:none!important;filter:none!important;mix-blend-mode:normal!important;
   transform:none!important;will-change:auto!important;opacity:.28!important
 }
-.brave-performance .calendar-particles{display:none!important}
-.brave-performance .calendar-ambient-glow{filter:none!important;opacity:.22!important}
+.calendar-particles{display:none!important}
+.calendar-ambient-glow{filter:none!important;opacity:.22!important}
+/* Remaining containment and glass reductions are Brave-specific. */
 .brave-performance .calendar-wrap,.brave-performance .daily-journal,
 .brave-performance .panel-area,.brave-performance .task-panel{
   backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
