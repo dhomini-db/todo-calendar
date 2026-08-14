@@ -69,11 +69,18 @@ export function useToggleTask(date: string) {
   })
 }
 
-export function useDeleteTask(date: string) {
-  const invalidate = useInvalidateAll(date)
+export function useDeleteTask(_date: string) {
+  const qc = useQueryClient()
   return useMutation({
     mutationFn: (id: number) => deleteTask(id),
-    onSuccess:  invalidate,
+    onSuccess: () => {
+      // Uma tarefa recorrente é removida de toda a série no backend.
+      // Limpar todos os dias evita que ocorrências antigas permaneçam no cache.
+      qc.invalidateQueries({ queryKey: ['tasks'] })
+      qc.invalidateQueries({ queryKey: ['summary'] })
+      qc.invalidateQueries({ queryKey: queryKeys.templates() })
+      qc.invalidateQueries({ queryKey: queryKeys.streak() })
+    },
   })
 }
 
