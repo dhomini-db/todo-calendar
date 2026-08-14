@@ -87,8 +87,10 @@ export default function TaskPanel({ selectedDate }: TaskPanelProps) {
   const interactedTasks = tasks.filter(t => t.interacted)
   const pct             = calcScore(tasks)
   const goodCount       = positiveTasks.filter(t => t.interacted && t.completed).length
-  const pendingCount    = tasks.filter(t => !t.completed).length
-  const nextTask        = orderedTasks.find(t => !t.completed)
+  // “Próxima atividade” representa somente algo positivo que o usuário deve fazer.
+  // Hábitos negativos são itens a evitar e nunca podem virar uma recomendação.
+  const pendingCount    = positiveTasks.filter(t => !t.completed).length
+  const nextTask        = positiveTasks.find(t => !t.completed)
   const nextMetadata    = nextTask ? parseTaskMetadata(nextTask.title) : null
   const plannedMinutes  = tasks.reduce((total, task) => {
     const { startTime: start, endTime: end } = parseTaskMetadata(task.title)
