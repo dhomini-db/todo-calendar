@@ -52,18 +52,16 @@ body{background-attachment:scroll!important}
 }
 .calendar-particles{display:none!important}
 .calendar-ambient-glow{filter:none!important;opacity:.22!important}
-/* Remaining containment and glass reductions are Brave-specific. */
-.brave-performance .calendar-wrap,.brave-performance .daily-journal,
-.brave-performance .panel-area,.brave-performance .task-panel{
+/* Keep the complete calendar composition identical in Safari, Brave and mobile browsers. */
+.calendar-wrap,.daily-journal,.panel-area,.task-panel{
   backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
   box-shadow:0 10px 30px rgba(0,0,0,.10)!important
 }
-.brave-performance .calendar-wrap,.brave-performance .daily-journal,
-.brave-performance .task-panel{
+.calendar-wrap,.daily-journal,.task-panel{
   contain:layout paint style
 }
-.brave-performance .daily-journal{content-visibility:auto;contain-intrinsic-size:760px}
-.brave-performance .cal-day,.brave-performance .task-item{
+.daily-journal{content-visibility:auto;contain-intrinsic-size:760px}
+.cal-day,.task-item{
   transition-duration:.1s!important;will-change:auto!important
 }
 `
