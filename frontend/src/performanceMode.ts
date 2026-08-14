@@ -2,8 +2,6 @@ const performanceStyle = document.createElement('style')
 performanceStyle.textContent = `
 body{background-attachment:scroll!important}
 .sidebar,.mobile-topbar,.calendar-wrap,.panel-area,.task-panel,.auth-card,.chart-card,.cfg-card,.conta-card,.profile-hero,.soc-rankings-wrap{
-  backdrop-filter:!important;
-  -webkit-backdrop-filter:!important;
   transform:translateZ(0);
 }
 .dash-card,.chart-summary-card,.graf-insight-card,.template-card,.soc-rank-card,.placeholder-stat-card,.conta-action-row,.profile-social-grid>*,.flm-row,.task-item,.add-form,.template-form,.recurrence-options,.streak-bar,.soc-info-bar,.conta-form,.cfg-expand,.chart-tooltip,.sidebar-user-menu{
@@ -46,6 +44,27 @@ body{background-attachment:scroll!important}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+/* Brave/Chromium: preserve the liquid-glass composition with a static, GPU-light surface. */
+.brave-performance .calendar-liquid-texture{
+  animation:none!important;filter:none!important;mix-blend-mode:normal!important;
+  transform:none!important;will-change:auto!important;opacity:.28!important
+}
+.brave-performance .calendar-particles{display:none!important}
+.brave-performance .calendar-ambient-glow{filter:none!important;opacity:.22!important}
+.brave-performance .calendar-wrap,.brave-performance .daily-journal,
+.brave-performance .panel-area,.brave-performance .task-panel{
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  box-shadow:0 10px 30px rgba(0,0,0,.10)!important
+}
+.brave-performance .calendar-page-content,.brave-performance .calendar-wrap,
+.brave-performance .daily-journal,.brave-performance .task-panel{
+  contain:layout paint style
+}
+.brave-performance .daily-journal{content-visibility:auto;contain-intrinsic-size:760px}
+.brave-performance .cal-day,.brave-performance .task-item{
+  transition-duration:.1s!important;will-change:auto!important
+}
 `
 document.head.appendChild(performanceStyle)
 
@@ -54,6 +73,13 @@ const syncPageVisibility = () => {
 }
 document.addEventListener('visibilitychange', syncPageVisibility, {passive:true})
 syncPageVisibility()
+
+const nav = navigator as Navigator & { brave?: { isBrave?: () => Promise<boolean> } }
+if (nav.brave?.isBrave) {
+  void nav.brave.isBrave().then(isBrave => {
+    if (isBrave) document.documentElement.classList.add('brave-performance')
+  }).catch(() => { /* browser detection is only a performance hint */ })
+}
 
 export {}
 
