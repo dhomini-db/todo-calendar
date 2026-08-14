@@ -57,8 +57,8 @@ body{background-attachment:scroll!important}
   backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
   box-shadow:0 10px 30px rgba(0,0,0,.10)!important
 }
-.brave-performance .calendar-page-content,.brave-performance .calendar-wrap,
-.brave-performance .daily-journal,.brave-performance .task-panel{
+.brave-performance .calendar-wrap,.brave-performance .daily-journal,
+.brave-performance .task-panel{
   contain:layout paint style
 }
 .brave-performance .daily-journal{content-visibility:auto;contain-intrinsic-size:760px}
