@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { format } from 'date-fns'
 import { enUS, ptBR } from 'date-fns/locale'
 import { useLanguage } from '../contexts/LanguageContext'
+import { getJournalEntry, saveJournalEntry } from '../api/tasks'
 
 type JournalStore = Record<string, string[]>
 type JournalImage = { src: string; flipped?: boolean; x?: number; y?: number; width?: number }
@@ -51,6 +52,10 @@ export default function DailyJournal({ selectedDate }: { selectedDate: Date }) {
   const [selectedImage, setSelectedImage] = useState<number | null>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const drawingRef = useRef(false)
+  const journalRef = useRef(journal)
+  const mediaRef = useRef(media)
+  const remoteReadyRef = useRef(false)
+  const remoteSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const imageGestureRef = useRef<{ index: number; mode: 'move' | 'resize'; startX: number; startY: number; x: number; y: number; width: number; containerWidth: number; containerHeight: number } | null>(null)
   const pages = useMemo(() => journal[dateKey] ?? [''], [journal, dateKey])
   const mediaKey = `${dateKey}:${page}`
@@ -59,10 +64,30 @@ export default function DailyJournal({ selectedDate }: { selectedDate: Date }) {
 
   useEffect(() => { setPage(0); setTurn(null); setTool('write'); setSelectedImage(null) }, [dateKey])
 
+  useEffect(() => { journalRef.current = journal }, [journal])
+  useEffect(() => { mediaRef.current = media }, [media])
+
+  const mediaForDate = (allMedia: MediaStore, date: string) => Object.fromEntries(
+    Object.entries(allMedia)
+      .filter(([key]) => key.startsWith(`${date}:`))
+      .map(([key, value]) => [key.slice(date.length + 1), value]),
+  )
+
+  const scheduleRemoteSave = (date: string, nextPages: string[], allMedia: MediaStore) => {
+    if (!remoteReadyRef.current) return
+    if (remoteSaveTimerRef.current) clearTimeout(remoteSaveTimerRef.current)
+    const remoteMedia = mediaForDate(allMedia, date)
+    remoteSaveTimerRef.current = setTimeout(() => {
+      void saveJournalEntry(date, nextPages, remoteMedia).catch(() => { /* cópia local permanece disponível */ })
+    }, 700)
+  }
+
   const persist = (nextPages: string[]) => {
     setJournal(current => {
       const next = { ...current, [dateKey]: nextPages }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+      journalRef.current = next
+      scheduleRemoteSave(dateKey, nextPages, mediaRef.current)
       return next
     })
   }
@@ -71,9 +96,50 @@ export default function DailyJournal({ selectedDate }: { selectedDate: Date }) {
     setMedia(current => {
       const next = { ...current, [mediaKey]: value }
       try { localStorage.setItem(MEDIA_KEY, JSON.stringify(next)) } catch { /* storage full: keep session usable */ }
+      mediaRef.current = next
+      scheduleRemoteSave(dateKey, journalRef.current[dateKey] ?? [''], next)
       return next
     })
   }
+
+  useEffect(() => {
+    let cancelled = false
+    remoteReadyRef.current = false
+    if (remoteSaveTimerRef.current) clearTimeout(remoteSaveTimerRef.current)
+
+    void getJournalEntry(dateKey).then(entry => {
+      if (cancelled) return
+      if (entry.found) {
+        const remotePages = entry.pages.length ? entry.pages : ['']
+        setJournal(current => {
+          const next = { ...current, [dateKey]: remotePages }
+          journalRef.current = next
+          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)) } catch { /* armazenamento local indisponível */ }
+          return next
+        })
+        setMedia(current => {
+          const withoutDate = Object.fromEntries(Object.entries(current).filter(([key]) => !key.startsWith(`${dateKey}:`))) as MediaStore
+          const remoteMedia = Object.fromEntries(Object.entries(entry.media ?? {}).map(([key, value]) => [`${dateKey}:${key}`, value as JournalMedia])) as MediaStore
+          const next = { ...withoutDate, ...remoteMedia }
+          mediaRef.current = next
+          try { localStorage.setItem(MEDIA_KEY, JSON.stringify(next)) } catch { /* armazenamento local indisponível */ }
+          return next
+        })
+      } else {
+        const localPages = journalRef.current[dateKey] ?? ['']
+        const localMedia = mediaForDate(mediaRef.current, dateKey)
+        if (localPages.some(value => value.trim()) || Object.keys(localMedia).length) {
+          void saveJournalEntry(dateKey, localPages, localMedia).catch(() => { /* tenta novamente na próxima edição */ })
+        }
+      }
+      remoteReadyRef.current = true
+    }).catch(() => { if (!cancelled) remoteReadyRef.current = true })
+
+    return () => {
+      cancelled = true
+      if (remoteSaveTimerRef.current) clearTimeout(remoteSaveTimerRef.current)
+    }
+  }, [dateKey])
 
   useEffect(() => {
     const canvas = canvasRef.current
