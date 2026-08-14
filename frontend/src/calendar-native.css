@@ -398,19 +398,22 @@
 .journal-canvas { position: absolute; z-index: 3; inset: 50px 20px 25px 30px; width: calc(100% - 50px); height: calc(100% - 75px); border-radius: 6px; pointer-events: none; touch-action: none; }
 .journal-canvas:not(.tool-write) { pointer-events: auto; cursor: crosshair; }
 .journal-canvas.tool-erase { cursor: cell; }
-.journal-images { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 8px; margin: 4px 3px 8px; }
-.journal-images figure { position: relative; width: 68%; min-height: 72px; margin: 0 auto; border: 1px solid rgba(31,41,55,.12); border-radius: 10px; background: rgba(255,255,255,.68); box-shadow: 0 5px 13px rgba(31,41,55,.10); transition: transform .25s ease, box-shadow .25s ease; }
-.journal-images figure.position-left { margin-left: 0; margin-right: auto; }
-.journal-images figure.position-right { margin-left: auto; margin-right: 0; }
+.journal-images { position: absolute; z-index: 2; inset: 50px 20px 25px 30px; overflow: hidden; pointer-events: none; }
+.journal-images figure { position: absolute; min-width: 72px; margin: 0; touch-action: none; user-select: none; pointer-events: auto; cursor: grab; border: 1px solid rgba(31,41,55,.12); border-radius: 10px; background: rgba(255,255,255,.68); box-shadow: 0 5px 13px rgba(31,41,55,.10); transition: box-shadow .2s ease; }
+.journal-images figure:active { cursor: grabbing; }
 .journal-images figure.selected { z-index: 5; box-shadow: 0 0 0 2px color-mix(in srgb,var(--accent) 65%,transparent), 0 10px 24px rgba(31,41,55,.16); }
-.journal-images figure.animated { animation: journalImageFloat 3.6s ease-in-out infinite; }
-.journal-images img { display: block; width: 100%; height: 110px; object-fit: cover; }
+.journal-images img { display: block; width: 100%; height: auto; max-height: 100%; object-fit: contain; border-radius: inherit; pointer-events: none; }
 .journal-images img.flipped { transform: scaleX(-1); }
-.journal-image-tools { position: absolute; left: 50%; bottom: 7px; display: flex; align-items: center; gap: 3px; padding: 4px; border: 1px solid rgba(255,255,255,.44); border-radius: 10px; background: rgba(250,250,252,.76); box-shadow: 0 7px 18px rgba(0,0,0,.15); backdrop-filter: blur(12px); transform: translateX(-50%); }
+.journal-image-tools { position: absolute; left: 50%; bottom: 7px; display: flex; align-items: center; gap: 3px; padding: 4px; border: 1px solid rgba(255,255,255,.44); border-radius: 10px; background: rgba(250,250,252,.76); box-shadow: 0 7px 18px rgba(0,0,0,.15); backdrop-filter: blur(12px); transform: translateX(-50%); cursor: default; }
 .journal-image-tools button { display: grid; place-items: center; gap: 1px; min-width: 40px; padding: 3px 5px; border: 0; border-radius: 7px; background: transparent; color: #20242b; font: 700 6px/1 inherit; cursor: pointer; }
 .journal-image-tools button:hover, .journal-image-tools button.active { background: rgba(31,41,55,.09); }
 .journal-image-tools button span { font-size: 13px; }
 .journal-image-tools button.remove { min-width: 25px; color: #dc2626; font-size: 16px; }
+.journal-resize-handle { position: absolute; z-index: 8; width: 11px; height: 11px; border: 2px solid #fff; border-radius: 50%; background: var(--accent); box-shadow: 0 2px 6px rgba(0,0,0,.22); touch-action: none; }
+.journal-resize-handle.handle-nw { left: -6px; top: -6px; cursor: nwse-resize; }
+.journal-resize-handle.handle-ne { right: -6px; top: -6px; cursor: nesw-resize; }
+.journal-resize-handle.handle-sw { left: -6px; bottom: -6px; cursor: nesw-resize; }
+.journal-resize-handle.handle-se { right: -6px; bottom: -6px; cursor: nwse-resize; }
 .journal-saved { position: relative; z-index: 4; display: block; color: #9ca1aa; font-size: 8px; text-align: right; pointer-events: none; }
 .journal-controls { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 12px; }
 .journal-controls button { min-width: 34px; height: 32px; padding: 0 12px; border: 1px solid var(--line-hi); border-radius: 999px; background: color-mix(in srgb, var(--surface) 74%, transparent); color: var(--text); font: 700 18px/1 inherit; cursor: pointer; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
