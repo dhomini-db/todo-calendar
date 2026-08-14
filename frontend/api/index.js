@@ -186,7 +186,16 @@ export default async function handler(req, res) {
     if (taskMatch) { const taskId=Number(taskMatch[1]); const rows=await sql.query('SELECT * FROM tasks WHERE id=$1 AND user_id=$2',[taskId,id]); if(!rows[0]) return json(res,404,{message:'Tarefa não encontrada'}); let out
       if(method==='PATCH'&&taskMatch[2]) out=(await sql.query('UPDATE tasks SET completed=NOT completed,interacted=true,updated_at=NOW() WHERE id=$1 RETURNING *',[taskId]))[0]
       else if(method==='PUT'){const b=await body(req); out=(await sql.query('UPDATE tasks SET title=$1,description=$2,date=$3,type=$4,interacted=true,updated_at=NOW() WHERE id=$5 AND user_id=$6 RETURNING *',[text(b.title,160,'Título'),optionalText(b.description,2000,'Descrição'),validDate(b.date),validType(b.type),taskId,id]))[0]}
-      else if(method==='DELETE'){ if(rows[0].source_template_id) await sql.query('UPDATE tasks SET skipped=true WHERE id=$1',[taskId]); else await sql.query('DELETE FROM tasks WHERE id=$1',[taskId]); return res.status(204).end() }
+      else if(method==='DELETE'){
+        const templateId=rows[0].source_template_id
+        if(templateId){
+          // Excluir uma ocorrência recorrente encerra a série inteira:
+          // remove todas as instâncias já geradas e impede novas gerações.
+          await sql.query('UPDATE tasks SET skipped=true,updated_at=NOW() WHERE user_id=$1 AND source_template_id=$2',[id,templateId])
+          await sql.query('DELETE FROM task_templates WHERE id=$1 AND user_id=$2',[templateId,id])
+        }else await sql.query('DELETE FROM tasks WHERE id=$1 AND user_id=$2',[taskId,id])
+        return res.status(204).end()
+      }
       else return json(res,405,{message:'Método não permitido'}); return json(res,200,taskOut(out)) }
     if (path === '/tasks/summary' && method === 'GET') { const y=Number(req.query.year),m=Number(req.query.month); const start=`${y}-${String(m).padStart(2,'0')}-01`; const end=new Date(Date.UTC(y,m,0)).toISOString().slice(0,10); const rows=await sql.query('SELECT date, count(*) FILTER (WHERE interacted) total, count(*) FILTER (WHERE interacted AND completed) completed FROM tasks WHERE user_id=$1 AND date BETWEEN $2 AND $3 AND skipped=false GROUP BY date',[id,start,end]); const out={}; for(const r of rows){const total=Number(r.total),completed=Number(r.completed),percentage=total?Math.round(completed*100/total):0; out[String(r.date).slice(0,10)]={date:String(r.date).slice(0,10),total,completed,percentage,color:percentage>=80?'GREEN':percentage>=60?'LIGHT_GREEN':percentage>=40?'YELLOW':'RED'}} return json(res,200,out) }
 
